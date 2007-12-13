@@ -1,1 +1,15 @@
-0.45 - First release
+0.46
+ - Add overloading of 'bool'.
+ - Change Rmpc_out_str and Rmpc_inp_str to allow use of streams other 
+   than STDOUT and STDIN.
+ - For compatibility with my other MPFR/GMP based perl modules, add
+   TRmpc_out_str and TRmpc_inp_str (which, for Math::MPC only, are 
+   aliased to Rmpc_out_str and Rmpc_inp_str respectively).
+ - Change 'Rmpc_get_prec' return to match 'mpc_get_prec' (which is a new
+   inclusion in mpc-0.4.6).
+ - Add 'Rmpc_get_prec2' and 'Rmpc_sin' (new in mpc-0.4.6).
+ - Remove the tests in the Makefile.PL that test for the presence of
+   a suitable compiler, GMP library, MPFR library and MPC library.
+
+0.45
+ - First release

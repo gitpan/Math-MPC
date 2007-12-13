@@ -38,8 +38,10 @@
     '='    => \&overload_copy,
     '""'   => \&overload_string,
     'abs'  => \&overload_abs,
+    'bool' => \&overload_true,
     'exp'  => \&overload_exp,
-    'sqrt' => \&overload_sqrt;
+    'sqrt' => \&overload_sqrt,
+    'sin'  => \&overload_sin;
 
     require Exporter;
     *import = \&Exporter::import;
@@ -51,7 +53,7 @@ MPC_RNDDU MPC_RNDDZ MPC_RNDZD MPC_RNDUD MPC_RNDUU MPC_RNDUZ MPC_RNDZU MPC_RNDZZ
 Rmpc_set_default_rounding_mode Rmpc_get_default_rounding_mode
 Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
 Rmpc_set_re_prec Rmpc_set_im_prec
-Rmpc_get_prec Rmpc_get_re_prec Rmpc_get_im_prec
+Rmpc_get_prec Rmpc_get_prec2 Rmpc_get_re_prec Rmpc_get_im_prec
 RMPC_RE RMPC_IM RMPC_INEX_RE RMPC_INEX_IM
 Rmpc_clear Rmpc_clear_ptr Rmpc_clear_mpc
 Rmpc_deref4 Rmpc_get_str
@@ -68,11 +70,13 @@ Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
 Rmpc_div Rmpc_div_ui Rmpc_ui_div Rmpc_div_fr Rmpc_sqrt Rmpc_div_2exp
 Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp 
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
-Rmpc_out_str Rmpc_inp_str c_string r_string i_string
+Rmpc_out_str Rmpc_inp_str c_string r_string i_string 
+TRmpc_out_str TRmpc_inp_str
 Rmpc_random Rmpc_random2
+Rmpc_sin
 );
 
-    $Math::MPC::VERSION = '0.45';
+    $Math::MPC::VERSION = '0.46';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
@@ -82,7 +86,7 @@ MPC_RNDDU MPC_RNDDZ MPC_RNDZD MPC_RNDUD MPC_RNDUU MPC_RNDUZ MPC_RNDZU MPC_RNDZZ
 Rmpc_set_default_rounding_mode Rmpc_get_default_rounding_mode
 Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
 Rmpc_set_re_prec Rmpc_set_im_prec
-Rmpc_get_prec Rmpc_get_re_prec Rmpc_get_im_prec
+Rmpc_get_prec Rmpc_get_prec2 Rmpc_get_re_prec Rmpc_get_im_prec
 RMPC_RE RMPC_IM RMPC_INEX_RE RMPC_INEX_IM
 Rmpc_clear Rmpc_clear_ptr Rmpc_clear_mpc
 Rmpc_deref4 Rmpc_get_str
@@ -100,8 +104,13 @@ Rmpc_div Rmpc_div_ui Rmpc_ui_div Rmpc_div_fr Rmpc_sqrt Rmpc_div_2exp
 Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp 
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string
+TRmpc_out_str TRmpc_inp_str
 Rmpc_random Rmpc_random2
+Rmpc_sin
 )]);
+
+*TRmpc_out_str = \&Rmpc_out_str;
+*TRmpc_inp_str = \&Rmpc_inp_str;
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
@@ -250,9 +259,20 @@ sub new {
 }
 
 sub Rmpc_out_str {
-    if(@_ == 4) { return _Rmpc_out_str($_[0], $_[1], $_[2], $_[3]) }
-    elsif(@_ == 5) { return _Rmpc_out_str2($_[0], $_[1], $_[2], $_[3], $_[4]) }
-    else {die "Wrong number of arguments supplied to Rmpc_out_str()"}
+    if(@_ == 5) {
+      die "Inappropriate 4th arg supplied to Rmpc_out_str" if _itsa($_[3]) != 10;
+      return _Rmpc_out_str($_[0], $_[1], $_[2], $_[3], $_[4]);
+    }
+    if(@_ == 6) {
+      if(_itsa($_[3]) == 10) {return _Rmpc_out_strS($_[0], $_[1], $_[2], $_[3], $_[4], $_[5])}
+      die "Incorrect args supplied to Rmpc_out_str" if _itsa($_[4]) != 10;
+      return _Rmpc_out_strP($_[0], $_[1], $_[2], $_[3], $_[4], $_[5]);
+    }
+    if(@_ == 7) {
+      die "Inappropriate 5th arg supplied to Rmpc_out_str" if _itsa($_[4]) != 10;
+      return _Rmpc_out_strPS($_[0], $_[1], $_[2], $_[3], $_[4], $_[5], $_[6]);
+    }
+    die "Wrong number of arguments supplied to Rmpc_out_str()";
 }
 
 
@@ -264,12 +284,21 @@ __END__
 
 Math::MPC - perl interface to the MPC (multi precision complex) library.
 
+=head1 DEPENDENCIES
+
+   This module needs the MPC, MPFR and GMP C libraries. (Install GMP
+   first, followed by MPFR, followed by MPC.)
+
+   The GMP library is availble from http://swox.com/gmp/
+   The MPFR library is available from http://www.mpfr.org/
+   The MPC library is available from
+    http://www.lix.polytechnique.fr/Labo/Andreas.Enge/Mpc.html
+
 =head1 DESCRIPTION
 
    A multiple precision complex number module utilising the MPC library.
    Basically, this module simply wraps the 'mpc' complex number functions
-   provided by that library - available from:
-   http://www.loria.fr/~zimmerma/software/mpc.html
+   provided by that library.
    Operator overloading is also available.
    The following documentation heavily plagiarises the mpc documentation.
    (Believe the mpc docs in preference to these docs if/when there's a 
@@ -429,13 +458,16 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $ui = Rmpc_get_default_prec();
     Returns the current default MPC precision in bits.
 
+   $ui = Rmpc_get_prec($op);
+    If the real and imaginary part of $op have the same precision,
+    it is returned. Otherwise 0 is returned.
+
    $ui = Rmpc_get_re_prec($op);
    $ui = Rmpc_get_im_prec($op)
-   ($re_prec, $im_prec) = Rmpc_get_prec($op);
+   ($re_prec, $im_prec) = Rmpc_get_prec2($op);
     Get (respectively) the precision of the real part of $op, the
     precision of the imaginary part of $op, or an array containing
-    both real and imaginary parts of $op. (There are currently no
-    corresponding MPC library functions.)
+    both real and imaginary parts of $op.
    
    $rop = Math::MPC->new();
    $rop = Math::MPC::new();
@@ -696,8 +728,8 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    I-O FUNCTIONS
    
-   $ul = Rmpc_in_str($rop, $base, $rnd);
-    Input a string in base $base from STDIN, rounded according to $rnd, 
+   $ul = Rmpc_inp_str($rop, $stream, $base, $rnd);
+    Input a string in base $base from $stream, rounded according to $rnd, 
     and put the read complex in $rop. Each of the real and imaginary 
     parts should be of the form X@Ym or, if the base is 10 or less, 
     alternatively XeY or XEY. (X is the mantissa, Y is the exponent.
@@ -706,20 +738,19 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     the imaginary part. The argument $base may be in the range 2 to 36.
     Return the number of bytes read, or if an error occurred, return 0.
 
-   $ul = Rmpc_out_str($op, $base, $digits, $rnd [, $ending]);
-    # This function segfaults on some architectures - better to use
-    # c_string (or r_string and i_string) functions instead.
-    Output $op to STDOUT, in base $base, rounded according to $rnd. First
+   $ul = Rmpc_out_str([$prefix], $stream, $base, $digits, $op, $rnd [, $suffix]);
+    This function changed from 1st release (version 0.45) of Math::MPC. 
+    Output $op to $stream, in base $base, rounded according to $rnd. First
     the real part is printed, followed by the imaginary part. The base may
     vary from 2 to 36.  Print at most $digits significant digits for each
     part, or if $digits is 0, the maximum number of digits accurately 
     representable by $op. In addition to the significant digits, a decimal
     point at the right of the first digit and a trailing exponent, in the
     form eYYY , are printed.  (If $base is greater than 10, "@" will be
-    used as exponent delimiter.) $ending is an optional fourth argument
-    containing a string (eg "\n") that will be appended to the output of
-    $op. Return the number of characters written. (Characters in $ending
-    are not included in the count.)
+    used as exponent delimiter.) $prefix and $suffix are optional
+    arguments containing a string that will be prepended/appended to the
+    output of $op. Return the number of bytes written. (The contents of 
+    $prefix and $suffix are not included in the count.)
 
 
    #############

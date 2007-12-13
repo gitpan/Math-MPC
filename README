@@ -4,20 +4,13 @@ The MPC library is a C library for multiple-precision complex number
 computations with exact rounding. It is based on the MPFR C library 
 which, in turn, is based on the GMP C library.
 
-The main goal of MPFR is to provide a library for multiple-precision
-floating-point computation which is both efficient and has a 
-well-defined semantics. It copies the good ideas from the
-ANSI/IEEE-754 standard for double-precision floating-point
-arithmetic (53-bit mantissa).
-
-It also offers a wide range of trig, log, and other functions, and
-constants.
-
 MPC, like MPFR and GMP, is free. It is distributed under the
 GNU Lesser General Public License (GNU Lesser GPL).
 
 Because this module wraps the MPC functions, it requires that the
-MPC library, the GMP library and the MPFR library have been installed.
+MPC library (version 0.4.6 or later), the GMP library (version 4.2
+or later) and the MPFR library (version 2.3.0 or later) have been
+installed. 
 
 For the GMP library see:
 http://swox.com/gmp
@@ -28,7 +21,9 @@ Do not use the (outdated) MPFR library source that ships with the
 GMP source.
 
 For the MPC library see:
-http://www.loria.fr/~zimmerma/software/mpc.html
+http://www.lix.polytechnique.fr/Labo/Andreas.Enge/Mpc.html
+
+You'll also need to have Math::MPFR (version 2.01 or later) installed.
 
 To build this module you need perl 5.6.0 or later. I'm not sure of all
 the requirements to get it to build with earlier versions of perl, but
@@ -89,7 +84,7 @@ libmpfr.lib, libgcc.lib, libcoldname.lib) and then run:
 
 perl Makefile.pl INC="-IC:/path/to/gmp_includes -I/path/to/mpfr_includes -IC:/path/to/mpc_include"
     LIBS="-LC:/path/to/mpc_lib -lmpc -LC:/path/to/gcc_lib -lgcc -LC:/path/to/coldname_lib -lcoldname
-    -L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
+    -LC:/path/to/mpfr_lib -lmpfr -LC:/path/to/gmp_lib -lgmp"
 
 
 

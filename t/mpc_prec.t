@@ -36,12 +36,21 @@ $ok .= 'l' if Rmpc_get_im_prec($mpc5) == 200;
 $ok .= 'm' if Rmpc_get_re_prec($mpc6) == 150;
 $ok .= 'n' if Rmpc_get_im_prec($mpc6) == 180;
 
-my($re_prec, $im_prec) = Rmpc_get_prec($mpc6);
+my($re_prec, $im_prec) = Rmpc_get_prec2($mpc6);
 
 $ok .= 'o' if $re_prec == 150;
 $ok .= 'p' if $im_prec == 180;
 
-if($ok eq 'abcdefghijklmnop') {print "ok 1\n"}
+my $prec = Rmpc_get_prec($mpc6);
+$ok .= 'q' if !$prec;
+
+$prec = Rmpc_get_prec($mpc5);
+$ok .= 'r' if $prec == 200;
+
+$prec = Rmpc_get_prec($mpc4);
+$ok .= 's' if $prec == 100;
+
+if($ok eq 'abcdefghijklmnopqrs') {print "ok 1\n"}
 else {print "not ok 1 $ok\n"}
 
 $ok = '';

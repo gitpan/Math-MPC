@@ -51,11 +51,14 @@ void Rmpc_set_im_prec(mpc_t * p, SV * prec) {
      mpfr_set_prec(MPC_IM(*p), SvUV(prec));
 }
 
-void Rmpc_get_prec(mpc_t * x) {
+SV * Rmpc_get_prec(mpc_t * x) {
+     return newSVuv(mpc_get_prec(*x));
+}
+
+void Rmpc_get_prec2(mpc_t * x) {
      Inline_Stack_Vars;
      mp_prec_t re, im;
-     re = mpfr_get_prec(MPC_RE(*x));
-     im = mpfr_get_prec(MPC_IM(*x));
+     mpc_get_prec2(&re, &im, *x);
      Inline_Stack_Reset;
      Inline_Stack_Push(sv_2mortal(newSVuv(re)));
      Inline_Stack_Push(sv_2mortal(newSVuv(im)));
@@ -619,27 +622,52 @@ void Rmpc_exp(mpc_t * a, mpc_t * b, SV * round) {
      mpc_exp(*a, *b, SvUV(round));
 }
 
-SV * _Rmpc_out_str(mpc_t * p, SV * base, SV * dig, SV * round) {
-     unsigned long ret;
+SV * _Rmpc_out_str(FILE * stream, SV * base, SV * dig, mpc_t * p, SV * round) {
+     size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpc_out_str is out of allowable range (must be between 2 and 36 inclusive)");
-     ret = mpc_out_str(stdout, SvUV(base), SvUV(dig), *p, SvUV(round));
-     fflush(stdout);
+     ret = mpc_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     fflush(stream);
      return newSVuv(ret);
 }
 
-SV * Rmpc_inp_str(mpc_t * p, SV * base, SV * round) {
-     if(SvIV(base) < 2 || SvIV(base) > 36)
-       croak("2nd argument supplied to Rmpc_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
-     return newSVuv(mpc_inp_str(*p, stdin, SvUV(base), SvUV(round)));
+SV * _Rmpc_out_strS(FILE * stream, SV * base, SV * dig, mpc_t * p, SV * round, SV * suff) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpc_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     ret = mpc_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     fflush(stream);
+     fprintf(stream, "%s", SvPV_nolen(suff));
+     fflush(stream);
+     return newSVuv(ret);
 }
 
-SV * _Rmpc_out_str2(mpc_t * p, SV * base, SV * dig, SV * round, SV * extra) {
-     unsigned long ret;
-     if(SvIV(base) < 2 || SvIV(base) > 36)
-       croak("2nd argument supplied to Rmpc_out_str is out of allowable range (must be between 2 and 36 inclusive)");
-     ret = mpc_out_str(stdout, SvUV(base), SvUV(dig), *p, SvUV(round));
-     printf("%s", SvPV_nolen(extra));
-     fflush(stdout);
+SV * _Rmpc_out_strP(SV * pre, FILE * stream, SV * base, SV * dig, mpc_t * p, SV * round) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpc_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     fprintf(stream, "%s", SvPV_nolen(pre));
+     fflush(stream);
+     ret = mpc_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     fflush(stream);
+     return newSVuv(ret);
+}
+
+SV * _Rmpc_out_strPS(SV * pre, FILE * stream, SV * base, SV * dig, mpc_t * p, SV * round, SV * suff) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpc_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     fprintf(stream, "%s", SvPV_nolen(pre));
+     fflush(stream);
+     ret = mpc_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     fflush(stream);
+     fprintf(stream, "%s", SvPV_nolen(suff));
+     fflush(stream);
+     return newSVuv(ret);
+}
+
+
+SV * Rmpc_inp_str(mpc_t * p, FILE * stream, SV * base, SV * round) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
+     ret = mpc_inp_str(*p, stream, (int)SvIV(base), SvUV(round));
+     fflush(stream);
      return newSVuv(ret);
 }
 
@@ -649,6 +677,18 @@ void Rmpc_random(mpc_t * p) {
 
 void Rmpc_random2(mpc_t * p, SV * s, SV * exp) {
      mpc_random2(*p, SvIV(s), SvUV(exp));
+}
+
+void Rmpc_sin(mpc_t * rop, mpc_t * op, SV * round) {
+     mpc_sin(*rop, *op, SvUV(round));
+}
+
+SV * overload_true(mpc_t *a, SV *second, SV * third) {
+     if(
+       ( mpfr_nan_p(MPC_RE(*a)) || !mpfr_cmp_ui(MPC_RE(*a), 0) ) &&
+       ( mpfr_nan_p(MPC_IM(*a)) || !mpfr_cmp_ui(MPC_IM(*a), 0) )
+       ) return newSVuv(0);
+     return newSVuv(1);
 }
 
 SV * overload_mul(mpc_t * a, SV * b, SV * third) {
@@ -1627,6 +1667,22 @@ SV * overload_exp(mpc_t * p, SV * second, SV * third) {
      return obj_ref;
 }
 
+SV * overload_sin(mpc_t * p, SV * second, SV * third) {
+     mpc_t * mpc_t_obj;
+     SV * obj_ref, * obj;
+
+     New(1, mpc_t_obj, 1, mpc_t);
+     if(mpc_t_obj == NULL) croak("Failed to allocate memory in overload_sin function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "Math::MPC");
+     mpc_init(*mpc_t_obj);
+
+     mpc_sin(*mpc_t_obj, *p, _perl_default_rounding_mode);
+     sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
 void _get_r_string(mpc_t * p, SV * base, SV * n_digits, SV * round) {
      Inline_Stack_Vars;
      char * out;
@@ -1994,14 +2050,18 @@ Rmpc_set_im_prec (p, prec)
         /* must have used dXSARGS; list context implied */
 	return; /* assume stack size is correct */
 
-void
+SV *
 Rmpc_get_prec (x)
+	mpc_t *	x
+
+void
+Rmpc_get_prec2 (x)
 	mpc_t *	x
 	PREINIT:
 	I32* temp;
 	PPCODE:
 	temp = PL_markstack_ptr++;
-	Rmpc_get_prec(x);
+	Rmpc_get_prec2(x);
 	if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
 	  PL_markstack_ptr = temp;
@@ -2652,25 +2712,47 @@ Rmpc_exp (a, b, round)
 	return; /* assume stack size is correct */
 
 SV *
-_Rmpc_out_str (p, base, dig, round)
-	mpc_t *	p
+_Rmpc_out_str (stream, base, dig, p, round)
+	FILE *	stream
 	SV *	base
 	SV *	dig
+	mpc_t *	p
 	SV *	round
 
 SV *
-Rmpc_inp_str (p, base, round)
-	mpc_t *	p
+_Rmpc_out_strS (stream, base, dig, p, round, suff)
+	FILE *	stream
 	SV *	base
+	SV *	dig
+	mpc_t *	p
+	SV *	round
+	SV *	suff
+
+SV *
+_Rmpc_out_strP (pre, stream, base, dig, p, round)
+	SV *	pre
+	FILE *	stream
+	SV *	base
+	SV *	dig
+	mpc_t *	p
 	SV *	round
 
 SV *
-_Rmpc_out_str2 (p, base, dig, round, extra)
-	mpc_t *	p
+_Rmpc_out_strPS (pre, stream, base, dig, p, round, suff)
+	SV *	pre
+	FILE *	stream
 	SV *	base
 	SV *	dig
+	mpc_t *	p
 	SV *	round
-	SV *	extra
+	SV *	suff
+
+SV *
+Rmpc_inp_str (p, stream, base, round)
+	mpc_t *	p
+	FILE *	stream
+	SV *	base
+	SV *	round
 
 void
 Rmpc_random (p)
@@ -2705,6 +2787,30 @@ Rmpc_random2 (p, s, exp)
         }
         /* must have used dXSARGS; list context implied */
 	return; /* assume stack size is correct */
+
+void
+Rmpc_sin (rop, op, round)
+	mpc_t *	rop
+	mpc_t *	op
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpc_sin(rop, op, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+overload_true (a, second, third)
+	mpc_t *	a
+	SV *	second
+	SV *	third
 
 SV *
 overload_mul (a, b, third)
@@ -2804,6 +2910,12 @@ overload_abs (p, second, third)
 
 SV *
 overload_exp (p, second, third)
+	mpc_t *	p
+	SV *	second
+	SV *	third
+
+SV *
+overload_sin (p, second, third)
 	mpc_t *	p
 	SV *	second
 	SV *	third

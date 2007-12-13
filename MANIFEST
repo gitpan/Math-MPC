@@ -6,9 +6,7 @@ MPC.xs
 INLINE.h
 README
 CHANGES
-check.c
-comp.c
-version.c
+t/basic.t
 t/get_str.t
 t/mpc_64.t
 t/mpc_add.t
@@ -16,9 +14,13 @@ t/mpc_cmp.t
 t/mpc_mpfr.t
 t/mpc_mul.t
 t/mpc_new.t
-t/out_str.t
+t/out_str1.t
+t/out_str2.t
 t/mpc_overload.t
 t/mpc_prec.t
 t/mpc_random.t
 t/mpc_round.t
+t/mpc_trig.t
+t/bool.t
+t/pod.t
 typemap
