@@ -1,3 +1,14 @@
+0.50
+ - Add Rmpc_log, Rmpc_cos, Rmpc_tan, Rmpc_sinh, Rmpc_cosh, and
+   Rmpc_tanh - all of which became available with mpc-0.5.
+ - Add log and cos overloading.
+ - Remove (the need for) INLINE.h
+ - Add mpfr_v and gmp_v functions (not exported).
+ - mpc_out_str changed with mpc-0.5. The tests in out_str1.t and
+   out_str2.t were changed accordingly.
+ - Bring Rmpc_get_str in line with the changed formatting of 
+   mpc_out_str that occurred with mpc-0.5.
+
 0.46
  - Add overloading of 'bool'.
  - Change Rmpc_out_str and Rmpc_inp_str to allow use of streams other 

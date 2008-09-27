@@ -1,12 +1,10 @@
-
 MANIFEST
 Makefile.PL
 MPC.pm
 MPC.xs
-INLINE.h
 README
 CHANGES
-t/basic.t
+t/aa_basic.t
 t/get_str.t
 t/mpc_64.t
 t/mpc_add.t

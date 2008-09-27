@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPC qw(:mpc);
 
-print "1..6\n";
+print "1..7\n";
 
 Rmpc_set_default_prec(500);
 Rmpfr_set_default_prec(500);
@@ -437,8 +437,7 @@ $ok .= 'i' if $mpfr1 > -1 && $mpfr1 < -0.9999999;
 RMPC_IM($mpfr1, $mpc1, MPC_RNDNN);
 $ok .= 'j' if $mpfr1 > 0 && $mpfr1 < 0.0000001;
 
-my $mpc3 = Math::MPC->new();
-$mpc3 = exp($mpc2);
+my $mpc3 = exp($mpc2);
 
 RMPC_RE($mpfr1, $mpc3, MPC_RNDNN);
 $ok .= 'k' if $mpfr1 > -1 && $mpfr1 < -0.9999999;
@@ -449,6 +448,25 @@ if($ok eq 'abcdefghijkl') {print "ok 6\n"}
 else {print "not ok 6\n"}
 
 $ok = ''; 
+
+my $log = log(exp(Math::MPC->new(8.5, 0)));
+
+RMPC_RE($mpfr1, $log, MPC_RNDNN);
+$ok .= 'a' if $mpfr1 > 8.499999 && $mpfr1 < 8.500001;
+RMPC_IM($mpfr1, $log, MPC_RNDNN);
+$ok .= 'b' if $mpfr1 == 0;
+
+Rmpc_log($log, Math::MPC->new(1, 0), MPC_RNDNN);
+
+RMPC_RE($mpfr1, $log, MPC_RNDNN);
+$ok .= 'c' if $mpfr1 == 0;
+RMPC_IM($mpfr1, $log, MPC_RNDNN);
+$ok .= 'd' if $mpfr1 == 0;
+
+if($ok eq 'abcd') {print "ok 7\n"}
+else {print "not ok 7\n"}
+
+
 
 
 

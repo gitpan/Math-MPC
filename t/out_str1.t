@@ -14,26 +14,26 @@ my $ok = '';
 
 my $ret = TRmpc_out_str(*STDOUT, 16, 0, $string, MPC_RNDNN);
 
-if($ret == 63) {$ok .= 'a'}
+if($ret == 64) {$ok .= 'a'}
 else {print "\nReturned: ", $ret, "\n"}
 
 print "\n";
 
 $ret = TRmpc_out_str(*STDOUT, 16, 0, $string, MPC_RNDNN, " \n");
 
-if($ret == 63) {$ok .= 'b'}
+if($ret == 64) {$ok .= 'b'}
 else {print "Returned: ", $ret, "\n"}
 
 $ret = TRmpc_out_str("hello world ", *STDOUT, 16, 0, $string, MPC_RNDNN);
 
-if($ret == 63) {$ok .= 'c'}
+if($ret == 64) {$ok .= 'c'}
 else {print "Returned: ", $ret, "\n"}
 
 print "\n";
 
 $ret = TRmpc_out_str("hello world ", *STDOUT, 16, 0, $string, MPC_RNDNN, " \n");
 
-if($ret == 63) {$ok .= 'd'}
+if($ret == 64) {$ok .= 'd'}
 else {print "Returned: ", $ret, "\n"}
 
 if($ok eq 'abcd') {print "ok 1 \n"}

@@ -94,3 +94,7 @@ $ok .= 'd' if Rmpfr_nan_p($mpfr);
 if($ok eq 'abcd') {print "ok 3\n"}
 else {print "not ok 3 $ok\n"}
 
+# Not yet implemented
+#if(RMPC_MAX_PREC($mpc6) > 0) {print "ok 4\n"}
+#else {print "not ok 4: ", RMPC_MAX_PREC($mpc6), "\n"}
+

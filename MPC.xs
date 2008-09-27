@@ -1,20 +1,21 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include "INLINE.h"
+
 #include <stdio.h>
+
+#if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
+#ifndef _MSC_VER
+#include <inttypes.h>
+#endif
+#endif
+
 #include <gmp.h>
 #include <mpfr.h>
 #include <mpc.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable:4700 4715 4716)
-#endif
-
-#if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
-#ifndef _MSC_VER
-#include <inttypes.h>
-#endif
 #endif
 
 #ifdef OLDPERL
@@ -56,14 +57,15 @@ SV * Rmpc_get_prec(mpc_t * x) {
 }
 
 void Rmpc_get_prec2(mpc_t * x) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mp_prec_t re, im;
      mpc_get_prec2(&re, &im, *x);
-     Inline_Stack_Reset;
-     Inline_Stack_Push(sv_2mortal(newSVuv(re)));
-     Inline_Stack_Push(sv_2mortal(newSVuv(im)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     // sp = mark; // not needed
+     EXTEND(SP, 2);
+     ST(0) = sv_2mortal(newSVuv(re));
+     ST(1) = sv_2mortal(newSVuv(im));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 SV * Rmpc_get_im_prec(mpc_t * x) {
@@ -203,12 +205,12 @@ SV * Rmpc_init3_nobless(SV * prec_r, SV * prec_i) {
 }
 
 void Rmpc_init_set(mpc_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set function");
@@ -218,19 +220,19 @@ void Rmpc_init_set(mpc_t * q, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpc_init_set_ui(SV * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set_ui function");
@@ -241,19 +243,19 @@ void Rmpc_init_set_ui(SV * q, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpc_init_set_ui_ui(SV * q_r, SV * q_i, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set_ui_ui function");
@@ -263,19 +265,19 @@ void Rmpc_init_set_ui_ui(SV * q_r, SV * q_i, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpc_init_set_si_si(SV * q_r, SV * q_i, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set_si_si function");
@@ -285,19 +287,19 @@ void Rmpc_init_set_si_si(SV * q_r, SV * q_i, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpc_init_set_ui_fr(SV * q_r, mpfr_t * q_i, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set_ui_fr function");
@@ -307,19 +309,19 @@ void Rmpc_init_set_ui_fr(SV * q_r, mpfr_t * q_i, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpc_init_set_nobless(mpc_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set_nobless function");
@@ -329,19 +331,19 @@ void Rmpc_init_set_nobless(mpc_t * q, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpc_init_set_ui_nobless(SV * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set_ui_nobless function");
@@ -352,19 +354,19 @@ void Rmpc_init_set_ui_nobless(SV * q, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpc_init_set_ui_ui_nobless(SV * q_r, SV * q_i, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set_ui_ui_nobless function");
@@ -374,19 +376,19 @@ void Rmpc_init_set_ui_ui_nobless(SV * q_r, SV * q_i, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpc_init_set_si_si_nobless(SV * q_r, SV * q_i, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set_si_si_nobless function");
@@ -396,19 +398,19 @@ void Rmpc_init_set_si_si_nobless(SV * q_r, SV * q_i, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK;
+     XSRETURN(2);
 }
 
 void Rmpc_init_set_ui_fr_nobless(SV * q_r, mpfr_t * q_i, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in Rmpc_init_set_ui_fr_nobless function");
@@ -418,10 +420,10 @@ void Rmpc_init_set_ui_fr_nobless(SV * q_r, mpfr_t * q_i, SV * round) {
 
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 SV * Rmpc_set(mpc_t * p, mpc_t * q, SV * round) {
@@ -457,6 +459,7 @@ SV * Rmpc_set_ui_fr(mpc_t * p, SV * q_r, mpfr_t * q_i, SV * round) {
 }
 
 void Rmpc_set_uj_uj(mpc_t * a, SV * uj1, SV * uj2, SV * round) {
+#ifdef USE_64_BIT_INT
      mpfr_t temp;
      mpfr_init2(temp, mpfr_get_prec(MPC_IM(*a)));
 #ifdef _MSC_VER
@@ -473,9 +476,13 @@ void Rmpc_set_uj_uj(mpc_t * a, SV * uj1, SV * uj2, SV * round) {
 #endif
      mpc_add_fr(*a, *a, temp, SvUV(round));
      mpfr_clear(temp);
+#else
+     croak("Rmpc_set_uj_uj() not implemented on this build of perl");
+#endif
 }
 
 void Rmpc_set_sj_sj(mpc_t * a, SV * sj1, SV * sj2, SV * round) {
+#ifdef USE_64_BIT_INT
      mpfr_t temp;
      mpfr_init2(temp, mpfr_get_prec(MPC_IM(*a)));
 #ifdef _MSC_VER
@@ -492,6 +499,9 @@ void Rmpc_set_sj_sj(mpc_t * a, SV * sj1, SV * sj2, SV * round) {
 #endif
      mpc_add_fr(*a, *a, temp, SvUV(round));
      mpfr_clear(temp);
+#else
+     croak("Rmpfr_set_sj_sj() not implemented on this build of perl");
+#endif
 }
 
 void Rmpc_set_ld_ld(mpc_t * a, SV * ld1, SV * ld2, SV * round) {
@@ -622,6 +632,10 @@ void Rmpc_exp(mpc_t * a, mpc_t * b, SV * round) {
      mpc_exp(*a, *b, SvUV(round));
 }
 
+void Rmpc_log(mpc_t * rop, mpc_t * op, SV * round) {
+     mpc_log(*rop, *op, SvUV(round));
+}
+
 SV * _Rmpc_out_str(FILE * stream, SV * base, SV * dig, mpc_t * p, SV * round) {
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpc_out_str is out of allowable range (must be between 2 and 36 inclusive)");
@@ -681,6 +695,26 @@ void Rmpc_random2(mpc_t * p, SV * s, SV * exp) {
 
 void Rmpc_sin(mpc_t * rop, mpc_t * op, SV * round) {
      mpc_sin(*rop, *op, SvUV(round));
+}
+
+void Rmpc_cos(mpc_t * rop, mpc_t * op, SV * round) {
+     mpc_cos(*rop, *op, SvUV(round));
+}
+
+void Rmpc_tan(mpc_t * rop, mpc_t * op, SV * round) {
+     mpc_tan(*rop, *op, SvUV(round));
+}
+
+void Rmpc_sinh(mpc_t * rop, mpc_t * op, SV * round) {
+     mpc_sinh(*rop, *op, SvUV(round));
+}
+
+void Rmpc_cosh(mpc_t * rop, mpc_t * op, SV * round) {
+     mpc_cosh(*rop, *op, SvUV(round));
+}
+
+void Rmpc_tanh(mpc_t * rop, mpc_t * op, SV * round) {
+     mpc_tanh(*rop, *op, SvUV(round));
 }
 
 SV * overload_true(mpc_t *a, SV *second, SV * third) {
@@ -1618,7 +1652,7 @@ SV * overload_sqrt(mpc_t * p, SV * second, SV * third) {
 }
 
 void overload_copy(mpc_t * p, SV * second, SV * third) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -1630,9 +1664,9 @@ void overload_copy(mpc_t * p, SV * second, SV * third) {
      mpc_init_set(*mpc_t_obj, *p, _perl_default_rounding_mode);
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Done;
-     Inline_Stack_Return(1);
+     ST(0) = sv_2mortal(obj_ref);
+     // PUTBACK; // not needed
+     XSRETURN(1);
 }
 
 SV * overload_abs(mpc_t * p, SV * second, SV * third) {
@@ -1667,6 +1701,22 @@ SV * overload_exp(mpc_t * p, SV * second, SV * third) {
      return obj_ref;
 }
 
+SV * overload_log(mpc_t * p, SV * second, SV * third) {
+     mpc_t * mpc_t_obj;
+     SV * obj_ref, * obj;
+
+     New(1, mpc_t_obj, 1, mpc_t);
+     if(mpc_t_obj == NULL) croak("Failed to allocate memory in overload_exp function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "Math::MPC");
+     mpc_init(*mpc_t_obj);
+
+     mpc_log(*mpc_t_obj, *p, _perl_default_rounding_mode);
+     sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
 SV * overload_sin(mpc_t * p, SV * second, SV * third) {
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
@@ -1683,8 +1733,24 @@ SV * overload_sin(mpc_t * p, SV * second, SV * third) {
      return obj_ref;
 }
 
+SV * overload_cos(mpc_t * p, SV * second, SV * third) {
+     mpc_t * mpc_t_obj;
+     SV * obj_ref, * obj;
+
+     New(1, mpc_t_obj, 1, mpc_t);
+     if(mpc_t_obj == NULL) croak("Failed to allocate memory in overload_sin function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "Math::MPC");
+     mpc_init(*mpc_t_obj);
+
+     mpc_cos(*mpc_t_obj, *p, _perl_default_rounding_mode);
+     sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
 void _get_r_string(mpc_t * p, SV * base, SV * n_digits, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      char * out;
      mp_exp_t ptr, *expptr;
      unsigned long b = SvUV(base);
@@ -1697,16 +1763,16 @@ void _get_r_string(mpc_t * p, SV * base, SV * n_digits, SV * round) {
 
      if(out == NULL) croak("An error occurred in _get_r_string()\n");
 
-     Inline_Stack_Reset;
-     Inline_Stack_Push(sv_2mortal(newSVpv(out, 0)));
+     // sp = mark; // not needed;
+     ST(0) = sv_2mortal(newSVpv(out, 0));
      mpfr_free_str(out);
-     Inline_Stack_Push(sv_2mortal(newSViv(ptr)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(1) = sv_2mortal(newSViv(ptr));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void _get_i_string(mpc_t * p, SV * base, SV * n_digits, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      char * out;
      mp_exp_t ptr, *expptr;
      unsigned long b = SvUV(base);
@@ -1719,12 +1785,12 @@ void _get_i_string(mpc_t * p, SV * base, SV * n_digits, SV * round) {
 
      if(out == NULL) croak("An error occurred in _get_i_string()\n");
 
-     Inline_Stack_Reset;
-     Inline_Stack_Push(sv_2mortal(newSVpv(out, 0)));
+     // sp = mark; // not needed
+     ST(0) = sv_2mortal(newSVpv(out, 0));
      mpfr_free_str(out);
-     Inline_Stack_Push(sv_2mortal(newSViv(ptr)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(1) = sv_2mortal(newSViv(ptr));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 
@@ -1954,6 +2020,20 @@ return 0;
 #endif
 #endif
 }
+
+SV * gmp_v() {
+     return newSVpv(gmp_version, 0);
+}
+
+SV * mpfr_v() {
+     return newSVpv(MPFR_VERSION_STRING, 0);
+}
+
+/* Not yet available
+SV * RMPC_MAX_PREC(mpc_t * a) {
+     return newSVuv(MPC_MAX_PREC(*a));
+}
+*/
 
 
 MODULE = Math::MPC	PACKAGE = Math::MPC	
@@ -2711,6 +2791,24 @@ Rmpc_exp (a, b, round)
         /* must have used dXSARGS; list context implied */
 	return; /* assume stack size is correct */
 
+void
+Rmpc_log (rop, op, round)
+	mpc_t *	rop
+	mpc_t *	op
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpc_log(rop, op, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
 SV *
 _Rmpc_out_str (stream, base, dig, p, round)
 	FILE *	stream
@@ -2798,6 +2896,96 @@ Rmpc_sin (rop, op, round)
 	PPCODE:
 	temp = PL_markstack_ptr++;
 	Rmpc_sin(rop, op, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+void
+Rmpc_cos (rop, op, round)
+	mpc_t *	rop
+	mpc_t *	op
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpc_cos(rop, op, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+void
+Rmpc_tan (rop, op, round)
+	mpc_t *	rop
+	mpc_t *	op
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpc_tan(rop, op, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+void
+Rmpc_sinh (rop, op, round)
+	mpc_t *	rop
+	mpc_t *	op
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpc_sinh(rop, op, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+void
+Rmpc_cosh (rop, op, round)
+	mpc_t *	rop
+	mpc_t *	op
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpc_cosh(rop, op, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+void
+Rmpc_tanh (rop, op, round)
+	mpc_t *	rop
+	mpc_t *	op
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpc_tanh(rop, op, round);
 	if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
 	  PL_markstack_ptr = temp;
@@ -2915,7 +3103,19 @@ overload_exp (p, second, third)
 	SV *	third
 
 SV *
+overload_log (p, second, third)
+	mpc_t *	p
+	SV *	second
+	SV *	third
+
+SV *
 overload_sin (p, second, third)
+	mpc_t *	p
+	SV *	second
+	SV *	third
+
+SV *
+overload_cos (p, second, third)
 	mpc_t *	p
 	SV *	second
 	SV *	third
@@ -2978,4 +3178,10 @@ _has_longdouble ()
 
 int
 _has_inttypes ()
+
+SV *
+gmp_v ()
+
+SV *
+mpfr_v ()
 

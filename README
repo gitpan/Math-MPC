@@ -8,7 +8,7 @@ MPC, like MPFR and GMP, is free. It is distributed under the
 GNU Lesser General Public License (GNU Lesser GPL).
 
 Because this module wraps the MPC functions, it requires that the
-MPC library (version 0.4.6 or later), the GMP library (version 4.2
+MPC library (version 0.5 or later), the GMP library (version 4.2.0
 or later) and the MPFR library (version 2.3.0 or later) have been
 installed. 
 
@@ -21,7 +21,7 @@ Do not use the (outdated) MPFR library source that ships with the
 GMP source.
 
 For the MPC library see:
-http://www.lix.polytechnique.fr/Labo/Andreas.Enge/Mpc.html
+http://www.multiprecision.org/mpc/
 
 You'll also need to have Math::MPFR (version 2.01 or later) installed.
 

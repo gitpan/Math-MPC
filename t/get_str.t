@@ -35,16 +35,16 @@ else {print "$im ne 3.57935793579357935793579e23\n"}
 
 my $mpc_simple = Math::MPC->new(16.03125, 15.25);
 my $complex_string = Rmpc_get_str($mpc_simple, 16, 0, MPC_RNDNN);
-if($complex_string eq '1.008@1+I*f.4') {$ok .= 'g'}
+if($complex_string eq '1.008@1 +I*f.4') {$ok .= 'g'}
 
 $complex_string = Rmpc_get_str($mpc_simple, 16, 5, MPC_RNDNN);
-if($complex_string eq '1.0080@1+I*f.4000') {$ok .= 'h'}
+if($complex_string eq '1.0080@1 +I*f.4000') {$ok .= 'h'}
 
 $complex_string = Rmpc_get_str($mpc_simple, 10, 0, MPC_RNDNN);
-if($complex_string eq '1.603125e1+I*1.525e1') {$ok .= 'i'}
+if($complex_string eq '1.603125e1 +I*1.525e1') {$ok .= 'i'}
 
 $complex_string = Rmpc_get_str($mpc_simple, 10, 9, MPC_RNDNN);
-if($complex_string eq '1.60312500e1+I*1.52500000e1') {$ok .= 'j'}
+if($complex_string eq '1.60312500e1 +I*1.52500000e1') {$ok .= 'j'}
 
 if($ok eq 'abcdefghij') {print "ok 1\n"}
 else {print "not ok 1 $ok\n"}
@@ -54,14 +54,14 @@ $ok = '';
 my $mpc2 = Math::MPC->new(0, 0);
 $mpc2 *= -1;
 
-if(Math::MPC::overload_string($mpc2, 10, 0, MPC_RNDNN) eq '-0+I*-0') {$ok .= 'a'}
+if(Math::MPC::overload_string($mpc2, 10, 0, MPC_RNDNN) eq '-0 -I*0') {$ok .= 'a'}
 
 my $mpfr1 = Math::MPFR->new(-0.0);
 my $inf = 1 / $mpfr1;
 my $nan = Math::MPFR->new();
 my $mpc3 = Math::MPC->new($nan, $inf);
 
-if(lc(Math::MPC::overload_string($mpc3, 10, 0, MPC_RNDNN)) eq '@nan@+i*-@inf@') {$ok .= 'b'}
+if(lc(Math::MPC::overload_string($mpc3, 10, 0, MPC_RNDNN)) eq '@nan@ -i*@inf@') {$ok .= 'b'}
 
 if($ok eq 'ab') {print "ok 2\n"}
 else {print "not ok 2 $ok\n"}

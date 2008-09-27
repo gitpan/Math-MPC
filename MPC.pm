@@ -40,8 +40,10 @@
     'abs'  => \&overload_abs,
     'bool' => \&overload_true,
     'exp'  => \&overload_exp,
+    'log'  => \&overload_log,
     'sqrt' => \&overload_sqrt,
-    'sin'  => \&overload_sin;
+    'sin'  => \&overload_sin,
+    'cos'  => \&overload_cos;
 
     require Exporter;
     *import = \&Exporter::import;
@@ -68,15 +70,15 @@ Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
 Rmpc_div Rmpc_div_ui Rmpc_ui_div Rmpc_div_fr Rmpc_sqrt Rmpc_div_2exp
-Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp 
+Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string 
 TRmpc_out_str TRmpc_inp_str
 Rmpc_random Rmpc_random2
-Rmpc_sin
+Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
 );
 
-    $Math::MPC::VERSION = '0.46';
+    $Math::MPC::VERSION = '0.50';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
@@ -101,12 +103,12 @@ Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
 Rmpc_div Rmpc_div_ui Rmpc_ui_div Rmpc_div_fr Rmpc_sqrt Rmpc_div_2exp
-Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp 
+Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string
 TRmpc_out_str TRmpc_inp_str
 Rmpc_random Rmpc_random2
-Rmpc_sin
+Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
 )]);
 
 *TRmpc_out_str = \&Rmpc_out_str;
@@ -120,7 +122,9 @@ sub overload_string {
 
 sub Rmpc_get_str {
     my ($r_s, $i_s) = c_string($_[0], $_[1], $_[2], $_[3]);
-    my $s = $r_s . "+I*" . $i_s;
+    my $sep = $i_s =~ /\-/ ? ' -I*' : ' +I*';
+    $i_s =~ s/\-//;
+    my $s = $r_s . $sep . $i_s;
     return $s;
 }
 
@@ -315,15 +319,15 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
 =head1 ROUNDING MODE
 
-    A complex rounding mode is of the form MPC_RNDxy where "x" and "y"
-    are one of "N" (to nearest), "Z" (towards zero), "U" (towards plus
-    infinity), "D" (towards minus infinity). The first letter refers to
-    the rounding mode for the real part, and the second one for the 
-    imaginary part.
-    For example MPC_RNDZU indicates to round the real part towards
-    zero, and the imaginary part towards plus infinity.
-    The default rounding mode is MPC_RNDNN, but this can be changed
-    using the Rmpc_set_default_rounding_mode() function.
+   A complex rounding mode is of the form MPC_RNDxy where "x" and "y"
+   are one of "N" (to nearest), "Z" (towards zero), "U" (towards plus
+   infinity), "D" (towards minus infinity). The first letter refers to
+   the rounding mode for the real part, and the second one for the 
+   imaginary part.
+   For example MPC_RNDZU indicates to round the real part towards
+   zero, and the imaginary part towards plus infinity.
+   The default rounding mode is MPC_RNDNN, but this can be changed
+   using the Rmpc_set_default_rounding_mode() function.
 
 =head1 MEMORY MANAGEMENT
 
@@ -397,7 +401,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    or 'zsa34760sdfgq123r5@11' which would have to represent a base 36
    number (because "z" is a valid digit only in base 36). Valid
    bases for MPC numbers are 2 to 36 (inclusive).
- 
+
    "$rnd" is simply one of the 16 rounding mode values (discussed above).
 
    "$p" is the (unsigned long) value for precision.
@@ -468,7 +472,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     Get (respectively) the precision of the real part of $op, the
     precision of the imaginary part of $op, or an array containing
     both real and imaginary parts of $op.
-   
+
    $rop = Math::MPC->new();
    $rop = Math::MPC::new();
    $rop = new Math::MPC();
@@ -535,7 +539,6 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     mpc library equivalents. Assign to $rop, using the values of 
     the two Math::MPFR objects ($mpfr1 and $mpfr2), rounded 
     according to $rnd.
-    
 
    ################################################
 
@@ -657,9 +660,8 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     $rnd. Just decreases the exponents of the real and imaginary 
     parts by $ui when $rop and $op are identical.
 
-
    ##########
-     
+
    COMPARISON
 
    $si = Rmpc_cmp($op1, $op2);
@@ -688,6 +690,38 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    Rmpc_exp($rop, $op, $rnd);
     Set $rop to the exponential of $op, rounded according to $rnd
     with the precision of $rop.
+
+   Rmpc_log($rop, $op, $rnd);
+    Set $rop to the log of $op, rounded according to $rnd with the
+    precision of $rop.
+
+   ##########
+
+   TRIGONOMETRIC
+
+   Rmpc_sin($rop, $op, $rnd);
+    Set $rop to the sine of $op, rounded according to $rnd with the
+    precision of $rop.
+
+   Rmpc_cos($rop, $op, $rnd);
+    Set $rop to the cosine of $op, rounded according to $rnd with
+    the precision of $rop.
+
+   Rmpc_tan($rop, $op, $rnd);
+    Set $rop to the tangent of $op, rounded according to $rnd with
+    the precision of $rop.
+
+   Rmpc_sinh($rop, $op, $rnd);
+    Set $rop to the hyperbolic sine of $op, rounded according to 
+    $rnd with the precision of $rop.
+
+   Rmpc_cosh($rop, $op, $rnd);
+    Set $rop to the hyperbolic cosine of $op, rounded according to 
+    $rnd with the precision of $rop.
+
+   Rmpc_tanh($rop, $op, $rnd);
+    Set $rop to the hyperbolic tangent of $op, rounded according to
+    $rnd with the precision of $rop.
 
    ##########
 
@@ -727,7 +761,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    #############
 
    I-O FUNCTIONS
-   
+
    $ul = Rmpc_inp_str($rop, $stream, $base, $rnd);
     Input a string in base $base from $stream, rounded according to $rnd, 
     and put the read complex in $rop. Each of the real and imaginary 
@@ -776,7 +810,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    ####################
 
    OPERATOR OVERLOADING
-    
+
     Overloading works with numbers, strings (bases 2, 10, and 16
     only - see step '4.' below) and Math::MPC objects.
     Overloaded operations are performed using the current
@@ -795,7 +829,8 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
      == != 
      ! not
      abs (Returns an MPFR object, blessed into package Math::MPFR)
-     exp (Return object has default precision)
+     exp log (Return object has default precision)
+     sin cos (Return object has default precision)
      = ""
 
     Attempting to use the overloaded operators with objects that
@@ -848,15 +883,16 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
 =head1 BUGS
 
-   You can get segfaults if you pass the wrong type of
-   argument to the functions - so if you get a segfault, the
-   first thing to do is to check that the argument types 
-   you have supplied are appropriate.
+    You can get segfaults if you pass the wrong type of
+    argument to the functions - so if you get a segfault, the
+    first thing to do is to check that the argument types 
+    you have supplied are appropriate.
 
 =head1 LICENSE
 
-    This perl code is free software; you may redistribute it
-    and/or modify it under the same terms as Perl itself.
+    This program is free software; you may redistribute it and/or 
+    modify it under the same terms as Perl itself.
+    Copyright 2006-2008, Sisyphus
 
 =head1 AUTHOR
 
