@@ -1,4 +1,13 @@
+0.51
+ - Requires version 0.5.1 of the mpc library.
+ - Add MPC_VERSION_STRING, MPC_VERSION_MAJOR, MPC_VERSION_MINOR
+   and MPC_VERSION_PATCHLEVEL.
+ - Replace pre-existing Rmpc_set_fr_fr with a function that wraps
+   the mpc_set_fr_fr function (which became available in 0.5.1)
+ - Add Rmpc_real, Rmpc_imag, Rmpc_arg, Rmpc_proj (new in 0.5.1)
+
 0.50
+ - Requires version 0.50 of the mpc library.
  - Add Rmpc_log, Rmpc_cos, Rmpc_tan, Rmpc_sinh, Rmpc_cosh, and
    Rmpc_tanh - all of which became available with mpc-0.5.
  - Add log and cos overloading.

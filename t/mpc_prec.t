@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPC qw(:mpc);
 
-print "1..3\n";
+print "1..4\n";
 
 my $mpc1 = Math::MPC->new();
 my $mpc2 = Rmpc_init();
@@ -93,6 +93,23 @@ $ok .= 'd' if Rmpfr_nan_p($mpfr);
 
 if($ok eq 'abcd') {print "ok 3\n"}
 else {print "not ok 3 $ok\n"}
+
+$ok = '';
+
+Rmpfr_set_prec($mpfr, 71);
+my $mpc7 = Math::MPC->new(1234, 5678);
+my $ret = Rmpc_real($mpfr, $mpc7, GMP_RNDN);
+if($ret == 0) {$ok .= 'a'}
+if($mpfr == 1234) {$ok .= 'b'}
+if(Rmpfr_get_prec($mpfr) == 71) {$ok .= 'c'}
+Rmpfr_set_prec($mpfr, 72);
+$ret = Rmpc_imag($mpfr, $mpc7, GMP_RNDN);
+if($ret == 0) {$ok .= 'd'}
+if($mpfr == 5678) {$ok .= 'e'}
+if(Rmpfr_get_prec($mpfr) == 72) {$ok .= 'f'}
+
+if($ok eq 'abcdef') {print "ok 4\n"}
+else {print "not ok 4 $ok\n"}
 
 # Not yet implemented
 #if(RMPC_MAX_PREC($mpc6) > 0) {print "ok 4\n"}

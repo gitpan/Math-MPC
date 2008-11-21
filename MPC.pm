@@ -22,6 +22,9 @@
     use constant MPC_RNDUD => 50;
     use constant MPC_RNDDD => 51;
 
+    use subs qw(MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR
+                MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING);
+
     use overload
     '+'    => \&overload_add,
     '-'    => \&overload_sub,
@@ -52,6 +55,7 @@
     @Math::MPC::EXPORT_OK = qw(
 MPC_RNDNN MPC_RNDND MPC_RNDNU MPC_RNDNZ MPC_RNDDN MPC_RNDUN MPC_RNDZN MPC_RNDDD 
 MPC_RNDDU MPC_RNDDZ MPC_RNDZD MPC_RNDUD MPC_RNDUU MPC_RNDUZ MPC_RNDZU MPC_RNDZZ
+MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
 Rmpc_set_default_rounding_mode Rmpc_get_default_rounding_mode
 Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
 Rmpc_set_re_prec Rmpc_set_im_prec
@@ -76,15 +80,17 @@ Rmpc_out_str Rmpc_inp_str c_string r_string i_string
 TRmpc_out_str TRmpc_inp_str
 Rmpc_random Rmpc_random2
 Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
+Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
 );
 
-    $Math::MPC::VERSION = '0.50';
+    $Math::MPC::VERSION = '0.51';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
     %Math::MPC::EXPORT_TAGS =(mpc => [qw(
 MPC_RNDNN MPC_RNDND MPC_RNDNU MPC_RNDNZ MPC_RNDDN MPC_RNDUN MPC_RNDZN MPC_RNDDD 
 MPC_RNDDU MPC_RNDDZ MPC_RNDZD MPC_RNDUD MPC_RNDUU MPC_RNDUZ MPC_RNDZU MPC_RNDZZ
+MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
 Rmpc_set_default_rounding_mode Rmpc_get_default_rounding_mode
 Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
 Rmpc_set_re_prec Rmpc_set_im_prec
@@ -109,6 +115,7 @@ Rmpc_out_str Rmpc_inp_str c_string r_string i_string
 TRmpc_out_str TRmpc_inp_str
 Rmpc_random Rmpc_random2
 Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
+Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
 )]);
 
 *TRmpc_out_str = \&Rmpc_out_str;
@@ -279,6 +286,12 @@ sub Rmpc_out_str {
     die "Wrong number of arguments supplied to Rmpc_out_str()";
 }
 
+sub MPC_VERSION {return _MPC_VERSION()}
+sub MPC_VERSION_MAJOR {return _MPC_VERSION_MAJOR()}
+sub MPC_VERSION_MINOR {return _MPC_VERSION_MINOR()}
+sub MPC_VERSION_PATCHLEVEL {return _MPC_VERSION_PATCHLEVEL()}
+sub MPC_VERSION_STRING {return _MPC_VERSION_STRING()}
+
 
 1;
 
@@ -296,7 +309,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    The GMP library is availble from http://swox.com/gmp/
    The MPFR library is available from http://www.mpfr.org/
    The MPC library is available from
-    http://www.lix.polytechnique.fr/Labo/Andreas.Enge/Mpc.html
+    http://www.multiprecision.org/mpc/
 
 =head1 DESCRIPTION
 
@@ -434,7 +447,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     The default rounding mode is to nearest initially (MPC_RNDNN).
     The default rounding mode is the rounding mode that is used in
     overloaded operations.
- 
+
    $ui = Rmpc_get_default_rounding_mode();
     Returns the numeric value of the current default rounding mode.
     This will initially be 0 (MPC_RNDNN).
@@ -695,6 +708,18 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     Set $rop to the log of $op, rounded according to $rnd with the
     precision of $rop.
 
+   $si = Rmpc_arg ($mpfr, $op, $rnd);
+     Set $mpfr to the argument of $op, with a branch cut along the
+     negative real axis. ($mpfr is a Math::MPFR object.)
+
+   $si = Rmpc_proj ($rop, $op, $rnd);
+     Compute a projection of $op onto the Riemann sphere. Set $rop 
+     to $op, rounded in the direction $rnd, except when at least one 
+     part of $op is infinite (even if the other part is a NaN) in 
+     which case the real part of $rop is set to plus infinity and its
+     imaginary part to a signed zero with the same sign as the 
+     imaginary part of $op.
+
    ##########
 
    TRIGONOMETRIC
@@ -757,6 +782,11 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     of $op. $mpfr will be an exact copy of the real/imaginary component 
     of op - ie the precision of $mpfr will be set to the precision of the
     real/imaginary component of $op before the copy is made. 
+
+   $si = Rmpc_real($mpfr, $op, $rnd);
+   $si = Rmpc_imag($mpfr, $op, $rnd);
+     Set $mpfr to the value of the real (respectively imaginary) part of
+     $op, rounded in the direction $rnd. ($mpfr is a Math::MPFR object.)
 
    #############
 
@@ -880,6 +910,28 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
        an appropriate error message.
 
    #####################
+
+   MISCELLANEOUS
+
+   $ui = MPC_VERSION_MAJOR;
+    The 'x' in the 'x.y.z' of the MPC library version.
+
+   $ui =MPC_VERSION_MINOR;
+    The 'y' in the 'x.y.z' of the MPC library version.
+
+   $ui = MPC_VERSION_PATCHLEVEL;
+    The 'z' in the 'x.y.z' of the MPC library version.
+
+   $string = MPC_VERSION_STRING;
+    $string contains the MPC library version ('x.y.z').
+
+   ####################
+
+=head1 TODO
+
+    For completeness, we probably should wrap mpc_realref and
+    mpc_imagref - though I don't think there's much to be
+    achieved by doing this in a *perl* context. 
 
 =head1 BUGS
 

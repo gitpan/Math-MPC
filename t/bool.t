@@ -6,6 +6,7 @@ use Math::MPFR qw(:mpfr);
 print "1..2\n";
 
 print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+print "# Usinf mpc library version ", MPC_VERSION_STRING, "\n";
 
 my $nan = Math::MPC->new();
 my $t1 = Math::MPFR->new();

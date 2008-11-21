@@ -12,7 +12,7 @@ $use_long_double = 0;# Let perl decide whether to include 'long double' support
 #$use_long_double = 1;# Force inclusion of 'long double' support
 
 print "\nThis module requires the following C libraries:\n";
-print " gmp-4.2.0 (or later)\n mpfr-2.3.0 (or later)\n mpc-0.5 (or later)\n\n";
+print " gmp-4.2.0 (or later)\n mpfr-2.3.0 (or later)\n mpc-0.5.1 (or later)\n\n";
 
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 

@@ -454,6 +454,10 @@ SV * Rmpc_set_d_d(mpc_t * p, SV * q_r, SV * q_i, SV * round) {
      return newSViv(mpc_set_d_d(*p, SvNV(q_r), SvNV(q_i), SvUV(round)));
 }
 
+SV * Rmpc_set_fr_fr(mpc_t * p, mpfr_t * q_r, mpfr_t * q_i, SV * round) {
+     return newSViv(mpc_set_fr_fr(*p, *q_r, *q_i, SvUV(round)));
+}
+
 SV * Rmpc_set_ui_fr(mpc_t * p, SV * q_r, mpfr_t * q_i, SV * round) {
      return newSViv(mpc_set_ui_fr(*p, SvUV(q_r), *q_i, SvUV(round)));
 }
@@ -513,11 +517,6 @@ void Rmpc_set_ld_ld(mpc_t * a, SV * ld1, SV * ld2, SV * round) {
      mpfr_set_ld(temp, SvNV(ld1), SvUV(round) & 3);
      mpc_add_fr(*a, *a, temp, SvUV(round));
      mpfr_clear(temp);
-}
-
-void Rmpc_set_fr_fr(mpc_t * a, mpfr_t * fr1, mpfr_t * fr2, SV * round) {
-     mpc_set_ui_fr(*a, 0, *fr2, SvUV(round));
-     mpc_add_fr(*a, *a, *fr1, SvUV(round));
 }
 
 SV * Rmpc_add(mpc_t * a, mpc_t * b, mpc_t * c, SV * round) {
@@ -2035,6 +2034,38 @@ SV * RMPC_MAX_PREC(mpc_t * a) {
 }
 */
 
+SV * _MPC_VERSION_MAJOR() {
+     return newSVuv(MPC_VERSION_MAJOR);
+}
+
+SV * _MPC_VERSION_MINOR() {
+     return newSVuv(MPC_VERSION_MINOR);
+}
+  
+SV * _MPC_VERSION_PATCHLEVEL() {
+     return newSVuv(MPC_VERSION_PATCHLEVEL);
+}
+
+SV * _MPC_VERSION_STRING() {
+     return newSVpv(MPC_VERSION_STRING, 0);
+}
+
+SV * Rmpc_real(mpfr_t * rop, mpc_t * op, SV * round) {
+     return newSViv(mpc_real(*rop, *op, SvUV(round)));
+}
+
+SV * Rmpc_imag(mpfr_t * rop, mpc_t * op, SV * round) {
+     return newSViv(mpc_imag(*rop, *op, SvUV(round)));
+}
+
+SV * Rmpc_arg(mpfr_t * rop, mpc_t * op, SV * round) {
+     return newSViv(mpc_arg(*rop, *op, SvUV(round)));
+}
+
+SV * Rmpc_proj(mpc_t * rop, mpc_t * op, SV * round) {
+     return newSViv(mpc_proj(*rop, *op, SvUV(round)));
+}
+
 
 MODULE = Math::MPC	PACKAGE = Math::MPC	
 
@@ -2512,6 +2543,13 @@ Rmpc_set_d_d (p, q_r, q_i, round)
 	SV *	round
 
 SV *
+Rmpc_set_fr_fr (p, q_r, q_i, round)
+	mpc_t *	p
+	mpfr_t *	q_r
+	mpfr_t *	q_i
+	SV *	round
+
+SV *
 Rmpc_set_ui_fr (p, q_r, q_i, round)
 	mpc_t *	p
 	SV *	q_r
@@ -2567,25 +2605,6 @@ Rmpc_set_ld_ld (a, ld1, ld2, round)
 	PPCODE:
 	temp = PL_markstack_ptr++;
 	Rmpc_set_ld_ld(a, ld1, ld2, round);
-	if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-	  PL_markstack_ptr = temp;
-	  XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-	return; /* assume stack size is correct */
-
-void
-Rmpc_set_fr_fr (a, fr1, fr2, round)
-	mpc_t *	a
-	mpfr_t *	fr1
-	mpfr_t *	fr2
-	SV *	round
-	PREINIT:
-	I32* temp;
-	PPCODE:
-	temp = PL_markstack_ptr++;
-	Rmpc_set_fr_fr(a, fr1, fr2, round);
 	if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
 	  PL_markstack_ptr = temp;
@@ -3184,4 +3203,40 @@ gmp_v ()
 
 SV *
 mpfr_v ()
+
+SV *
+_MPC_VERSION_MAJOR ()
+
+SV *
+_MPC_VERSION_MINOR ()
+
+SV *
+_MPC_VERSION_PATCHLEVEL ()
+
+SV *
+_MPC_VERSION_STRING ()
+
+SV *
+Rmpc_real (rop, op, round)
+	mpfr_t *	rop
+	mpc_t *	op
+	SV *	round
+
+SV *
+Rmpc_imag (rop, op, round)
+	mpfr_t *	rop
+	mpc_t *	op
+	SV *	round
+
+SV *
+Rmpc_arg (rop, op, round)
+	mpfr_t *	rop
+	mpc_t *	op
+	SV *	round
+
+SV *
+Rmpc_proj (rop, op, round)
+	mpc_t *	rop
+	mpc_t *	op
+	SV *	round
 
