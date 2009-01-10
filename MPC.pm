@@ -23,7 +23,8 @@
     use constant MPC_RNDDD => 51;
 
     use subs qw(MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR
-                MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING);
+                MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
+                MPC_VERSION MPC_VERSION_NUM);
 
     use overload
     '+'    => \&overload_add,
@@ -55,7 +56,8 @@
     @Math::MPC::EXPORT_OK = qw(
 MPC_RNDNN MPC_RNDND MPC_RNDNU MPC_RNDNZ MPC_RNDDN MPC_RNDUN MPC_RNDZN MPC_RNDDD 
 MPC_RNDDU MPC_RNDDZ MPC_RNDZD MPC_RNDUD MPC_RNDUU MPC_RNDUZ MPC_RNDZU MPC_RNDZZ
-MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
+MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
+MPC_VERSION MPC_VERSION_NUM Rmpc_get_version
 Rmpc_set_default_rounding_mode Rmpc_get_default_rounding_mode
 Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
 Rmpc_set_re_prec Rmpc_set_im_prec
@@ -83,14 +85,15 @@ Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
 );
 
-    $Math::MPC::VERSION = '0.51';
+    $Math::MPC::VERSION = '0.52';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
     %Math::MPC::EXPORT_TAGS =(mpc => [qw(
 MPC_RNDNN MPC_RNDND MPC_RNDNU MPC_RNDNZ MPC_RNDDN MPC_RNDUN MPC_RNDZN MPC_RNDDD 
 MPC_RNDDU MPC_RNDDZ MPC_RNDZD MPC_RNDUD MPC_RNDUU MPC_RNDUZ MPC_RNDZU MPC_RNDZZ
-MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
+MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
+MPC_VERSION MPC_VERSION_NUM Rmpc_get_version
 Rmpc_set_default_rounding_mode Rmpc_get_default_rounding_mode
 Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
 Rmpc_set_re_prec Rmpc_set_im_prec
@@ -291,7 +294,7 @@ sub MPC_VERSION_MAJOR {return _MPC_VERSION_MAJOR()}
 sub MPC_VERSION_MINOR {return _MPC_VERSION_MINOR()}
 sub MPC_VERSION_PATCHLEVEL {return _MPC_VERSION_PATCHLEVEL()}
 sub MPC_VERSION_STRING {return _MPC_VERSION_STRING()}
-
+sub MPC_VERSION_NUM {return _MPC_VERSION_NUM(@_)}
 
 1;
 
@@ -306,7 +309,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    This module needs the MPC, MPFR and GMP C libraries. (Install GMP
    first, followed by MPFR, followed by MPC.)
 
-   The GMP library is availble from http://swox.com/gmp/
+   The GMP library is availble from http://gmplib.org
    The MPFR library is available from http://www.mpfr.org/
    The MPC library is available from
     http://www.multiprecision.org/mpc/
@@ -802,7 +805,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     the imaginary part. The argument $base may be in the range 2 to 36.
     Return the number of bytes read, or if an error occurred, return 0.
 
-   $ul = Rmpc_out_str([$prefix], $stream, $base, $digits, $op, $rnd [, $suffix]);
+   $ul = Rmpc_out_str([$prefix,] $stream, $base, $digits, $op, $rnd [, $suffix]);
     This function changed from 1st release (version 0.45) of Math::MPC. 
     Output $op to $stream, in base $base, rounded according to $rnd. First
     the real part is printed, followed by the imaginary part. The base may
@@ -914,16 +917,29 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    MISCELLANEOUS
 
    $ui = MPC_VERSION_MAJOR;
-    The 'x' in the 'x.y.z' of the MPC library version.
+    Returns the 'x' in the 'x.y.z' of the MPC library version.
 
    $ui =MPC_VERSION_MINOR;
-    The 'y' in the 'x.y.z' of the MPC library version.
+    Returns the 'y' in the 'x.y.z' of the MPC library version.
 
    $ui = MPC_VERSION_PATCHLEVEL;
-    The 'z' in the 'x.y.z' of the MPC library version.
+    Returns the 'z' in the 'x.y.z' of the MPC library version.
+
+   $ui = MPC_VERSION();
+    An integer value derived from the library's major, minor and
+    patchlevel values.
+
+   $ui = MPC_VERSION_NUM($major, $minor, $patchlevel);
+    Returns an integer in the same format as used by MPC_VERSION,
+    using the given $major, $minor and $patchlevel.
 
    $string = MPC_VERSION_STRING;
-    $string contains the MPC library version ('x.y.z').
+    $string contains the MPC library version ('x.y.z'), as defined
+    by the header file (mpc.h)
+
+   $string = Rmpc_get_version();
+    $string contains the MPC library version ('x.y.z'), as defined
+    by the library.
 
    ####################
 

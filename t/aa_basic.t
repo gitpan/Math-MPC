@@ -3,7 +3,9 @@ use strict;
 use Math::MPC qw(:mpc);
 use Math::MPFR qw(:mpfr);
 
-print "1..2\n";
+print "1..4\n";
+
+my $string = Rmpc_get_version();
 
 print STDERR "\n# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print STDERR "# Using Math::MPC version ", $Math::MPC::VERSION, "\n";
@@ -13,9 +15,19 @@ print STDERR "# Math::MPC uses mpfr library version ", Math::MPC::mpfr_v(), "\n"
 print STDERR "# Math::MPFR uses gmp library version ", Math::MPFR::gmp_v(), "\n";
 print STDERR "# Math::MPC uses gmp library version ", Math::MPC::gmp_v(), "\n";
 
-if($Math::MPC::VERSION eq '0.51') {print "ok 1\n"}
+if($Math::MPC::VERSION eq '0.52') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPC::VERSION\n"}
 
 if(MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 5 ||
-  (MPC_VERSION_MINOR == 5 && MPC_VERSION_PATCHLEVEL >= 1)) {print "ok 2\n"}
+  (MPC_VERSION_MINOR == 5 && MPC_VERSION_PATCHLEVEL >= 2)) {print "ok 2\n"}
 else {print "not ok 2 MPC Library version ", MPC_VERSION_STRING, " is too old\n"}
+
+if(MPC_VERSION_STRING eq '0.5.2') {$string =~ s/mpc //i} # known issue with 0.5.2
+
+if($string eq MPC_VERSION_STRING) {print "ok 3\n"}
+else {print "not ok 3 \"", Rmpc_get_version, "\" (library version) does not match \"", MPC_VERSION_STRING, "\" (header file version)\n"}
+
+if(MPC_VERSION == MPC_VERSION_NUM(MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCHLEVEL)) {print "ok 4\n"}
+else {print "not ok 4 ", MPC_VERSION, " does not match ",
+                         MPC_VERSION_NUM(MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCHLEVEL), "\n"}
+

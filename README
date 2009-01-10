@@ -8,12 +8,12 @@ MPC, like MPFR and GMP, is free. It is distributed under the
 GNU Lesser General Public License (GNU Lesser GPL).
 
 Because this module wraps the MPC functions, it requires that the
-MPC library (version 0.5.1 or later), the GMP library (version 4.2.0
+MPC library (version 0.5.2 or later), the GMP library (version 4.2.0
 or later) and the MPFR library (version 2.3.0 or later) have been
 installed. 
 
 For the GMP library see:
-http://swox.com/gmp
+http://gmplib.org
 
 For the MPFR library see:
 http://www.mpfr.org

@@ -1,3 +1,7 @@
+0.52
+ - Requires version 0.5.2 of the mpc library.
+ - Add MPC_VERSION, MPC_VERSION_NUM and Rmpc_get_version.
+
 0.51
  - Requires version 0.5.1 of the mpc library.
  - Add MPC_VERSION_STRING, MPC_VERSION_MAJOR, MPC_VERSION_MINOR

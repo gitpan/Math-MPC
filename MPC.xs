@@ -2046,8 +2046,20 @@ SV * _MPC_VERSION_PATCHLEVEL() {
      return newSVuv(MPC_VERSION_PATCHLEVEL);
 }
 
+SV * _MPC_VERSION() {
+     return newSVuv(MPC_VERSION);
+}
+
+SV * _MPC_VERSION_NUM(SV * x, SV * y, SV * z) {
+     return newSVuv(MPC_VERSION_NUM((unsigned long)SvUV(x), (unsigned long)SvUV(y), (unsigned long)SvUV(z)));
+}
+
 SV * _MPC_VERSION_STRING() {
      return newSVpv(MPC_VERSION_STRING, 0);
+}
+
+SV * Rmpc_get_version() {
+     return newSVpv(mpc_get_version(), 0);
 }
 
 SV * Rmpc_real(mpfr_t * rop, mpc_t * op, SV * round) {
@@ -3214,7 +3226,19 @@ SV *
 _MPC_VERSION_PATCHLEVEL ()
 
 SV *
+_MPC_VERSION ()
+
+SV *
+_MPC_VERSION_NUM (x, y, z)
+	SV *	x
+	SV *	y
+	SV *	z
+
+SV *
 _MPC_VERSION_STRING ()
+
+SV *
+Rmpc_get_version ()
 
 SV *
 Rmpc_real (rop, op, round)
