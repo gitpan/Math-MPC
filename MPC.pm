@@ -60,18 +60,35 @@ MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
 MPC_VERSION MPC_VERSION_NUM Rmpc_get_version
 Rmpc_set_default_rounding_mode Rmpc_get_default_rounding_mode
 Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
+Rmpc_set_default_prec2 Rmpc_get_default_prec2
 Rmpc_set_re_prec Rmpc_set_im_prec
 Rmpc_get_prec Rmpc_get_prec2 Rmpc_get_re_prec Rmpc_get_im_prec
 RMPC_RE RMPC_IM RMPC_INEX_RE RMPC_INEX_IM
 Rmpc_clear Rmpc_clear_ptr Rmpc_clear_mpc
 Rmpc_deref4 Rmpc_get_str
-Rmpc_init Rmpc_init2 Rmpc_init3
-Rmpc_init_nobless Rmpc_init2_nobless Rmpc_init3_nobless
-Rmpc_init_set Rmpc_init_set_ui Rmpc_init_set_ui_ui Rmpc_init_set_si_si Rmpc_init_set_ui_fr
-Rmpc_init_set_nobless Rmpc_init_set_ui_nobless Rmpc_init_set_ui_ui_nobless
-Rmpc_init_set_si_si_nobless Rmpc_init_set_ui_fr_nobless
-Rmpc_set Rmpc_set_ui Rmpc_set_si Rmpc_set_d Rmpc_set_ui_ui Rmpc_set_si_si Rmpc_set_d_d Rmpc_set_ui_fr
-Rmpc_set_uj_uj Rmpc_set_sj_sj Rmpc_set_fr_fr Rmpc_set_ld_ld
+Rmpc_init2 Rmpc_init3
+Rmpc_init2_nobless Rmpc_init3_nobless
+Rmpc_strtoc Rmpc_set_str
+Rmpc_set Rmpc_set_ui Rmpc_set_si Rmpc_set_d Rmpc_set_uj Rmpc_set_sj Rmpc_set_ld
+Rmpc_set_z Rmpc_set_q Rmpc_set_f Rmpc_set_fr 
+Rmpc_set_z_z Rmpc_set_q_q Rmpc_set_f_f
+Rmpc_set_ui_ui Rmpc_set_ui_si Rmpc_set_ui_d Rmpc_set_ui_uj Rmpc_set_ui_sj Rmpc_set_ui_ld Rmpc_set_ui_fr
+Rmpc_set_si_ui Rmpc_set_si_si Rmpc_set_si_d Rmpc_set_si_uj Rmpc_set_si_sj Rmpc_set_si_ld Rmpc_set_si_fr
+Rmpc_set_d_ui Rmpc_set_d_si Rmpc_set_d_d Rmpc_set_d_uj Rmpc_set_d_sj Rmpc_set_d_ld Rmpc_set_d_fr
+Rmpc_set_uj_ui Rmpc_set_uj_si Rmpc_set_uj_d Rmpc_set_uj_uj Rmpc_set_uj_sj Rmpc_set_uj_ld Rmpc_set_uj_ld Rmpc_set_uj_fr
+Rmpc_set_sj_ui Rmpc_set_sj_si Rmpc_set_sj_d Rmpc_set_sj_uj Rmpc_set_sj_sj Rmpc_set_sj_ld Rmpc_set_sj_fr
+Rmpc_set_ld_ui Rmpc_set_ld_si Rmpc_set_ld_uj Rmpc_set_ld_d Rmpc_set_ld_sj Rmpc_set_ld_ld Rmpc_set_ld_fr
+Rmpc_set_fr_ui Rmpc_set_fr_si Rmpc_set_fr_d Rmpc_set_fr_uj Rmpc_set_fr_sj Rmpc_set_fr_ld Rmpc_set_fr_fr
+
+Rmpc_set_f_ui Rmpc_set_q_ui Rmpc_set_z_ui Rmpc_set_ui_f Rmpc_set_ui_q Rmpc_set_ui_z 
+Rmpc_set_f_si Rmpc_set_q_si Rmpc_set_z_si Rmpc_set_si_f Rmpc_set_si_q Rmpc_set_si_z 
+Rmpc_set_f_d Rmpc_set_q_d Rmpc_set_z_d Rmpc_set_d_f Rmpc_set_d_q Rmpc_set_d_z 
+Rmpc_set_f_uj Rmpc_set_q_uj Rmpc_set_z_uj Rmpc_set_uj_f Rmpc_set_uj_q Rmpc_set_uj_z 
+Rmpc_set_f_sj Rmpc_set_q_sj Rmpc_set_z_sj Rmpc_set_sj_f Rmpc_set_sj_q Rmpc_set_sj_z 
+Rmpc_set_f_ld Rmpc_set_q_ld Rmpc_set_z_ld Rmpc_set_ld_f Rmpc_set_ld_q Rmpc_set_ld_z
+Rmpc_set_f_q Rmpc_set_q_f Rmpc_set_f_z Rmpc_set_z_f Rmpc_set_z_q Rmpc_set_q_z
+Rmpc_set_f_fr Rmpc_set_q_fr Rmpc_set_z_fr Rmpc_set_fr_f Rmpc_set_fr_q Rmpc_set_fr_z
+
 Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
@@ -85,7 +102,7 @@ Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
 );
 
-    $Math::MPC::VERSION = '0.52';
+    $Math::MPC::VERSION = '0.60';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
@@ -96,18 +113,35 @@ MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
 MPC_VERSION MPC_VERSION_NUM Rmpc_get_version
 Rmpc_set_default_rounding_mode Rmpc_get_default_rounding_mode
 Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
+Rmpc_set_default_prec2 Rmpc_get_default_prec2
 Rmpc_set_re_prec Rmpc_set_im_prec
 Rmpc_get_prec Rmpc_get_prec2 Rmpc_get_re_prec Rmpc_get_im_prec
 RMPC_RE RMPC_IM RMPC_INEX_RE RMPC_INEX_IM
 Rmpc_clear Rmpc_clear_ptr Rmpc_clear_mpc
 Rmpc_deref4 Rmpc_get_str
-Rmpc_init Rmpc_init2 Rmpc_init3
-Rmpc_init_nobless Rmpc_init2_nobless Rmpc_init3_nobless
-Rmpc_init_set Rmpc_init_set_ui Rmpc_init_set_ui_ui Rmpc_init_set_si_si Rmpc_init_set_ui_fr
-Rmpc_init_set_nobless Rmpc_init_set_ui_nobless Rmpc_init_set_ui_ui_nobless
-Rmpc_init_set_si_si_nobless Rmpc_init_set_ui_fr_nobless
-Rmpc_set Rmpc_set_ui Rmpc_set_si Rmpc_set_d Rmpc_set_ui_ui Rmpc_set_si_si Rmpc_set_d_d Rmpc_set_ui_fr
-Rmpc_set_uj_uj Rmpc_set_sj_sj Rmpc_set_fr_fr Rmpc_set_ld_ld
+Rmpc_init2 Rmpc_init3
+Rmpc_init2_nobless Rmpc_init3_nobless
+Rmpc_strtoc Rmpc_set_str
+Rmpc_set Rmpc_set_ui Rmpc_set_si Rmpc_set_d Rmpc_set_uj Rmpc_set_sj Rmpc_set_ld
+Rmpc_set_z Rmpc_set_q Rmpc_set_f Rmpc_set_fr
+Rmpc_set_z_z Rmpc_set_q_q Rmpc_set_f_f
+Rmpc_set_ui_ui Rmpc_set_ui_si Rmpc_set_ui_d Rmpc_set_ui_uj Rmpc_set_ui_sj Rmpc_set_ui_ld Rmpc_set_ui_fr
+Rmpc_set_si_ui Rmpc_set_si_si Rmpc_set_si_d Rmpc_set_si_uj Rmpc_set_si_sj Rmpc_set_si_ld Rmpc_set_si_fr
+Rmpc_set_d_ui Rmpc_set_d_si Rmpc_set_d_d Rmpc_set_d_uj Rmpc_set_d_sj Rmpc_set_d_ld Rmpc_set_d_fr
+Rmpc_set_uj_ui Rmpc_set_uj_si Rmpc_set_uj_d Rmpc_set_uj_uj Rmpc_set_uj_sj Rmpc_set_uj_ld Rmpc_set_uj_ld Rmpc_set_uj_fr
+Rmpc_set_sj_ui Rmpc_set_sj_si Rmpc_set_sj_d Rmpc_set_sj_uj Rmpc_set_sj_sj Rmpc_set_sj_ld Rmpc_set_sj_fr
+Rmpc_set_ld_ui Rmpc_set_ld_si Rmpc_set_ld_uj Rmpc_set_ld_d Rmpc_set_ld_sj Rmpc_set_ld_ld Rmpc_set_ld_fr
+Rmpc_set_fr_ui Rmpc_set_fr_si Rmpc_set_fr_d Rmpc_set_fr_uj Rmpc_set_fr_sj Rmpc_set_fr_ld Rmpc_set_fr_fr
+
+Rmpc_set_f_ui Rmpc_set_q_ui Rmpc_set_z_ui Rmpc_set_ui_f Rmpc_set_ui_q Rmpc_set_ui_z 
+Rmpc_set_f_si Rmpc_set_q_si Rmpc_set_z_si Rmpc_set_si_f Rmpc_set_si_q Rmpc_set_si_z 
+Rmpc_set_f_d Rmpc_set_q_d Rmpc_set_z_d Rmpc_set_d_f Rmpc_set_d_q Rmpc_set_d_z 
+Rmpc_set_f_uj Rmpc_set_q_uj Rmpc_set_z_uj Rmpc_set_uj_f Rmpc_set_uj_q Rmpc_set_uj_z 
+Rmpc_set_f_sj Rmpc_set_q_sj Rmpc_set_z_sj Rmpc_set_sj_f Rmpc_set_sj_q Rmpc_set_sj_z 
+Rmpc_set_f_ld Rmpc_set_q_ld Rmpc_set_z_ld Rmpc_set_ld_f Rmpc_set_ld_q Rmpc_set_ld_z
+Rmpc_set_f_q Rmpc_set_q_f Rmpc_set_f_z Rmpc_set_z_f Rmpc_set_z_q Rmpc_set_q_z
+Rmpc_set_f_fr Rmpc_set_q_fr Rmpc_set_z_fr Rmpc_set_fr_f Rmpc_set_fr_q Rmpc_set_fr_z
+
 Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
@@ -124,13 +158,29 @@ Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
 *TRmpc_out_str = \&Rmpc_out_str;
 *TRmpc_inp_str = \&Rmpc_inp_str;
 
+*Rmpc_set_uj_si = \&Rmpc_set_uj_sj;
+*Rmpc_set_ui_sj = \&Rmpc_set_uj_sj;
+
+*Rmpc_set_sj_ui = \&Rmpc_set_sj_uj;
+*Rmpc_set_si_uj = \&Rmpc_set_sj_uj;
+
+*Rmpc_set_uj_ui = \&Rmpc_set_uj_uj;
+*Rmpc_set_ui_uj = \&Rmpc_set_uj_uj;
+
+*Rmpc_set_sj_si = \&Rmpc_set_sj_sj;
+*Rmpc_set_si_sj = \&Rmpc_set_sj_sj;
+
+*Rmpc_set_d_ld  = \&Rmpc_set_ld_ld;
+*Rmpc_set_ld_d  = \&Rmpc_set_ld_ld;
+
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
 sub overload_string {
-     return Rmpc_get_str($_[0], 10, 0, Rmpc_get_default_rounding_mode());
+     return _get_str($_[0], 10, 0, Rmpc_get_default_rounding_mode());
 }
 
-sub Rmpc_get_str {
+### Was originally called Rmpc_get_str ###
+sub _get_str {
     my ($r_s, $i_s) = c_string($_[0], $_[1], $_[2], $_[3]);
     my $sep = $i_s =~ /\-/ ? ' -I*' : ' +I*';
     $i_s =~ s/\-//;
@@ -215,7 +265,8 @@ sub new {
     #    which case there will be a maximum of 2 args.
     # If there are no args, then we just want to return an
     # initialized Math::MPC object
-    if(!@_) {return Rmpc_init()}
+    my @prec = Rmpc_get_default_prec2();
+    if(!@_) {return Rmpc_init3(@prec)}
    
     if(@_ > 3) {die "Too many arguments supplied to new()"}
 
@@ -227,12 +278,12 @@ sub new {
     # an object - which we'll do by using the ref() function:
     if(!ref($_[0]) && $_[0] eq "Math::MPC") {
       shift;
-      if(!@_) {return Rmpc_init()}
+      if(!@_) {return Rmpc_init3(@prec)}
       } 
 
     if(_itsa($_[0]) == 10) { # It's a Math::MPC object
       if(@_ > 1) {die "Too many arguments supplied to new() - expected no more than one"}
-      my $mpc = Rmpc_init();
+      my $mpc = Rmpc_init3(@prec);
       Rmpc_set($mpc, $_[0], Rmpc_get_default_rounding_mode());
       return $mpc;
     } 
@@ -253,9 +304,9 @@ sub new {
     $type2 = _itsa($arg2);
 
     # Die if either of the args are unacceptable.
-    if($type1 == 0 || $type1 == 6 || $type1 == 7 || $type1 == 8 || $type1 == 9)
+    if($type1 == 0)
       {die "First argument to new() is inappropriate"}
-    if($type2 == 0 || $type2 == 6 || $type2 == 7 || $type2 == 8 || $type2 == 9)
+    if($type2 == 0)
       {die "Second argument to new() is inappropriate"}
 
     # Create a Math::MPC object that has $arg1 as its
@@ -268,7 +319,7 @@ sub new {
 
     # Add the 2 created Math::MPC objects together and return
     # the result
-    Rmpc_add($mpc1, $mpc1, $mpc2, Rmpc_get_default_rounding_mode());
+    Rmpc_add($mpc1, $mpc1, $mpc2, MPC_RNDNN);
     return $mpc1;    
 }
 
@@ -323,7 +374,8 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    The following documentation heavily plagiarises the mpc documentation.
    (Believe the mpc docs in preference to these docs if/when there's a 
    conflict.)
-   See also the Math::MPC test suite for some examples of usage.
+   See also the Math::MPC test suite for some (simplistic) examples of
+   usage.
 
    use warnings;
    use Math::MPC qw(:mpc);
@@ -347,15 +399,15 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
 =head1 MEMORY MANAGEMENT
 
-   Objects can be created with the Rmpc_init* functions, which
-   return an object that has been blessed into the package Math::MPC.
-   Alternatively, blessed objects can also be created by calling the
-   new() function (either as a function or as a method). These
-   objects will therefore be automatically cleaned up by the
-   DESTROY() function whenever they go out of scope.
+   Objects can be created with the Rmpc_init2 and Rmpc_init3 functions,
+   which return an object that has been blessed into the package
+   Math::MPC. Alternatively, blessed objects can also be created by 
+   calling the new() function (either as a function or as a method). 
+   These objects will be automatically cleaned up by the DESTROY()
+   function whenever they go out of scope.
 
-   For each Rmpc_init* function there is a corresponding function
-   called Rmpc_init*_nobless which returns an unblessed object.
+   Rmpc_init2_nobless and Rmpc_init3_nobless are the same as Rmpc_init2
+   and Rmpc_init3, except that they return an unblessed object.
    If you create Math::MPC objects using the '_nobless' versions,
    it will then be up to you to clean up the memory associated with
    these objects by calling Rmpc_clear($op) for each object. 
@@ -363,12 +415,12 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    I don't know why you would want to create unblessed objects. The 
    point is that you can if you want to.
 
-=head1 MIXING MPC OBJECTS WITH MPFR OBJECTS
+=head1 MIXING MPC OBJECTS WITH MPFR & GMP OBJECTS
 
-   Some of the Math::MPC functions below take Math::MPFR objects
-   as arguments. (Such arguments have been designated "$mpfr" in the
-   documentation that follows.) Obviously, to make use of these 
-   functions, you'll need to load the Math::MPFR module. 
+   Some of the Math::MPC functions below take Math::MPFR, Math::GMP,
+   Math::GMPz, Math::GMPq, or Math::GMPf objects as arguments. 
+   Obviously, to make use of these functions, you'll need to have
+   loaded the appropriate module. 
 
 =head1 FUNCTIONS
 
@@ -422,6 +474,12 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    "$p" is the (unsigned long) value for precision.
 
+   "$mpf" is a Math::GMPf object (floating point).
+
+   "$mpq" is a Math::GMPq object (rational).
+
+   "$mpz" is a Math::GMP or Math::GMPz object (integer).
+
    "$mpfr" is a Math::MPFR object (floating point).
 
    ######################
@@ -468,15 +526,26 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    First read the section 'MEMORY MANAGEMENT' (above).
 
    Rmpc_set_default_prec($p);
-    Set the default precision to be *exactly* $p bits.  The
+   Rmpc_set_default_prec2($p_re, $p_im);
+    Rmpc_set_default_prec sets the default precision to exactly $p
+    bits for both the real and imaginary parts. Rmpc_set_default_prec
+    sets the default precision to be *exactly* $p_re bits for the real
+    part, and *exactly* $p_im bits for the imaginary part. The
     precision of a variable means the number of bits used to store its
-    mantissa.  All subsequent calls to `mpc_init' will use this
-    precision, but previously initialized variables are unaffected.
-    This default precision is set to 53 bits initially.
-    It sets the precision of both real and imaginary parts alike.
+    mantissa.  All subsequent calls to `new' will use this precision,
+    but previously initialized variables are unaffected. This is also
+    the precision that will be used during some overloaded operations
+    (see OPERATOR OVERLOADING below).
+    The default precision is set to 53 bits initially (for both
+    real and imaginary components).
 
    $ui = Rmpc_get_default_prec();
-    Returns the current default MPC precision in bits.
+   ($ui_re, $ui_im) = Rmpc_get_default_prec2();
+    Rmpc_get_default_prec returns the current default real precision
+    iff the default real precision is the same as the current default
+    imaginary precision. Otherwise it returns zero.
+    Rmpc_get_default_prec2 returns both current default real precision
+    and current default imaginary precision (in bits).
 
    $ui = Rmpc_get_prec($op);
     If the real and imaginary part of $op have the same precision,
@@ -487,27 +556,27 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    ($re_prec, $im_prec) = Rmpc_get_prec2($op);
     Get (respectively) the precision of the real part of $op, the
     precision of the imaginary part of $op, or an array containing
-    both real and imaginary parts of $op.
+    precision of both real and imaginary parts of $op.
 
    $rop = Math::MPC->new();
    $rop = Math::MPC::new();
    $rop = new Math::MPC();
-   $rop = Rmpc_init();
-   $rop = Rmpc_init_nobless();
     Initialize $rop, and set its real and imaginary parts to NaN.
     The precision of $rop is the default precision, which can be
-    changed by a call to `Rmpc_set_default_prec'.
+    changed by a call to `Rmpc_set_default_prec' or
+    `Rmpc_set_default_prec2' (documented above).
 
    $rop = Rmpc_init2($p);
    $rop = Rmpc_init2_nobless($p);
-    Initialize $rop, set its precision to be *exactly* $p bits, 
-    and set its real and imaginary parts to NaN.
+    Initialize $rop, set the precision (of both real and imaginary
+    parts) to be *exactly* $p bits, and set its real and imaginary
+    parts to NaN.
 
-   $rop = Rmpc_init3($p_r, $p_i);
+   $rop = Rmpc_init3($p_re, $p_im);
    $rop = Rmpc_init3_nobless($p_r, $p_i);
     Initialize $rop, set the precision of the real part to be 
-    *exactly* $p_r bits, set the precision of the imaginary part to
-    be *exactly* $p_i bits, and set its real and imaginary parts to
+    *exactly* $p_re bits, set the precision of the imaginary part to
+    be *exactly* $p_im bits, and set its real and imaginary parts to
     NaN.
 
    Rmpc_set_prec($op, $p);
@@ -529,32 +598,47 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_set_ui($rop, $ui, $rnd);
    $si2 = Rmpc_set_si($rop, $si1, $rnd);
    $si = Rmpc_set_d($rop, $double, $rnd);
+   $si = Rmpc_set_uj($rop, $uj, $rnd);
+   $si = Rmpc_set_sj($rop, $sj, $rnd);
+   $si = Rmpc_set_ld($rop, $ld, $rnd); 
+   $si = Rmpc_set_f($rop, $mpf, $rnd);
+   $si = Rmpc_set_q($rop, $mpq, $rnd);
+   $si = Rmpc_set_z($rop, $mpz, $rnd);
+   $si = Rmpc_set_fr($rop, $mpfr, $rnd);
     Set the value of $rop from 2nd arg, rounded to the precision of
     $rop towards the given direction $rnd.
+    Don't use Rmpc_set_ld unless perl has been built with long 
+    double support. Don't use Rmpc_set_uj or Rmpc_set_sj unless
+    perl has been built with long long int support.
 
    $si = Rmpc_set_ui_ui($rop, $ui1, $ui2, $rnd);
    $si3 = Rmpc_set_si_si($rop, $si1, $si2, $rnd);
    $si = Rmpc_set_d_d($rop, $double1, $double2, $rnd);
-   $si = Rmpc_set_ui_fr($rop, $ui, $mpfr, $rnd);
-    Set the real part of $rop from 2nd arg, and the imaginary part
+   $si = Rmpc_set_f_f($rop, $mpf1, $mpf2, $rnd);
+   $si = Rmpc_set_q_q($rop, $mpq1, $mpq2, $rnd);
+   $si = Rmpc_set_z_z($rop, $mpz1, $mpz2, $rnd);
+   $si = Rmpc_set_fr_fr($rop, $mpfr1, $mpfr2, $rnd);
+    Sets the real part of $rop from 2nd arg, and the imaginary part
     of $rop from 3rd arg, according to the rounding mode $rnd.
 
-   void Rmpc_set_uj_uj($rop, $uj1, $uj2, $rnd);
-   void Rmpc_set_sj_sj($rop, $sj1, $sj2, $rnd);
-   void Rmpc_set_ld_ld($rop, $ld1, $ld2, $rnd);
+   $si = Rmpc_set_uj_uj($rop, $uj1, $uj2, $rnd);
+   $si = Rmpc_set_sj_sj($rop, $sj1, $sj2, $rnd);
+   $si = Rmpc_set_ld_ld($rop, $ld1, $ld2, $rnd);
     Don't use the first 2 functions unless Math::MPC::_has_longlong()
     returns a true value. Don't use the 3rd function unless
     Math::MPC::_has_longdouble() returns true.
-    These functions are provided for convenience - there are no 
-    mpc library equivalents. Assign to $rop, using (respectively)
-    unsigned long long, signed long long, and long double values,
-    rounded according to $rnd.
+    Sets the real part of $rop from 2nd arg, and the imaginary part
+    of $rop from 3rd arg, according to the rounding mode $rnd.
 
-   void Rmpc_set_fr_fr($rop, $mpfr1, $mpfr2, $rnd);
-    This function is provided for convenience - there are no 
-    mpc library equivalents. Assign to $rop, using the values of 
-    the two Math::MPFR objects ($mpfr1 and $mpfr2), rounded 
-    according to $rnd.
+   $si = Rmpc_set_x_y($rop, $op1, $op2, $rnd);
+    You need to replace the 'x' and the 'y' with any one of 'ui',
+    'si', 'd', 'uj', 'sj', 'ld', 'f', 'q', 'z' and 'fr' - eg:
+        Rmpc_set_ui_d($rop, $ui, $double, $rnd);
+    Don't use the 'uj' or 'sj' variants if Math::MPC::_has_longlong()
+    doesn't return a true value. And don't use the 'ld' variants if
+    Math::MPC_haslongdouble() doesn't return a true value.
+    Sets the real part of $rop from 2nd arg, and the imaginary part
+    of $rop from 3rd arg, according to the rounding mode $rnd.
 
    ################################################
 
@@ -576,30 +660,12 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     direction, with default precision. Otherwise the imaginary component
     of the returned Math::MPC object is set to zero. $arg1 & $arg2 can be
     either a number (signed integer, unsigned integer, signed fraction or
-    unsigned fraction), a string that represents a numeric value, or a
-    Math::MPFR object. If a string argument begins with "0b" or "0B",
-    then the string is treated as a base 2 string. Elsif it begins with
-    "0x" or "0X" it is treated as a base 16 string. Else it is treated
-    as a base 10 string.
-
-   ($rop, $si) = Rmpc_init_set($op, $rnd);
-   ($rop, $si) = Rmpc_init_set_nobless($op, $rnd);
-   ($rop, $si) = Rmpc_init_set_ui($ui, $rnd);
-   ($rop, $si) = Rmpc_init_set_ui_nobless($ui, $rnd);
-    Initialize $rop and set its value from the 1st arg, rounded to
-    direction $rnd. The precision of $rop will be taken from the
-    active default precision, as set by `Rmpc_set_default_prec'.
-
-   ($rop, $si) = Rmpc_init_set_ui_ui($ui1, $ui2, $rnd);
-   ($rop, $si) = Rmpc_init_set_ui_ui_nobless($ui1, $ui2, $rnd);
-   ($rop, $si) = Rmpc_init_set_si_si($si1, $si2, $rnd);
-   ($rop, $si) = Rmpc_init_set_si_si_nobless($si1, $si2, $rnd);
-   ($rop, $si) = Rmpc_init_set_ui_fr($ui, $mpfr, $rnd);
-   ($rop, $si) = Rmpc_init_set_ui_fr_nobless($ui, $mpfr, $rnd);
-    Initialize $rop, set the value of the real part from the 1st arg 
-    and the value of the imaginary part from the 2nd arg (both values
-    rounded to direction $rnd). The precision of $rop will be taken
-    from the active default precision, as set by `Rmpc_set_default_prec'.
+    unsigned fraction), a string that represents a numeric value, a
+    Math::MPFR object, a Math::GMP object, a Math::GMPz object, a
+    Math::GMPq object or a Math::GMPf object.
+    If a string argument begins with "0b" or "0B", then the string is
+    treated as a base 2 string. Elsif it begins with "0x" or "0X" it is
+    treated as a base 16 string. Else it is treated as a base 10 string.
 
    ##########
 
@@ -703,11 +769,11 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    SPECIAL
 
-   Rmpc_exp($rop, $op, $rnd);
+   $si = Rmpc_exp($rop, $op, $rnd);
     Set $rop to the exponential of $op, rounded according to $rnd
     with the precision of $rop.
 
-   Rmpc_log($rop, $op, $rnd);
+   $si = Rmpc_log($rop, $op, $rnd);
     Set $rop to the log of $op, rounded according to $rnd with the
     precision of $rop.
 
@@ -727,27 +793,27 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    TRIGONOMETRIC
 
-   Rmpc_sin($rop, $op, $rnd);
+   $si = Rmpc_sin($rop, $op, $rnd);
     Set $rop to the sine of $op, rounded according to $rnd with the
     precision of $rop.
 
-   Rmpc_cos($rop, $op, $rnd);
+   $si = Rmpc_cos($rop, $op, $rnd);
     Set $rop to the cosine of $op, rounded according to $rnd with
     the precision of $rop.
 
-   Rmpc_tan($rop, $op, $rnd);
+   $si = Rmpc_tan($rop, $op, $rnd);
     Set $rop to the tangent of $op, rounded according to $rnd with
     the precision of $rop.
 
-   Rmpc_sinh($rop, $op, $rnd);
+   $si = Rmpc_sinh($rop, $op, $rnd);
     Set $rop to the hyperbolic sine of $op, rounded according to 
     $rnd with the precision of $rop.
 
-   Rmpc_cosh($rop, $op, $rnd);
+   $si = Rmpc_cosh($rop, $op, $rnd);
     Set $rop to the hyperbolic cosine of $op, rounded according to 
     $rnd with the precision of $rop.
 
-   Rmpc_tanh($rop, $op, $rnd);
+   $si = Rmpc_tanh($rop, $op, $rnd);
     Set $rop to the hyperbolic tangent of $op, rounded according to
     $rnd with the precision of $rop.
 
@@ -819,6 +885,21 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     output of $op. Return the number of bytes written. (The contents of 
     $prefix and $suffix are not included in the count.)
 
+   $si = Rmpc_set_str($rop, $string, $base, $rnd);
+   $si = Rmpc_strtoc($rop, $string, $base, $rnd);
+    Set $rop to the value represented in $string (in base $base), rounded
+    in accordance with $rnd. See the mpc documentation for details.
+
+   
+   $string = Rmpc_get_str($base, $how_many, $op, $rnd);
+    Convert $op to a string containing the real and imaginary parts of
+    $op. The number of significant digits for both real and imaginary
+    parts is specified by $how_many. It is also possible to let 
+    $how_many be zero, in which case the number of digits is chosen large
+    enough so that re-reading the printed value with the same precision,
+    assuming both output and input use rounding to nearest, will recover
+    the original value of $op. See the mpc documentation for details.
+
 
    #############
 
@@ -864,7 +945,8 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
      abs (Returns an MPFR object, blessed into package Math::MPFR)
      exp log (Return object has default precision)
      sin cos (Return object has default precision)
-     = ""
+     = (The copy has the same precision as the copied object.)
+     ""
 
     Attempting to use the overloaded operators with objects that
     have been blessed into some package other than 'Math::MPC'
@@ -960,7 +1042,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
     This program is free software; you may redistribute it and/or 
     modify it under the same terms as Perl itself.
-    Copyright 2006-2008, Sisyphus
+    Copyright 2006-2009, Sisyphus
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use Math::MPC qw(:mpc);
 
 print "1..7\n";
 
-Rmpc_set_default_prec(500);
+Rmpc_set_default_prec2(500, 500);
 Rmpfr_set_default_prec(500);
 my $mpfr1 = Math::MPFR->new();
 my $mpc1 = Math::MPC->new(10, 20);

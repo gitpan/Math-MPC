@@ -7,7 +7,7 @@ print "1..2\n";
 
 my $ok = '';
 
-Rmpc_set_default_prec(100);
+Rmpc_set_default_prec2(100, 100);
 Rmpfr_set_default_prec(81);
 
 my $mpc1 = Math::MPC->new(1.23456, 654321);

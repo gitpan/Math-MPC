@@ -5,7 +5,7 @@ use Math::MPC qw(:mpc);
 
 print "1..3\n";
 
-Rmpc_set_default_prec(359);
+Rmpc_set_default_prec2(359, 359);
 
 my $z = Math::MPC->new(2, 2);
 my $zz = Math::MPC->new(1,1);

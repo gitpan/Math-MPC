@@ -6,19 +6,21 @@ use Math::MPC qw(:mpc);
 print "1..4\n";
 
 my $mpc1 = Math::MPC->new();
-my $mpc2 = Rmpc_init();
+my @prec = Rmpc_get_default_prec2();
+my $mpc2 = Rmpc_init3(@prec);
 
-Rmpc_set_default_prec(100);
+Rmpc_set_default_prec2(100, 121);
 Rmpfr_set_default_prec(150);
 
 my $mpc3 = Math::MPC->new();
-my $mpc4 = Rmpc_init();
+@prec = Rmpc_get_default_prec2();
+my $mpc4 = Rmpc_init3(@prec);
 my $mpc5 = Rmpc_init2(200);
 my $mpc6 = Rmpc_init3(150, 180);
 
 my $ok = '';
 
-$ok .= 'a' if Rmpc_get_default_prec() == 100;
+$ok .= 'a' if $prec[0] == 100 && $prec[1] == 121;
 
 $ok .= 'b' if Rmpfr_get_default_prec() == 150;
 $ok .= 'c' if Rmpc_get_re_prec($mpc1) == 53;
@@ -27,9 +29,9 @@ $ok .= 'e' if Rmpc_get_re_prec($mpc2) == 53;
 $ok .= 'f' if Rmpc_get_im_prec($mpc2) == 53;
 
 $ok .= 'g' if Rmpc_get_re_prec($mpc3) == 100;
-$ok .= 'h' if Rmpc_get_im_prec($mpc3) == 100;
+$ok .= 'h' if Rmpc_get_im_prec($mpc3) == 121;
 $ok .= 'i' if Rmpc_get_re_prec($mpc4) == 100;
-$ok .= 'j' if Rmpc_get_im_prec($mpc4) == 100;
+$ok .= 'j' if Rmpc_get_im_prec($mpc4) == 121;
 
 $ok .= 'k' if Rmpc_get_re_prec($mpc5) == 200;
 $ok .= 'l' if Rmpc_get_im_prec($mpc5) == 200;
@@ -48,9 +50,18 @@ $prec = Rmpc_get_prec($mpc5);
 $ok .= 'r' if $prec == 200;
 
 $prec = Rmpc_get_prec($mpc4);
-$ok .= 's' if $prec == 100;
+$ok .= 's' if $prec == 0;
 
-if($ok eq 'abcdefghijklmnopqrs') {print "ok 1\n"}
+@prec = Rmpc_get_prec2($mpc4);
+$ok .= 't' if $prec[0] == 100 && $prec[1] == 121;
+
+Rmpc_set_default_prec2(401, 400);
+$ok .= 'u' if Rmpc_get_default_prec() == 0;
+
+Rmpc_set_default_prec(401);
+$ok .= 'v' if Rmpc_get_default_prec() == 401;
+
+if($ok eq 'abcdefghijklmnopqrstuv') {print "ok 1\n"}
 else {print "not ok 1 $ok\n"}
 
 $ok = '';

@@ -1,5 +1,10 @@
 This module wraps the MPC library functions.
 
+Note: The mpc library API changed with the release of mpc-0.6.
+Consequently some code that works with Math::MPC-0.60 won't work 
+with earlier versions of Math::MPC (and vice-versa). See the 
+CHANGES file for details.
+
 The MPC library is a C library for multiple-precision complex number
 computations with exact rounding. It is based on the MPFR C library 
 which, in turn, is based on the GMP C library.
@@ -8,7 +13,7 @@ MPC, like MPFR and GMP, is free. It is distributed under the
 GNU Lesser General Public License (GNU Lesser GPL).
 
 Because this module wraps the MPC functions, it requires that the
-MPC library (version 0.5.2 or later), the GMP library (version 4.2.0
+MPC library (version 0.6.0 or later), the GMP library (version 4.2.0
 or later) and the MPFR library (version 2.3.0 or later) have been
 installed. 
 

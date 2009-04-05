@@ -5,6 +5,7 @@ MPC.xs
 README
 CHANGES
 t/aa_basic.t
+t/bool.t
 t/get_str.t
 t/mpc_64.t
 t/mpc_add.t
@@ -12,14 +13,15 @@ t/mpc_cmp.t
 t/mpc_mpfr.t
 t/mpc_mul.t
 t/mpc_new.t
-t/out_str1.t
-t/out_str2.t
 t/mpc_overload.t
 t/mpc_prec.t
 t/mpc_random.t
 t/mpc_round.t
+t/mpc_set.t
 t/mpc_trig.t
-t/bool.t
+t/out_str1.t
+t/out_str2.t
 t/pod.t
+t/set_str.t
 t/special.t
 typemap

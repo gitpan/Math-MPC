@@ -4,15 +4,17 @@ use Math::MPC qw(:mpc);
 use Math::MPFR qw(:mpfr);
 use Math::BigInt;
 
-print "1..11\n";
+print "1..15\n";
 
-Rmpc_set_default_prec(5000);
+Rmpc_set_default_prec2(5000, 5000);
 Rmpfr_set_default_prec(5000);
 
 my ($mpc, $mpc3, $mpc4, $mpfr, $mpfr1, $mpfr2, $mpfr3, $mpfr4, $mpfr5);
 my $ok = '';
 my $string = 'hello world';
 my $mbi = Math::BigInt->new(123456);
+my $mpfr_re = Math::MPFR->new();
+my $mpfr_im = Math::MPFR->new();
 
 eval {$mpc = Math::MPC->new($string);};
 if($@ =~ /Math::MPC::new/) {$ok = 'a'}
@@ -270,5 +272,101 @@ if($ok eq 'abcde') {print "ok 11\n"}
 else {print "not ok 11 $ok\n"}
 
 $ok = '';
+
+my ($have_GMP, $have_GMPz, $have_GMPq, $have_GMPf) = (0, 0, 0, 0);
+
+eval{require Math::GMP;};
+$have_GMP = 1 if !$@;
+
+eval{require Math::GMPz;};
+$have_GMPz = 1 if !$@;
+
+eval{require Math::GMPq;};
+$have_GMPq = 1 if !$@;
+
+eval{require Math::GMPf;};
+$have_GMPf = 1 if !$@;
+
+if($have_GMP) {
+  $ok = '';
+  my $gmp = Math::GMP->new(1234567);
+  my $gmp2 = Math::GMP->new(890);
+  my $mpc1 = Math::MPC->new($gmp);
+  if($mpc1 == 1234567){$ok .= 'a'}
+  else {warn "12a: $mpc1\n"}
+  my $mpc2 = Math::MPC->new($gmp, $gmp2);
+  Rmpc_real($mpfr_re, $mpc2, MPC_RNDNN);
+  Rmpc_imag($mpfr_im, $mpc2, MPC_RNDNN);
+  if($mpfr_re == 1234567 && $mpfr_im == 890) {$ok .= 'b'}
+  else {warn "12b: $mpc2\n"}
+
+  if($ok eq 'ab') {print "ok 12\n"}
+  else {print "not ok 12 $ok\n"}
+}
+else {
+  print "ok 12 - skipped, no Math::GMP\n";
+}
+
+if($have_GMPz) {
+  $ok = '';
+  my $gmp = Math::GMPz->new(1234567);
+  my $gmp2 = Math::GMPz->new(890);
+  my $mpc1 = Math::MPC->new($gmp);
+  if($mpc1 == 1234567){$ok .= 'a'}
+  else {warn "13a: $mpc1\n"}
+  my $mpc2 = Math::MPC->new($gmp, $gmp2);
+  Rmpc_real($mpfr_re, $mpc2, MPC_RNDNN);
+  Rmpc_imag($mpfr_im, $mpc2, MPC_RNDNN);
+  if($mpfr_re == 1234567 && $mpfr_im == 890) {$ok .= 'b'}
+  else {warn "13b: $mpc2\n"}
+
+  if($ok eq 'ab') {print "ok 13\n"}
+  else {print "not ok 13 $ok\n"}
+}
+else {
+  print "ok 13 - skipped, no Math::GMPz\n";
+}
+
+
+if($have_GMPq) {
+  $ok = '';
+  my $gmp = Math::GMPq->new(1234567);
+  my $gmp2 = Math::GMPq->new(890);
+  my $mpc1 = Math::MPC->new($gmp);
+  if($mpc1 == 1234567){$ok .= 'a'}
+  else {warn "14a: $mpc1\n"}
+  my $mpc2 = Math::MPC->new($gmp, $gmp2);
+  Rmpc_real($mpfr_re, $mpc2, MPC_RNDNN);
+  Rmpc_imag($mpfr_im, $mpc2, MPC_RNDNN);
+  if($mpfr_re == 1234567 && $mpfr_im == 890) {$ok .= 'b'}
+  else {warn "14b: $mpc2\n"}
+
+  if($ok eq 'ab') {print "ok 14\n"}
+  else {print "not ok 14 $ok\n"}
+}
+else {
+  print "ok 14 - skipped, no Math::GMPq\n";
+}
+
+if($have_GMPf) {
+  $ok = '';
+  my $gmp = Math::GMPf->new(1234567.5);
+  my $gmp2 = Math::GMPf->new(890.5);
+  my $mpc1 = Math::MPC->new($gmp);
+  if($mpc1 == 1234567.5){$ok .= 'a'}
+  else {warn "15a: $mpc1\n"}
+  my $mpc2 = Math::MPC->new($gmp, $gmp2);
+  Rmpc_real($mpfr_re, $mpc2, MPC_RNDNN);
+  Rmpc_imag($mpfr_im, $mpc2, MPC_RNDNN);
+  if($mpfr_re == 1234567.5 && $mpfr_im == 890.5) {$ok .= 'b'}
+  else {warn "15b: $mpc2\n"}
+
+  if($ok eq 'ab') {print "ok 15\n"}
+  else {print "not ok 15 $ok\n"}
+}
+else {
+  print "ok 15 - skipped, no Math::GMPf\n";
+}
+
 
 

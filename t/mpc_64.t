@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPC qw(:mpc);
 
-Rmpc_set_default_prec(100);
+Rmpc_set_default_prec2(100, 100);
 Rmpfr_set_default_prec(100);
 
 print "1..2\n";
@@ -19,7 +19,7 @@ else {print "Not using long double\n"};
 
 my $uimax = ~0;
 my $simax = ($uimax - 1) / -2;
-my $mpc1 = Rmpc_init();
+my $mpc1 = Rmpc_init3(100, 100);
 my $mpfr1 = Rmpfr_init();
 my $uimpfr = Math::MPFR->new(~0);
 my $simpfr = Math::MPFR->new((~0 - 1) / -2);

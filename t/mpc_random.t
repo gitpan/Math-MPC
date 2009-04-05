@@ -6,7 +6,7 @@ use Math::MPC qw(:mpc);
 print "1..3\n";
 
 Rmpfr_set_default_prec(640);
-Rmpc_set_default_prec(640);
+Rmpc_set_default_prec2(640, 640);
 
 my $mpfr = Math::MPFR->new();
 my $mpc = Math::MPC->new();

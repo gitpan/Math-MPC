@@ -6,7 +6,7 @@ use Math::MPFR qw(:mpfr);
 print "1..8\n";
 
 
-Rmpc_set_default_prec(64);
+Rmpc_set_default_prec2(64, 64);
 
 my $mpc = Math::MPC->new(6.5, 8.25); # 6.5000000000000000+I*8.2500000000000000 (39 characters)
 my $ret;
@@ -87,7 +87,7 @@ my $count = 0;
 while(<RD1>) {
      $count = $.;
      chomp;
-     unless($_ eq '6.50000000000000000000 +I*8.25000000000000000000'x5) {$ok = 0}
+     unless($_ eq '(6.50000000000000000000 8.25000000000000000000)'x5) {$ok = 0}
 }
 
 if($ok && $count == 1) {print "ok 1\n"}
@@ -100,7 +100,7 @@ $count = 0;
 while(<RD2>) {
      $count = $.;
      chomp;
-     unless($_ eq 'This is the prefix 6.50000000000000000000 +I*8.25000000000000000000'x5) {$ok = 0}
+     unless($_ eq 'This is the prefix (6.50000000000000000000 8.25000000000000000000)'x5) {$ok = 0}
 }
 
 if($ok && $count == 1) {print "ok 2\n"}
@@ -112,7 +112,7 @@ $count = 0;
 while(<RD3>) {
      $count = $.;
      chomp;
-     unless($_ eq '6.50000000000000000000 +I*8.25000000000000000000 and this is the suffix') {$ok = 0}
+     unless($_ eq '(6.50000000000000000000 8.25000000000000000000) and this is the suffix') {$ok = 0}
 }
 
 if($ok && $count == 5) {print "ok 3\n"}
@@ -124,7 +124,7 @@ $count = 0;
 while(<RD4>) {
      $count = $.;
      chomp;
-     unless($_ eq 'This is the prefix 6.50000000000000000000 +I*8.25000000000000000000 and this is the suffix') {$ok = 0}
+     unless($_ eq 'This is the prefix (6.50000000000000000000 8.25000000000000000000) and this is the suffix') {$ok = 0}
 }
 
 if($ok && $count == 5) {print "ok 4\n"}
@@ -140,10 +140,10 @@ while(<RD5>) {
        unless($_ eq 'This is the prefix ') {$ok = 0}
      }
      elsif($. == 6) {
-       unless($_ eq '6.50000000000000000000 +I*8.25000000000000000000') {$ok = 0}
+       unless($_ eq '(6.50000000000000000000 8.25000000000000000000)') {$ok = 0}
      }
      else {
-       unless($_ eq '6.50000000000000000000 +I*8.25000000000000000000This is the prefix ') {$ok = 0}
+       unless($_ eq '(6.50000000000000000000 8.25000000000000000000)This is the prefix ') {$ok = 0}
      }
 }
 
@@ -160,7 +160,7 @@ while(<RD6>) {
        unless($_ eq 'This is the prefix ') {$ok = 0}
      }
      else {
-       unless($_ eq '6.50000000000000000000 +I*8.25000000000000000000 and this is the suffix') {$ok = 0}
+       unless($_ eq '(6.50000000000000000000 8.25000000000000000000) and this is the suffix') {$ok = 0}
      }
 }
 
@@ -202,9 +202,10 @@ close RD6 or die "Can't close RD6: $!";
 close RD7 or die "Can't close RD7: $!";
 
 open(WR8, '>', 'out1.txt') or die "Can't open WR8: $!";
-print WR8 "6.5000000000000000\n";
-print WR8 "+I*\n";
-print WR8 "8.2500000000000000\n";
+#print WR8 "6.5000000000000000\n";
+#print WR8 "+I*\n";
+#print WR8 "8.2500000000000000\n";
+print WR8 "(6.5000000000000000 8.2500000000000000)\n";
 close WR8 or die "Can't close WR8: $!";
 
 open(RD8, '<', 'out1.txt') or die "Can't open RD8: $!";
@@ -217,10 +218,7 @@ my $im = Math::MPFR->new();
 RMPC_RE($real, $mpc, GMP_RNDN);
 RMPC_IM($im, $mpc, GMP_RNDN);
 
-# I'm not gunna check the actual value of $ret as I suspect it might
-# be dependent upon the OS. I'll just check that it's >= 39.
-
-if($ret >= 39 && $real == 6.5 && $im == 8.25) {print "ok 8\n"}
+if($ret == 0 && $real == 6.5 && $im == 8.25) {print "ok 8\n"}
 else {print "not ok 8 $ret $real $im $mpc\n"}
 
 

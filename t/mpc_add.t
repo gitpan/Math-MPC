@@ -5,13 +5,14 @@ use Math::MPC qw(:mpc);
 
 print "1..6\n";
 
-Rmpc_set_default_prec(200);
+Rmpc_set_default_prec2(200, 200);
 Rmpfr_set_default_prec(200);
 my $_64 = Math::MPC::_has_longlong();
 
-my ($mpc1, $ok) = Rmpc_init_set_ui_ui(10, 10, MPC_RNDNN);
+my $mpc1 = Rmpc_init2(200);
+Rmpc_set_ui_ui($mpc1, 10, 10, MPC_RNDNN);
 my $mpfr1 = Math::MPFR->new(50.5);
-$ok = '';
+my $ok = '';
 
 Rmpc_add_ui($mpc1, $mpc1, 30, MPC_RNDNN);
 Rmpc_add_fr($mpc1, $mpc1, $mpfr1, MPC_RNDNN);

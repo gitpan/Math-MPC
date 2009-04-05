@@ -1,3 +1,29 @@
+0.60
+ - Requires version 0.60 of the mpc library.
+ - Now a complete range of Rmpc_set_*_* functions (where '*' can be any
+   one of 'ui', 'si', 'd', 'uj', 'sj', 'ld', 'f', 'q', 'z' and 'fr').
+ - Add Rmpc_set_z, Rmpc_set_q, Rmpc_set_f and Rmpc_set_fr.
+ - Add Rmpc_set_z_z, Rmpc_set_q_q and Rmpc_set_f_f.
+ - In keeping with changes to the mpc library, all of the Rmpc_init*
+   functions have been removed except for Rmpc_init2 and Rmpc_init3
+   (and their "_nobless" forms).
+ - mpc-0.60 has removed mpc_get_default_prec and mpc_set_default_prec.
+   Rmpc_get_default_prec and Rmpc_set_default_prec remain (but the
+   former has changed to return 0 if default real and imaginary
+   precisions are different. With earlier versions, real and imaginary
+   default precisions were always the same, but this is no longer the
+   case). Rmpc_get_default_prec2 and Rmpc_set_default_prec2 have now
+   been added. The former returns an array of 2 values(real,
+   imaginary) and the latter requires 2 arguments (real, imaginary).
+ - The overload_copy sub now preserves the precision of the copied object
+   (instead of assigning default precision as was previously the case).
+ - Rmpc_get_str now wraps mpc_get_str (available in 0.6). The (pure perl)
+   sub that was formerly "Rmpc_get_str" has been renamed "_get_str".
+   The "overload_string" sub is unchanged.
+ - Add Rmpc_set_uj, Rmpc_set_sj and Rmpc_set_ld (available in mpc-0.6).
+ - Add Rmpc_strtoc and Rmpc_set_str (available in 0.6), and add set_str.t
+   test script.
+
 0.52
  - Requires version 0.5.2 of the mpc library.
  - Add MPC_VERSION, MPC_VERSION_NUM and Rmpc_get_version.

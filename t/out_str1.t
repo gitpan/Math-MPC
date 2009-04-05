@@ -7,33 +7,34 @@ use Math::MPC qw(:mpc);
 
 print "1..2\n";
 
-Rmpc_set_default_prec(100);
+Rmpc_set_default_prec2(100, 100);
 
 my $string = Math::MPC->new('246' x 7, '3579' x 6);
 my $ok = '';
 
 my $ret = TRmpc_out_str(*STDOUT, 16, 0, $string, MPC_RNDNN);
+# prints "(d.595a684adcdfe766000000000@16 4.bcbbcfdfb50863475ab000000@19)".
 
-if($ret == 64) {$ok .= 'a'}
+if($ret == 63) {$ok .= 'a'}
 else {print "\nReturned: ", $ret, "\n"}
 
 print "\n";
 
 $ret = TRmpc_out_str(*STDOUT, 16, 0, $string, MPC_RNDNN, " \n");
 
-if($ret == 64) {$ok .= 'b'}
+if($ret == 63) {$ok .= 'b'}
 else {print "Returned: ", $ret, "\n"}
 
 $ret = TRmpc_out_str("hello world ", *STDOUT, 16, 0, $string, MPC_RNDNN);
 
-if($ret == 64) {$ok .= 'c'}
+if($ret == 63) {$ok .= 'c'}
 else {print "Returned: ", $ret, "\n"}
 
 print "\n";
 
 $ret = TRmpc_out_str("hello world ", *STDOUT, 16, 0, $string, MPC_RNDNN, " \n");
 
-if($ret == 64) {$ok .= 'd'}
+if($ret == 63) {$ok .= 'd'}
 else {print "Returned: ", $ret, "\n"}
 
 if($ok eq 'abcd') {print "ok 1 \n"}
