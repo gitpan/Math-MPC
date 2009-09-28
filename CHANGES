@@ -1,5 +1,17 @@
+0.70
+ - Requires version 0.7 of the mpc library. (Change to MPC_SET_X_Y.)
+ - Remove Rmpc_random and Rmpc_random2 (as the functions that they
+   wrap have been removed in mpc-0.7. (And remove t/mpc_random.t.)
+ - Add Rmpc_pow, Rmpc_set_nan and Rmpc_swap (new in mpc-0.7).
+ - Overload the ** and **= operators.
+ - Improve the efficiency of some of the overload routines by
+   eliminating the need to use a temporary mpfr object (using the
+   already existing *mpc_t_obj instead).
+ - Remove the rounding arg from RMPC_RE() and RMPC_IM() as it does
+   nothing, anyway.
+
 0.60
- - Requires version 0.60 of the mpc library.
+ - Requires version 0.6 of the mpc library.
  - Now a complete range of Rmpc_set_*_* functions (where '*' can be any
    one of 'ui', 'si', 'd', 'uj', 'sj', 'ld', 'f', 'q', 'z' and 'fr').
  - Add Rmpc_set_z, Rmpc_set_q, Rmpc_set_f and Rmpc_set_fr.

@@ -2,25 +2,36 @@
     use strict;
     use warnings;
 
-    use constant MPC_RNDNN => 0;
-    use constant MPC_RNDZN => 1;
-    use constant MPC_RNDUN => 2;
-    use constant MPC_RNDDN => 3;
+    use constant  MPC_RNDNN => 0;
+    use constant  MPC_RNDZN => 1;
+    use constant  MPC_RNDUN => 2;
+    use constant  MPC_RNDDN => 3;
 
-    use constant MPC_RNDNZ => 16;
-    use constant MPC_RNDZZ => 17;
-    use constant MPC_RNDUZ => 18;
-    use constant MPC_RNDDZ => 19;
+    use constant  MPC_RNDNZ => 16;
+    use constant  MPC_RNDZZ => 17;
+    use constant  MPC_RNDUZ => 18;
+    use constant  MPC_RNDDZ => 19;
 
-    use constant MPC_RNDNU => 32;
-    use constant MPC_RNDZU => 33;
-    use constant MPC_RNDUU => 34;
-    use constant MPC_RNDDU => 35;
+    use constant  MPC_RNDNU => 32;
+    use constant  MPC_RNDZU => 33;
+    use constant  MPC_RNDUU => 34;
+    use constant  MPC_RNDDU => 35;
 
-    use constant MPC_RNDND => 48;
-    use constant MPC_RNDZD => 49;
-    use constant MPC_RNDUD => 50;
-    use constant MPC_RNDDD => 51;
+    use constant  MPC_RNDND => 48;
+    use constant  MPC_RNDZD => 49;
+    use constant  MPC_RNDUD => 50;
+    use constant  MPC_RNDDD => 51;
+
+    use constant  _UOK_T   => 1;
+    use constant  _IOK_T   => 2;
+    use constant  _NOK_T   => 3;
+    use constant  _POK_T   => 4;
+    use constant  _MATH_MPFR_T   => 5;
+    use constant  _MATH_GMPf_T   => 6;
+    use constant  _MATH_GMPq_T   => 7;
+    use constant  _MATH_GMPz_T   => 8;
+    use constant  _MATH_GMP_T    => 9;
+    use constant  _MATH_MPC_T    => 10;
 
     use subs qw(MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR
                 MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
@@ -31,10 +42,12 @@
     '-'    => \&overload_sub,
     '*'    => \&overload_mul,
     '/'    => \&overload_div,
+    '**'   => \&overload_pow,
     '+='   => \&overload_add_eq,
     '-='   => \&overload_sub_eq,
     '*='   => \&overload_mul_eq,
     '/='   => \&overload_div_eq,
+    '**='  => \&overload_pow_eq,
     '=='   => \&overload_equiv,
     '!='   => \&overload_not_equiv,
     '!'    => \&overload_not,
@@ -97,12 +110,12 @@ Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string 
 TRmpc_out_str TRmpc_inp_str
-Rmpc_random Rmpc_random2
 Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
+Rmpc_pow Rmpc_set_nan Rmpc_swap
 );
 
-    $Math::MPC::VERSION = '0.60';
+    $Math::MPC::VERSION = '0.70';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
@@ -150,9 +163,9 @@ Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string
 TRmpc_out_str TRmpc_inp_str
-Rmpc_random Rmpc_random2
 Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
+Rmpc_pow Rmpc_set_nan Rmpc_swap
 )]);
 
 *TRmpc_out_str = \&Rmpc_out_str;
@@ -281,7 +294,7 @@ sub new {
       if(!@_) {return Rmpc_init3(@prec)}
       } 
 
-    if(_itsa($_[0]) == 10) { # It's a Math::MPC object
+    if(_itsa($_[0]) == _MATH_MPC_T) {
       if(@_ > 1) {die "Too many arguments supplied to new() - expected no more than one"}
       my $mpc = Rmpc_init3(@prec);
       Rmpc_set($mpc, $_[0], Rmpc_get_default_rounding_mode());
@@ -325,16 +338,16 @@ sub new {
 
 sub Rmpc_out_str {
     if(@_ == 5) {
-      die "Inappropriate 4th arg supplied to Rmpc_out_str" if _itsa($_[3]) != 10;
+      die "Inappropriate 4th arg supplied to Rmpc_out_str" if _itsa($_[3]) != _MATH_MPC_T;
       return _Rmpc_out_str($_[0], $_[1], $_[2], $_[3], $_[4]);
     }
     if(@_ == 6) {
-      if(_itsa($_[3]) == 10) {return _Rmpc_out_strS($_[0], $_[1], $_[2], $_[3], $_[4], $_[5])}
-      die "Incorrect args supplied to Rmpc_out_str" if _itsa($_[4]) != 10;
+      if(_itsa($_[3]) == _MATH_MPC_T) {return _Rmpc_out_strS($_[0], $_[1], $_[2], $_[3], $_[4], $_[5])}
+      die "Incorrect args supplied to Rmpc_out_str" if _itsa($_[4]) != _MATH_MPC_T;
       return _Rmpc_out_strP($_[0], $_[1], $_[2], $_[3], $_[4], $_[5]);
     }
     if(@_ == 7) {
-      die "Inappropriate 5th arg supplied to Rmpc_out_str" if _itsa($_[4]) != 10;
+      die "Inappropriate 5th arg supplied to Rmpc_out_str" if _itsa($_[4]) != _MATH_MPC_T;
       return _Rmpc_out_strPS($_[0], $_[1], $_[2], $_[3], $_[4], $_[5], $_[6]);
     }
     die "Wrong number of arguments supplied to Rmpc_out_str()";
@@ -444,21 +457,23 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    would add $r2 to $r3 and store the result in $r1. Alternatively
    it could be coded as $r1 = $r2 + $r3.
 
+   In the documentation that follows:
+
    "$ui" means an integer that will fit into a C 'unsigned long int',
 
    "$si" means an integer that will fit into a C 'signed long int'.
 
    "$uj" means an integer that will fit into a C 'uintmax_t'. Don't
-   use any of these functions unless your perl was compiled with 64
+   use the _uj functions unless your perl was compiled with 64
    bit integer support.
 
    "$sj" means an integer that will fit into a C 'intmax_t'. Don't
-   use any of these functions unless your perl was compiled with 64
+   use the _sj functions unless your perl was compiled with 64
    bit integer support.
 
    "$double" is a C double.
 
-   "$ld" is a C long double. Don't use these functions unless your
+   "$ld" is a C long double. Don't use the _ld functions unless your
    perl was compiled with long double support.
 
    "$bool" means a value (usually a 'signed long int') in which
@@ -714,6 +729,9 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     direction $rnd. When the return value is 0, it means the result
     is exact. Else it's unknown whether the result is exact or not.
 
+   $si = Rmpc_pow($rop, $op1, $op2, $rnd);
+    Set $op to ($op1 ** $op2) rounded in the direction $rnd. 
+
    $si = Rmpc_neg($rop, $op, $rnd);
     Set $rop to -$op rounded in the direction $rnd. Just
     changes the sign if $rop and $op are the same variable.
@@ -741,6 +759,9 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     Set $rop to $op divided by 2 raised to $ui rounded according to
     $rnd. Just decreases the exponents of the real and imaginary 
     parts by $ui when $rop and $op are identical.
+
+  Rmpc_swap($op1, $op2);
+    Swap the values (and precisions) of op1 and op2 efficiently.
 
    ##########
 
@@ -788,6 +809,9 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
      which case the real part of $rop is set to plus infinity and its
      imaginary part to a signed zero with the same sign as the 
      imaginary part of $op.
+
+   Rmpc_set_nan($op);
+     Set $op to 'NaN +I*NaN'.  
 
    ##########
 
@@ -845,12 +869,13 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     the mantissa will contain the maximum number of digits accurately
     representable.    
 
-   RMPC_RE($mpfr, $op, $rnd);
-   RMPC_IM($mpfr, $op, $rnd);
+   RMPC_RE($mpfr, $op);
+   RMPC_IM($mpfr, $op);
     Set $mpfr to the value of the real (respectively imaginary) component
     of $op. $mpfr will be an exact copy of the real/imaginary component 
     of op - ie the precision of $mpfr will be set to the precision of the
-    real/imaginary component of $op before the copy is made. 
+    real/imaginary component of $op before the copy is made. Hence no need
+    for a rounding arg to be supplied. 
 
    $si = Rmpc_real($mpfr, $op, $rnd);
    $si = Rmpc_imag($mpfr, $op, $rnd);
@@ -871,7 +896,8 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     the imaginary part. The argument $base may be in the range 2 to 36.
     Return the number of bytes read, or if an error occurred, return 0.
 
-   $ul = Rmpc_out_str([$prefix,] $stream, $base, $digits, $op, $rnd [, $suffix]);
+   $ul = 
+   Rmpc_out_str([$pre,] $stream, $base, $digits, $op, $rnd [, $suf]);
     This function changed from 1st release (version 0.45) of Math::MPC. 
     Output $op to $stream, in base $base, rounded according to $rnd. First
     the real part is printed, followed by the imaginary part. The base may
@@ -880,10 +906,10 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     representable by $op. In addition to the significant digits, a decimal
     point at the right of the first digit and a trailing exponent, in the
     form eYYY , are printed.  (If $base is greater than 10, "@" will be
-    used as exponent delimiter.) $prefix and $suffix are optional
-    arguments containing a string that will be prepended/appended to the
-    output of $op. Return the number of bytes written. (The contents of 
-    $prefix and $suffix are not included in the count.)
+    used as exponent delimiter.) $pre and $suf are optional arguments
+    containing a string that will be prepended/appended to the output.
+    Return the number of bytes written. (The contents of $pre and $suf
+    are not included in the count.)
 
    $si = Rmpc_set_str($rop, $string, $base, $rnd);
    $si = Rmpc_strtoc($rop, $string, $base, $rnd);
@@ -901,26 +927,6 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     the original value of $op. See the mpc documentation for details.
 
 
-   #############
-
-   RANDOM NUMBERS
-
-   Rmpc_random($rop);
-    Assign a random complex to $rop, with real and imaginary parts
-    uniformly distributed in the interval -1 < X < 1.
-
-   Rmpc_random2($rop, $si, $ui);
-    Assign a random complex to $rop, with real and imaginary part
-    of at most $si limbs, with long strings of zeros and ones in the
-    binary representation. The exponent of the real (resp. imaginary)
-    part is in the interval -$ui to +$ui. (I find that the exponent can
-    be equal to -$ui, but is always less than +$ui - not sure if that's
-    a bug in the MPC library.)
-    This function is useful for testing functions and algorithms, since
-    this kind of random numbers have proven to be more likely to trigger
-    corner-case bugs.  
-    Negative (mantissa) parts are generated when $si is negative.
-
    ####################
 
    OPERATOR OVERLOADING
@@ -937,9 +943,16 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     Math::MPC object with *current default precision*, and using
     the *current default rounding mode*.
 
+    Be aware also, that the sign of zero is not always handled
+    correctly by the overload subroutines. If it's important to you
+    that the sign of zero be handled correctly, don't use the
+    overloaded operators. (For multiplication, division, addition
+    and subtraction the sign of zero will be handled correctly by the
+    overloaded operators if both operands are Math::MPC objects.)
+
     The following operators are overloaded:
-     + - * / sqrt (Return object has default precision)
-     += -= *= /= (Precision remains unchanged)
+     + - * / ** sqrt (Return object has default precision)
+     += -= *= /= **= (Precision remains unchanged)
      == != 
      ! not
      abs (Returns an MPFR object, blessed into package Math::MPFR)
@@ -963,7 +976,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
     1. If the variable is an unsigned long then that value is used.
        The variable is considered to be an unsigned long if 
-       (perl 5.8) the UOK flag is set or if (perl 5.6) SvIsUV() 
+       (perl 5.8 on) the UOK flag is set or if (perl 5.6) SvIsUV() 
        returns true.(In the case of perls built with -Duse64bitint,
        the variable is treated as an unsigned long long int if the
        UOK flag is set.)
@@ -1037,6 +1050,9 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     argument to the functions - so if you get a segfault, the
     first thing to do is to check that the argument types 
     you have supplied are appropriate.
+    Also, as mentioned above in the "OPERATOR OVERLOADING" section,
+    the overloaded operators are not guaranteed to handle the sign
+    of zero correctly.
 
 =head1 LICENSE
 

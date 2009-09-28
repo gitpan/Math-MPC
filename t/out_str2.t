@@ -215,8 +215,8 @@ close RD8 or die "Can't close RD8: $!";
 my $real = Math::MPFR->new();
 my $im = Math::MPFR->new();
 
-RMPC_RE($real, $mpc, GMP_RNDN);
-RMPC_IM($im, $mpc, GMP_RNDN);
+RMPC_RE($real, $mpc);
+RMPC_IM($im, $mpc);
 
 if($ret == 0 && $real == 6.5 && $im == 8.25) {print "ok 8\n"}
 else {print "not ok 8 $ret $real $im $mpc\n"}

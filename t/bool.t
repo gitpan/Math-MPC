@@ -17,20 +17,20 @@ my $ok = '';
 
 if(Rmpfr_erangeflag_p()) {Rmpfr_clear_erangeflag()}
 
-RMPC_RE($t1, $nan, MPC_RNDNN);
-RMPC_IM($t2, $nan, MPC_RNDNN);
+RMPC_RE($t1, $nan);
+RMPC_IM($t2, $nan);
 
 if(Rmpfr_nan_p($t1) && Rmpfr_nan_p($t2))
   {$ok .= 'a'}
 
-RMPC_RE($t1, $untrue1, MPC_RNDNN);
-RMPC_IM($t2, $untrue1, MPC_RNDNN);
+RMPC_RE($t1, $untrue1);
+RMPC_IM($t2, $untrue1);
 
 if(Rmpfr_nan_p($t1) && !Rmpfr_nan_p($t2))
   {$ok .= 'b'}
 
-RMPC_RE($t1, $untrue2, MPC_RNDNN);
-RMPC_IM($t2, $untrue2, MPC_RNDNN);
+RMPC_RE($t1, $untrue2);
+RMPC_IM($t2, $untrue2);
 
 if(!Rmpfr_nan_p($t1) && Rmpfr_nan_p($t2))
   {$ok .= 'c'}

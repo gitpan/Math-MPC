@@ -84,10 +84,10 @@ $ok = '';
 {
 my $mpc1 = Math::MPC->new();
 my $mpc2 = Math::MPC::new();
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
-RMPC_IM($mpfr2, $mpc1, MPC_RNDNN);
-RMPC_RE($mpfr3, $mpc2, MPC_RNDNN);
-RMPC_IM($mpfr4, $mpc2, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+RMPC_IM($mpfr2, $mpc1);
+RMPC_RE($mpfr3, $mpc2);
+RMPC_IM($mpfr4, $mpc2);
 }
 $ok .= 'a' if Rmpfr_nan_p($mpfr1);
 $ok .= 'b' if Rmpfr_nan_p($mpfr2);
@@ -102,10 +102,10 @@ $ok = '';
 {
 my $mpc1 = Math::MPC->new(~0);
 my $mpc2 = Math::MPC::new(~0);
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
-RMPC_IM($mpfr2, $mpc1, MPC_RNDNN);
-RMPC_RE($mpfr3, $mpc2, MPC_RNDNN);
-RMPC_IM($mpfr4, $mpc2, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+RMPC_IM($mpfr2, $mpc1);
+RMPC_RE($mpfr3, $mpc2);
+RMPC_IM($mpfr4, $mpc2);
 }
 
 $ok .= 'a' if $mpfr1 == ~0;
@@ -121,10 +121,10 @@ $ok = '';
 {
 my $mpc1 = Math::MPC->new(-7, ~0);
 my $mpc2 = Math::MPC::new(-7, ~0);
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
-RMPC_IM($mpfr2, $mpc1, MPC_RNDNN);
-RMPC_RE($mpfr3, $mpc2, MPC_RNDNN);
-RMPC_IM($mpfr4, $mpc2, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+RMPC_IM($mpfr2, $mpc1);
+RMPC_RE($mpfr3, $mpc2);
+RMPC_IM($mpfr4, $mpc2);
 }
 
 $ok .= 'a' if $mpfr1 == -7;
@@ -140,10 +140,10 @@ $ok = '';
 {
 my $mpc1 = Math::MPC->new(2199023255552.5, -7);
 my $mpc2 = Math::MPC::new(2199023255552.5, -7);
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
-RMPC_IM($mpfr2, $mpc1, MPC_RNDNN);
-RMPC_RE($mpfr3, $mpc2, MPC_RNDNN);
-RMPC_IM($mpfr4, $mpc2, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+RMPC_IM($mpfr2, $mpc1);
+RMPC_RE($mpfr3, $mpc2);
+RMPC_IM($mpfr4, $mpc2);
 }
 
 $ok .= 'a' if $mpfr1 == 2199023255552.5;
@@ -159,10 +159,10 @@ $ok = '';
 {
 my $mpc1 = Math::MPC->new('2199023255552' x 7, -2199023255552.5);
 my $mpc2 = Math::MPC::new('2199023255552' x 7, -2199023255552.5);
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
-RMPC_IM($mpfr2, $mpc1, MPC_RNDNN);
-RMPC_RE($mpfr3, $mpc2, MPC_RNDNN);
-RMPC_IM($mpfr4, $mpc2, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+RMPC_IM($mpfr2, $mpc1);
+RMPC_RE($mpfr3, $mpc2);
+RMPC_IM($mpfr4, $mpc2);
 $mpfr = Math::MPFR->new($mpfr1);
 }
 
@@ -182,10 +182,10 @@ $string = '-' . $string;
 {
 my $mpc1 = Math::MPC->new($mpfr, $string);
 my $mpc2 = Math::MPC::new($mpfr, $string);
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
-RMPC_IM($mpfr2, $mpc1, MPC_RNDNN);
-RMPC_RE($mpfr3, $mpc2, MPC_RNDNN);
-RMPC_IM($mpfr4, $mpc2, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+RMPC_IM($mpfr2, $mpc1);
+RMPC_RE($mpfr3, $mpc2);
+RMPC_IM($mpfr4, $mpc2);
 }
 
 $ok .= 'a' if $mpfr1 == $mpfr;
@@ -203,10 +203,10 @@ my $mpc1 = Math::MPC->new(6, $mpfr);
 my $mpc2 = Math::MPC::new(6, $mpfr);
 $mpc3 = Math::MPC->new($mpc1);
 $mpc4 = Math::MPC::new($mpc1);
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
-RMPC_IM($mpfr2, $mpc1, MPC_RNDNN);
-RMPC_RE($mpfr3, $mpc2, MPC_RNDNN);
-RMPC_IM($mpfr4, $mpc2, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+RMPC_IM($mpfr2, $mpc1);
+RMPC_RE($mpfr3, $mpc2);
+RMPC_IM($mpfr4, $mpc2);
 }
 
 $ok .= 'a' if $mpfr1 == 6;
@@ -235,10 +235,10 @@ $ok = '';
 {
 my $mpc1 = Math::MPC->new('0b111', '0xff');
 my $mpc2 = Math::MPC::new('0B111', '0XFF');
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
-RMPC_IM($mpfr2, $mpc1, MPC_RNDNN);
-RMPC_RE($mpfr3, $mpc2, MPC_RNDNN);
-RMPC_IM($mpfr4, $mpc2, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+RMPC_IM($mpfr2, $mpc1);
+RMPC_RE($mpfr3, $mpc2);
+RMPC_IM($mpfr4, $mpc2);
 }
 
 $ok .= 'a' if $mpfr1 == 7;

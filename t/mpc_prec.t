@@ -72,11 +72,11 @@ my $mpfr = Math::MPFR->new();
 
 $ok .= 'a' if Rmpfr_get_prec($mpfr) == 60;
 
-RMPC_RE($mpfr, $mpc6, MPC_RNDNN);
+RMPC_RE($mpfr, $mpc6);
 
 $ok .= 'b' if Rmpfr_get_prec($mpfr) == 150;
 
-RMPC_IM($mpfr, $mpc6, MPC_RNDNN);
+RMPC_IM($mpfr, $mpc6);
 
 $ok .= 'c' if Rmpfr_get_prec($mpfr) == 180;
 
@@ -94,11 +94,11 @@ Rmpc_set_im_prec($mpc3, 222);
 $ok .= 'a' if Rmpc_get_re_prec($mpc3) == 111;
 $ok .= 'b' if Rmpc_get_im_prec($mpc3) == 222;
 
-RMPC_RE($mpfr, $mpc3, MPC_RNDNN);
+RMPC_RE($mpfr, $mpc3);
 
 $ok .= 'c' if Rmpfr_nan_p($mpfr);
 
-RMPC_IM($mpfr, $mpc3, MPC_RNDNN);
+RMPC_IM($mpfr, $mpc3);
 
 $ok .= 'd' if Rmpfr_nan_p($mpfr);
 

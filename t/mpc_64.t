@@ -40,39 +40,39 @@ $ok = '';
 if($_64i) {Rmpc_set_uj_uj($mpc1, ~0, ~0, MPC_RNDNN)}
 else {Rmpc_set_ui_ui($mpc1, ~0, ~0, MPC_RNDNN)}
 
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
 $ok .= 'a' if $mpfr1 == ~0;
-RMPC_IM($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_IM($mpfr1, $mpc1);
 $ok .= 'b' if $mpfr1 == ~0;
 
 if($_64i) {Rmpc_set_sj_sj($mpc1, $simax, $simax, MPC_RNDNN)}
 else {Rmpc_set_si_si($mpc1, $simax, $simax, MPC_RNDNN)}
 
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
 $ok .= 'c' if $mpfr1 == $simax;
-RMPC_IM($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_IM($mpfr1, $mpc1);
 $ok .= 'd' if $mpfr1 == $simax;
 
 if($_64d) {Rmpc_set_ld_ld($mpc1, $uimax + 2, $uimax + 2, MPC_RNDNN)}
 else {Rmpc_set_d_d($mpc1, $uimax + 2, $uimax + 2, MPC_RNDNN)}
 
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
 $ok .= 'e' if $mpfr1 == $uimax + 2;
-RMPC_IM($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_IM($mpfr1, $mpc1);
 $ok .= 'f' if $mpfr1 == $uimax + 2;
 
 Rmpc_set_fr_fr($mpc1, $uimpfr, $uimpfr, MPC_RNDNN);
 
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
 $ok .= 'g' if $mpfr1 == ~0;
-RMPC_IM($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_IM($mpfr1, $mpc1);
 $ok .= 'h' if $mpfr1 == ~0;
 
 Rmpc_set_fr_fr($mpc1, $simpfr, $simpfr, MPC_RNDNN);
 
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
 $ok .= 'i' if $mpfr1 == $simpfr;
-RMPC_IM($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_IM($mpfr1, $mpc1);
 $ok .= 'j' if $mpfr1 == $simpfr;
 
 if($ok eq 'abcdefghij') {print "ok 2\n"}

@@ -15,14 +15,11 @@ print STDERR "# Math::MPC uses mpfr library version ", Math::MPC::mpfr_v(), "\n"
 print STDERR "# Math::MPFR uses gmp library version ", Math::MPFR::gmp_v(), "\n";
 print STDERR "# Math::MPC uses gmp library version ", Math::MPC::gmp_v(), "\n";
 
-if($Math::MPC::VERSION eq '0.60') {print "ok 1\n"}
+if($Math::MPC::VERSION eq '0.70') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPC::VERSION\n"}
 
-if(MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 5 ||
-  (MPC_VERSION_MINOR == 5 && MPC_VERSION_PATCHLEVEL >= 2)) {print "ok 2\n"}
+if(MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 5) {print "ok 2\n"}
 else {print "not ok 2 MPC Library version ", MPC_VERSION_STRING, " is too old\n"}
-
-if(MPC_VERSION_STRING eq '0.5.2') {$string =~ s/mpc //i} # known issue with 0.5.2
 
 if($string eq MPC_VERSION_STRING) {print "ok 3\n"}
 else {print "not ok 3 \"", Rmpc_get_version, "\" (library version) does not match \"", MPC_VERSION_STRING, "\" (header file version)\n"}

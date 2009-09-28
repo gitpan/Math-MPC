@@ -17,16 +17,16 @@ my $ok = '';
 
 Rmpc_sin($mpc1, $z, MPC_RNDNN);
 
-RMPC_RE($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
 $ok .= 'a' if $mpfr1 < 3.420954862 && $mpfr1 > 3.42095486;
-RMPC_IM($mpfr1, $mpc1, MPC_RNDNN);
+RMPC_IM($mpfr1, $mpc1);
 $ok .= 'b' if $mpfr1 > -1.50930648533 && $mpfr1 < -1.5093064853;
 
 my $mpc2 = sin($zz);
 
-RMPC_RE($mpfr1, $mpc2, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc2);
 $ok .= 'c' if $mpfr1 < 1.29845758142 && $mpfr1 > 1.2984575814;
-RMPC_IM($mpfr1, $mpc2, MPC_RNDNN);
+RMPC_IM($mpfr1, $mpc2);
 $ok .= 'd' if $mpfr1 > 0.634963914784 && $mpfr1 < 0.634963914785;
 
 if($ok eq 'abcd') {print "ok 1\n"}
@@ -40,14 +40,14 @@ Rmpc_tan($tan, $z, MPC_RNDNN);
 
 my $diff1 = $tan - ($sin / $cos);
 
-RMPC_RE($mpfr1, $diff1, MPC_RNDNN);
+RMPC_RE($mpfr1, $diff1);
 $ok .= 'a' if $mpfr1 < 0.000001 && $mpfr1 > -0.000001;
-RMPC_IM($mpfr1, $diff1, MPC_RNDNN);
+RMPC_IM($mpfr1, $diff1);
 $ok .= 'b' if $mpfr1 < 0.000001 && $mpfr1 > -0.000001;
 
-RMPC_RE($mpfr1, ($sin * $sin) + ($cos * $cos), MPC_RNDNN);
+RMPC_RE($mpfr1, ($sin * $sin) + ($cos * $cos));
 $ok .= 'c' if $mpfr1 < 1.000001 && $mpfr1 > 0.999999;
-RMPC_IM($mpfr1, ($sin * $sin) + ($cos * $cos),  MPC_RNDNN);
+RMPC_IM($mpfr1, ($sin * $sin) + ($cos * $cos));
 $ok .= 'd' if $mpfr1 < 0.000001 && $mpfr1 > -0.000001;
 
 if($ok eq 'abcd') {print "ok 2\n"}
