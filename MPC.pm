@@ -60,7 +60,8 @@
     'log'  => \&overload_log,
     'sqrt' => \&overload_sqrt,
     'sin'  => \&overload_sin,
-    'cos'  => \&overload_cos;
+    'cos'  => \&overload_cos,
+    'atan2'=> \&overload_atan2;
 
     require Exporter;
     *import = \&Exporter::import;
@@ -111,11 +112,13 @@ Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string 
 TRmpc_out_str TRmpc_inp_str
 Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
+Rmpc_asin Rmpc_acos Rmpc_atan Rmpc_asinh Rmpc_acosh Rmpc_atanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
-Rmpc_pow Rmpc_set_nan Rmpc_swap
+Rmpc_pow Rmpc_pow_d Rmpc_pow_ld Rmpc_pow_si Rmpc_pow_ui Rmpc_pow_z Rmpc_pow_fr
+Rmpc_set_nan Rmpc_swap
 );
 
-    $Math::MPC::VERSION = '0.70';
+    $Math::MPC::VERSION = '0.80';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
@@ -164,8 +167,10 @@ Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string
 TRmpc_out_str TRmpc_inp_str
 Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
+Rmpc_asin Rmpc_acos Rmpc_atan Rmpc_asinh Rmpc_acosh Rmpc_atanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
-Rmpc_pow Rmpc_set_nan Rmpc_swap
+Rmpc_pow Rmpc_pow_d Rmpc_pow_ld Rmpc_pow_si Rmpc_pow_ui Rmpc_pow_z Rmpc_pow_fr
+Rmpc_set_nan Rmpc_swap
 )]);
 
 *TRmpc_out_str = \&Rmpc_out_str;
@@ -489,13 +494,18 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    "$p" is the (unsigned long) value for precision.
 
-   "$mpf" is a Math::GMPf object (floating point).
+   "$mpf" is a Math::GMPf object (floating point). You'll need Math::GMPf
+          installed in order to create $mpf.
 
-   "$mpq" is a Math::GMPq object (rational).
+   "$mpq" is a Math::GMPq object (rational). You'll need Nath::GMPq 
+          installed in order to create $mpq.
 
-   "$mpz" is a Math::GMP or Math::GMPz object (integer).
+   "$mpz" is a Math::GMP or Math::GMPz object (integer). You'll need
+          Math::GMPz or Math::GMP installed in order to create $mpz.  
 
-   "$mpfr" is a Math::MPFR object (floating point).
+   "$mpfr" is a Math::MPFR object (floating point). You'll need to 
+           'use Math::MPFR;' in order to create $mpfr. (Math::MPFR
+           a pre-requisite module for Math::MPC.) 
 
    ######################
 
@@ -730,7 +740,15 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     is exact. Else it's unknown whether the result is exact or not.
 
    $si = Rmpc_pow($rop, $op1, $op2, $rnd);
-    Set $op to ($op1 ** $op2) rounded in the direction $rnd. 
+   $si = Rmpc_pow_d($rop, $op1, $double, $rnd);
+   $si = Rmpc_pow_ld($rop, $op1, $ld, $rnd);
+   $si2 = Rmpc_pow_si($rop, $op1, $si, $rnd);
+   $si = Rmpc_pow_ui($rop, $op1, $ui, $rnd);
+   $si = Rmpc_pow_z($rop, $op1, $mpz, $rnd);
+   $si = Rmpc_pow_fr($rop, $op1, $mpfr, $rnd);
+    Set $op to ($op1 ** 3rd arg) rounded in the direction $rnd. 
+    Rmpc_pow_ld is available only on perls that have "long double"
+    support.
 
    $si = Rmpc_neg($rop, $op, $rnd);
     Set $rop to -$op rounded in the direction $rnd. Just
@@ -840,6 +858,30 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_tanh($rop, $op, $rnd);
     Set $rop to the hyperbolic tangent of $op, rounded according to
     $rnd with the precision of $rop.
+
+   $si = Rmpc_asin ($rop, $op, $rnd);
+    Set $rop to the inverse sine of $op, rounded according to
+    $rnd with the precision of $rop.
+
+   $si = Rmpc_acos ($rop, $op, $rnd);
+    Set $rop to the inverse cosine of $op, rounded according to
+    $rnd with the precision of $rop.
+
+   $si = Rmpc_atan ($rop, $op, $rnd);
+    Set $rop to the inverse tangent of $op, rounded according to
+    $rnd with the precision of $rop.
+
+   $si = Rmpc_asinh ($rop, $op, $rnd);
+    Set $rop to the inverse hyperbolic sine of $op, rounded
+    according to $rnd with the precision of $rop.
+
+   $si = Rmpc_acosh ($rop, $op, $rnd);
+    Set $rop to the inverse hyperbolic cosine of $op, rounded
+    according to$rnd with the precision of $rop.
+
+   $si = Rmpc_atanh ($rop, $op, $rnd);
+    Set $rop to the inverse hyperbolic tangent of $op, rounded
+    according to$rnd with the precision of $rop.
 
    ##########
 

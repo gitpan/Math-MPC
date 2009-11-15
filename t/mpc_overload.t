@@ -1,9 +1,10 @@
 use warnings;
 use strict;
 use Math::MPC qw(:mpc);
+use Math::MPFR qw(:mpfr);
 use Math::BigInt;
 
-print "1..4\n";
+print "1..5\n";
 
 my $mbi2;
 my $ok = '';
@@ -263,6 +264,25 @@ if($ok eq 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN') {print "ok 4\n"}
 else {
   warn "$ok\n";
   print "not ok 4\n";
+}
+
+$ok = '';
+my $mpc6 = Math::MPC->new(1, 2);
+my $mpc7 = Math::MPC->new(3, 4);
+
+$mpc6 = atan2($mpc6, $mpc7);
+my $mpfr = Math::MPFR->new();
+
+RMPC_RE($mpfr, $mpc6);
+if($mpfr > 0.4164906 && $mpfr < 0.4164907) {$ok .= 'a'}
+
+RMPC_IM($mpfr, $mpc6);
+if($mpfr > 0.06706599 && $mpfr < 0.067066) {$ok .= 'b'}
+
+if($ok eq 'ab') {print "ok 5\n"}
+else {
+  warn "$ok $mpc6\n";
+  print "not ok 5\n";
 }
 
 

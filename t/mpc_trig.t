@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPC qw(:mpc);
 
-print "1..3\n";
+print "1..4\n";
 
 Rmpc_set_default_prec2(359, 359);
 
@@ -75,4 +75,63 @@ $ok .= 'f' if $mpc1 == 0;
 
 if($ok eq 'abcdef') {print "ok 3\n"}
 else {print "not ok 3 $ok\n"}
+
+$ok = '';
+
+Rmpc_sinh($mpc1, $z, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+$ok .= 'a' if $mpfr1 < -1.509306485 && $mpfr1 > -1.50930649;
+RMPC_IM($mpfr1, $mpc1);
+$ok .= 'b' if $mpfr1 > 3.42095486 && $mpfr1 < 3.420954862;
+
+Rmpc_cosh($mpc1, $z, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+$ok .= 'c' if $mpfr1 < -1.565625835 && $mpfr1 > -1.5656258354;
+RMPC_IM($mpfr1, $mpc1);
+$ok .= 'd' if $mpfr1 > 3.297894836 && $mpfr1 < 3.2978948364;
+
+Rmpc_tanh($mpc1, $z, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+$ok .= 'e' if $mpfr1 < 1.0238355946 && $mpfr1 > 1.023835594;
+RMPC_IM($mpfr1, $mpc1);
+$ok .= 'f' if $mpfr1 > -0.028392953 && $mpfr1 < -0.02839295;
+
+Rmpc_asin($mpc1, $z, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+$ok .= 'g' if $mpfr1 < 0.7542492 && $mpfr1 > 0.754249;
+RMPC_IM($mpfr1, $mpc1);
+$ok .= 'h' if $mpfr1 > 1.734324521 && $mpfr1 < 1.7343245215;
+
+Rmpc_acos($mpc1, $z, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+$ok .= 'i' if $mpfr1 < 0.8165471821 && $mpfr1 > 0.816547182;
+RMPC_IM($mpfr1, $mpc1);
+$ok .= 'j' if $mpfr1 > -1.7343245215 && $mpfr1 < -1.734324521;
+
+Rmpc_atan($mpc1, $z, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+$ok .= 'k' if $mpfr1 < 1.3112232697 && $mpfr1 > 1.311223269;
+RMPC_IM($mpfr1, $mpc1);
+$ok .= 'l' if $mpfr1 > 0.23887786 && $mpfr1 < 0.238877862;
+
+Rmpc_asinh($mpc1, $z, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+$ok .= 'm' if $mpfr1 < 1.734324522 && $mpfr1 > 1.734324521;
+RMPC_IM($mpfr1, $mpc1);
+$ok .= 'n' if $mpfr1 > 0.754249144698 && $mpfr1 < 0.7542491446981;
+
+Rmpc_acosh($mpc1, $z, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+$ok .= 'o' if $mpfr1 < 1.734324522 && $mpfr1 > 1.734324521;
+RMPC_IM($mpfr1, $mpc1);
+$ok .= 'p' if $mpfr1 > 0.816547182 && $mpfr1 < 0.8165471821;
+
+Rmpc_atanh($mpc1, $z, MPC_RNDNN);
+RMPC_RE($mpfr1, $mpc1);
+$ok .= 'q' if $mpfr1 < 0.2388778613 && $mpfr1 > 0.2388778612;
+RMPC_IM($mpfr1, $mpc1);
+$ok .= 'r' if $mpfr1 > 1.3112232 && $mpfr1 < 1.31122327;
+
+if($ok eq 'abcdefghijklmnopqr') { print "ok 4\n" }
+else { print "not ok 4 $ok\n" }
 

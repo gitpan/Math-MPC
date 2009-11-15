@@ -1,9 +1,6 @@
 This module wraps the MPC library functions.
 
-Note: The mpc library API changed with the release of mpc-0.7.
-Consequently some code that works with Math::MPC-0.70 won't work 
-with earlier versions of Math::MPC (and vice-versa). See the 
-CHANGES file for details.
+This version of Math::MPC needs mpc-0.8 or later.
 
 The MPC library is a C library for multiple-precision complex number
 computations with exact rounding. It is based on the MPFR C library 
@@ -13,7 +10,7 @@ MPC, like MPFR and GMP, is free. It is distributed under the
 GNU Lesser General Public License (GNU Lesser GPL).
 
 Because this module wraps the MPC functions, it requires that the
-MPC library (version 0.7.0 or later), the GMP library (version 4.2.0
+MPC library (version 0.8.0 or later), the GMP library (version 4.2.0
 or later) and the MPFR library (version 2.3.0 or later) have been
 installed. 
 
@@ -54,18 +51,16 @@ perl Makefile.pl INC="-I/path/to/gmp_includes -I/path/to/mpfr_includes -I/path/t
 64-bit support
 ==============
 
-If your perl's Config reports that 'use64bitint' is defined, or that
-'use64bitall' is defined, or that 'usemorebits' is defined, or that
-'ivsize' is 8, then Math::MPC will, by default, be built with access
+If your perl's Config reports that 'ivsize' is greater than 
+or equal to 8,then Math::MPC will, by default, be built with access
 to the mpfr_*_uj and mpfr_*_sj functions. Else, access to those 
 functions is, by default, denied. You can override the default by 
 opening up the Makefile.PL and uncommenting the appropriate line (just
 a few lines down from the top of the file ... the comments in that
 file should make it clear).
 
-Similarly, if your perl's Config reports that 'uselongdouble' is 
-defined, or that 'usemorebits' is defined, or that 'longdblsize' ==
-'doublesize', then Math::MPC will, by default, be built with access
+Similarly, if your perl's Config reports that 'nvsize' is greater than
+8 then Math::MPC will, by default, be built with access
 to the mpfr_*_ld functions. Else, access to those functions is, 
 by default, denied. You can override the default by opening up the 
 Makefile.PL and uncommenting the appropriate line (just a few lines down

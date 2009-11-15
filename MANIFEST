@@ -15,6 +15,7 @@ t/mpc_mul.t
 t/mpc_nan.t
 t/mpc_new.t
 t/mpc_overload.t
+t/mpc_pow.t
 t/mpc_prec.t
 t/mpc_round.t
 t/mpc_set.t

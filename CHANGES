@@ -1,3 +1,11 @@
+0.80
+ - Requires version 0.8 of the mpc library.
+ - Add Rmpc_asin, Rmpc_acos, Rmpc_atan, Rmpc_asinh, Rmpc_acosh and
+   Rmpc_atanh (new in mpc-0.8).
+ - Add Rmpc_pow_d, Rmpc_pow_ld, Rmpc_pow_si, Rmpc_pow_ui, Rmpc_pow_z
+   and Rmpc_pow_fr (new in mpc-0.8).
+ - Add overloaded atan2 function.
+
 0.70
  - Requires version 0.7 of the mpc library. (Change to MPC_SET_X_Y.)
  - Remove Rmpc_random and Rmpc_random2 (as the functions that they
