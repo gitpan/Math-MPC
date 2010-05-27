@@ -52,19 +52,17 @@ else {print "not ok 1 $ok\n"}
 $ok = '';
 
 my $mpc2 = Math::MPC->new(0, 0);
-$mpc2 *= -1; # On 64bit int builds this will be done as an mpc_mul(),
-             # not an mpc_mul_si() ... and a minus sign will not be
-             # applied to the imaginary part. For the moment, just
-             # check that the real part is a '-0'.
-if(Math::MPC::overload_string($mpc2) =~ /^\-0 /) {$ok .= 'a'}
-else {warn "\n2a: got '",Math::MPC::overload_string($mpc2), "'\nexpected '-0 -I*0'\n"}
+$mpc2 *= -1;
+if(Math::MPC::overload_string($mpc2) eq '(-0 -0)') {$ok .= 'a'}
+else {warn "\n2a: got '",Math::MPC::overload_string($mpc2), "'\nexpected '(-0 -0)'\n"}
 my $mpfr1 = Math::MPFR->new(-0.0);
 my $inf = 1 / $mpfr1;
 my $nan = Math::MPFR->new();
 my $mpc3 = Math::MPC->new($nan, $inf);
 
-if(lc(Math::MPC::overload_string($mpc3)) eq '@nan@ -i*@inf@') {$ok .= 'b'}
-
+if(lc(Math::MPC::overload_string($mpc3)) eq '(@nan@ -@inf@)') {$ok .= 'b'}
+else {warn "\n2b: got '", lc(Math::MPC::overload_string($mpc3)), "'\n" }
+ 
 if($ok eq 'ab') {print "ok 2\n"}
 else {print "not ok 2 $ok\n"}
 

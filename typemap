@@ -3,6 +3,11 @@ mpz_t *		MPZ
 mpf_t * 	MPF
 mpfr_t *	MPFR
 mpc_t *		MPC
+mpc_ptr		MPC_PTR
+mpc_rnd_t		MPC_RND
+intmax_t		INTMAX
+uintmax_t		UINTMAX
+long double		LONG_DOUBLE
 
 INPUT
 MPQ
@@ -15,4 +20,21 @@ MPFR
             $var = INT2PTR($type, SvIV(SvRV($arg)))
 MPC
             $var = INT2PTR($type, SvIV(SvRV($arg)))
+MPC_PTR
+            $var = INT2PTR($type, SvIV(SvRV($arg)))
+MPC_RND
+            $var = ($type)SvUV($arg)
+INTMAX
+            $var = ($type)SvIV($arg)
+UINTMAX
+            $var = ($type)SvUV($arg)
+LONG_DOUBLE
+            $var = ($type)SvNV($arg)
+
+
+
+
+
+
+
 

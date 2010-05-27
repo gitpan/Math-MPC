@@ -1,3 +1,13 @@
+0.81
+ - Change the overload_string() and _get_str() functions to match the
+   formatting provided by mpc_out_str().
+ - Fix the signed zero problem with overloaded mul and div operations,
+   and add t/signed_zero.t as a check. Thanks Paul Zimmerman and 
+   Philippe Theveny.
+ - Add Rmpc_mul_sj, Rmpc_mul_ld, Rmpc_mul_d, Rmpc_div_sj, Rmpc_sj_div,
+   Rmpc_div_ld, Rmpc_ld_div, Rmpc_div_d and Rmpc_d_div. These simply
+   wrap the the XSubs created to fix the signed zero anomaly (above). 
+
 0.80
  - Requires version 0.8 of the mpc library.
  - Add Rmpc_asin, Rmpc_acos, Rmpc_atan, Rmpc_asinh, Rmpc_acosh and

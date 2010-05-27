@@ -116,9 +116,10 @@ Rmpc_asin Rmpc_acos Rmpc_atan Rmpc_asinh Rmpc_acosh Rmpc_atanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
 Rmpc_pow Rmpc_pow_d Rmpc_pow_ld Rmpc_pow_si Rmpc_pow_ui Rmpc_pow_z Rmpc_pow_fr
 Rmpc_set_nan Rmpc_swap
+Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_div Rmpc_div_d Rmpc_d_div
 );
 
-    $Math::MPC::VERSION = '0.80';
+    $Math::MPC::VERSION = '0.81';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
@@ -171,6 +172,7 @@ Rmpc_asin Rmpc_acos Rmpc_atan Rmpc_asinh Rmpc_acosh Rmpc_atanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
 Rmpc_pow Rmpc_pow_d Rmpc_pow_ld Rmpc_pow_si Rmpc_pow_ui Rmpc_pow_z Rmpc_pow_fr
 Rmpc_set_nan Rmpc_swap
+Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_div Rmpc_div_d Rmpc_d_div
 )]);
 
 *TRmpc_out_str = \&Rmpc_out_str;
@@ -191,19 +193,32 @@ Rmpc_set_nan Rmpc_swap
 *Rmpc_set_d_ld  = \&Rmpc_set_ld_ld;
 *Rmpc_set_ld_d  = \&Rmpc_set_ld_ld;
 
+*Rmpc_mul_sj  = \&Math::MPC::_mpc_mul_sj;
+*Rmpc_mul_ld  = \&Math::MPC::_mpc_mul_ld; 
+*Rmpc_mul_d   = \&Math::MPC::_mpc_mul_d;
+*Rmpc_div_sj  = \&Math::MPC::_mpc_div_sj;
+*Rmpc_sj_div  = \&Math::MPC::_mpc_sj_div;
+*Rmpc_div_ld  = \&Math::MPC::_mpc_div_ld;
+*Rmpc_ld_div  = \&Math::MPC::_mpc_ld_div;
+*Rmpc_div_d   = \&Math::MPC::_mpc_div_d;
+*Rmpc_d_div   = \&Math::MPC::_mpc_d_div;
+
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
 sub overload_string {
-     return _get_str($_[0], 10, 0, Rmpc_get_default_rounding_mode());
+     return "(" . _get_str($_[0], 10, 0, Rmpc_get_default_rounding_mode()) . ")";
+
 }
 
 ### Was originally called Rmpc_get_str ###
 sub _get_str {
     my ($r_s, $i_s) = c_string($_[0], $_[1], $_[2], $_[3]);
-    my $sep = $i_s =~ /\-/ ? ' -I*' : ' +I*';
-    $i_s =~ s/\-//;
-    my $s = $r_s . $sep . $i_s;
-    return $s;
+    # Changed to stay in step with change to mpc_out_str() format
+    #my $sep = $i_s =~ /\-/ ? ' -I*' : ' +I*';
+    #$i_s =~ s/\-//;
+    #my $s = $r_s . $sep . $i_s;
+    #return $s;
+    return $r_s . " " . $i_s;
 }
 
 sub c_string {
@@ -636,6 +651,11 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     double support. Don't use Rmpc_set_uj or Rmpc_set_sj unless
     perl has been built with long long int support.
 
+   $si = Rmpc_set_str($rop, $string, $base, $rnd);
+   $si = Rmpc_strtoc($rop, $string, $base, $rnd);
+    Set $rop to the value represented in $string (in base $base), rounded
+    in accordance with $rnd. See the mpc documentation for details.
+
    $si = Rmpc_set_ui_ui($rop, $ui1, $ui2, $rnd);
    $si3 = Rmpc_set_si_si($rop, $si1, $si2, $rnd);
    $si = Rmpc_set_d_d($rop, $double1, $double2, $rnd);
@@ -717,8 +737,13 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_mul($rop, $op1, $op2, $rnd);
    $si = Rmpc_mul_ui($rop, $op, $ui, $rnd);
    $si = Rmpc_mul_si($rop, $op, $si1, $rnd);
+   $si = Rmpc_mul_sj($rop, $op, $sj, $rnd);   # Math::MPC XSub
+   $si = Rmpc_mul_d($rop, $op, $double, $rnd);# Math::MPC XSub
+   $si = Rmpc_mul_ld($rop, $op, $ld, $rnd);   # Math::MPC XSub
    $si = Rmpc_mul_fr($rop, $op, $mpfr, $rnd);
     Set $rop to 2nd arg * 3rd arg rounded in the direction $rnd.
+    The 'sj'/'ld' versions are available only on perls built with
+    '64 bit int'/'long double' support.
 
    $si = Rmpc_mul_i($rop, $op, $si1, $rnd);
     If $si1 >= 0 (non-negative), set $rop to $op times the 
@@ -728,8 +753,16 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_div($rop, $op1, $op2, $rnd);
    $si = Rmpc_div_ui($rop, $op, $ui, $rnd);
    $si = Rmpc_ui_div($rop, $ui, $op, $rnd);
+   $si = Rmpc_div_d($rop, $op, $double, $rnd); # Math::MPC XSub
+   $si = Rmpc_d_div($rop, $double, $op, $rnd); # Math::MPC XSub
+   $si = Rmpc_div_sj($rop, $op, $sj, $rnd); # Math::MPC XSub
+   $si = Rmpc_sj_div($rop, $sj, $op, $rnd); # Math::MPC XSub
+   $si = Rmpc_div_ld($rop, $op, $ld, $rnd); # Math::MPC XSub
+   $si = Rmpc_ld_div($rop, $ld, $op, $rnd); # Math::MPC XSub
    $si = Rmpc_div_fr($rop, $op, $mpfr, $rnd);
     Set $rop to 2nd arg / 3rd arg rounded in the direction $rnd. 
+    The 'sj'/'ld' versions are available only on perls built with
+    '64 bit int'/'long double' support.
 
    $si = Rmpc_sqr($rop, $op, $rnd);
     Set $rop to the square of $op, rounded in direction $rnd.
@@ -953,12 +986,6 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     Return the number of bytes written. (The contents of $pre and $suf
     are not included in the count.)
 
-   $si = Rmpc_set_str($rop, $string, $base, $rnd);
-   $si = Rmpc_strtoc($rop, $string, $base, $rnd);
-    Set $rop to the value represented in $string (in base $base), rounded
-    in accordance with $rnd. See the mpc documentation for details.
-
-   
    $string = Rmpc_get_str($base, $how_many, $op, $rnd);
     Convert $op to a string containing the real and imaginary parts of
     $op. The number of significant digits for both real and imaginary
@@ -1100,7 +1127,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
     This program is free software; you may redistribute it and/or 
     modify it under the same terms as Perl itself.
-    Copyright 2006-2009, Sisyphus
+    Copyright 2006-2009, 2010, Sisyphus
 
 =head1 AUTHOR
 

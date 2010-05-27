@@ -7,6 +7,7 @@
 #if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
 #ifndef _MSC_VER
 #include <inttypes.h>
+#include <limits.h>
 #endif
 #endif
 
@@ -16,6 +17,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(disable:4700 4715 4716)
+#define intmax_t __int64
 #endif
 
 #ifdef OLDPERL
@@ -38,6 +40,223 @@ mpc_rnd_t _perl_default_rounding_mode = MPC_RNDNN;
 
 mp_prec_t _perl_default_prec_re = 53;
 mp_prec_t _perl_default_prec_im = 53;
+
+
+
+/* This function is used by overload_mul and overload_mul_eq whenn           */
+/* USE_64_BIT_INT is defined.                                                */
+/* It is based on some code posted by Philippe Theveny.                      */
+
+int _mpc_mul_sj (mpc_ptr rop, mpc_ptr op, intmax_t i, mpc_rnd_t rnd) {
+
+#ifdef USE_64_BIT_INT
+
+   mpfr_t x;
+   int inex;
+
+   mpfr_init2 (x, sizeof(intmax_t) * CHAR_BIT);
+   mpfr_set_sj (x, i, GMP_RNDN);
+
+   inex = mpc_mul_fr (rop, op, x, rnd);
+
+   mpfr_clear (x);
+   return inex;
+}
+
+#else
+
+   croak("_mpc_mul_sj not implememnted on this build of perl\n");
+}
+
+#endif
+
+
+/* This function is used by overload_mul and overload_mul_eq whenn           */
+/* USE_LONG_DOUBLE is defined.                                               */
+/* It is based on some code posted by Philippe Theveny.                      */
+
+int _mpc_mul_ld (mpc_ptr rop, mpc_ptr op, long double i, mpc_rnd_t rnd) {
+
+#ifdef USE_LONG_DOUBLE
+
+   mpfr_t x;
+   int inex;
+
+   mpfr_init2 (x, sizeof(long double) * CHAR_BIT);
+   mpfr_set_ld (x, i, GMP_RNDN);
+
+   inex = mpc_mul_fr (rop, op, x, rnd);
+
+   mpfr_clear (x);
+   return inex;
+}
+
+#else
+
+   croak("_mpc_mul_ld not implememnted on this build of perl\n");
+}
+
+#endif
+
+
+/* This function is used by overload_mul and overload_mul_eq.                */
+/* It is based on some code posted by Philippe Theveny.                      */
+
+int _mpc_mul_d (mpc_ptr rop, mpc_ptr op, double i, mpc_rnd_t rnd) {
+   mpfr_t x;
+   int inex;
+
+   mpfr_init2 (x, sizeof(double) * CHAR_BIT);
+   mpfr_set_d (x, i, GMP_RNDN);
+
+   inex = mpc_mul_fr (rop, op, x, rnd);
+
+   mpfr_clear (x);
+   return inex;
+}
+
+
+/* This function is used by overload_div and overload_div_eq whenn           */
+/* USE_64_BIT_INT is defined.                                                */
+/* It is based on some code posted by Philippe Theveny.                      */
+
+int _mpc_div_sj (mpc_ptr rop, mpc_ptr op, intmax_t i, mpc_rnd_t rnd) {
+
+#ifdef USE_64_BIT_INT
+
+   mpfr_t x;
+   int inex;
+
+   mpfr_init2 (x, sizeof(intmax_t) * CHAR_BIT);
+   mpfr_set_sj (x, i, GMP_RNDN);
+
+   inex = mpc_div_fr (rop, op, x, rnd);
+
+   mpfr_clear (x);
+   return inex;
+}
+
+#else
+
+   croak("_mpc_div_sj not implememnted on this build of perl\n");
+}
+
+#endif
+
+
+/* This function is used by overload_div and overload_div_eq whenn           */
+/* USE_64_BIT_INT is defined.                                                */
+/* It is based on some code posted by Philippe Theveny.                      */
+
+int _mpc_sj_div (mpc_ptr rop, intmax_t i, mpc_ptr op, mpc_rnd_t rnd) {
+
+#ifdef USE_64_BIT_INT
+
+   mpfr_t x;
+   int inex;
+
+   mpfr_init2 (x, sizeof(intmax_t) * CHAR_BIT);
+   mpfr_set_sj (x, i, GMP_RNDN);
+
+   inex = mpc_fr_div (rop, x, op, rnd);
+
+   mpfr_clear (x);
+   return inex;
+}
+
+#else
+
+   croak("_mpc_sj_div not implememnted on this build of perl\n");
+}
+
+#endif
+
+
+/* This function is used by overload_div and overload_div_eq whenn           */
+/* USE_LONG_DOUBLE is defined.                                               */
+/* It is based on some code posted by Philippe Theveny.                      */
+
+int _mpc_div_ld (mpc_ptr rop, mpc_ptr op, long double i, mpc_rnd_t rnd) {
+
+#ifdef USE_LONG_DOUBLE
+
+   mpfr_t x;
+   int inex;
+
+   mpfr_init2 (x, sizeof(long double) * CHAR_BIT);
+   mpfr_set_ld (x, i, GMP_RNDN);
+
+   inex = mpc_div_fr (rop, op, x, rnd);
+
+   mpfr_clear (x);
+   return inex;
+}
+
+#else
+
+   croak("_mpc_div_ld not implememnted on this build of perl\n");
+}
+
+#endif
+
+
+/* This function is used by overload_div and overload_div_eq whenn           */
+/* USE_LONG_DOUBLE is defined.                                               */
+/* It is based on some code posted by Philippe Theveny.                      */
+
+int _mpc_ld_div (mpc_ptr rop, long double i, mpc_ptr op, mpc_rnd_t rnd) {
+
+#ifdef USE_LONG_DOUBLE
+
+   mpfr_t x;
+   int inex;
+
+   mpfr_init2 (x, sizeof(long double) * CHAR_BIT);
+   mpfr_set_ld (x, i, GMP_RNDN);
+
+   inex = mpc_fr_div (rop, x, op, rnd);
+
+   mpfr_clear (x);
+   return inex;
+}
+
+#else
+
+   croak("_mpc_ld_div not implememnted on this build of perl\n");
+}
+
+#endif
+
+/* This function is used by overload_div and overload_div_eq.                */
+/* It is based on some code posted by Philippe Theveny.                      */
+int _mpc_div_d (mpc_ptr rop, mpc_ptr op, double i, mpc_rnd_t rnd) {
+   mpfr_t x;
+   int inex;
+
+   mpfr_init2 (x, sizeof(double) * CHAR_BIT);
+   mpfr_set_d (x, i, GMP_RNDN);
+
+   inex = mpc_div_fr (rop, op, x, rnd);
+
+   mpfr_clear (x);
+   return inex;
+}
+
+
+/* This function is used by overload_div and overload_div_eq.                */
+/* It is based on some code posted by Philippe Theveny.                      */
+int _mpc_d_div (mpc_ptr rop, double i, mpc_ptr op, mpc_rnd_t rnd) {
+   mpfr_t x;
+   int inex;
+
+   mpfr_init2 (x, sizeof(double) * CHAR_BIT);
+   mpfr_set_d (x, i, GMP_RNDN);
+
+   inex = mpc_fr_div (rop, x, op, rnd);
+
+   mpfr_clear (x);
+   return inex;
+}
 
 void Rmpc_set_default_rounding_mode(SV * round) {
      _perl_default_rounding_mode = (mpc_rnd_t)SvUV(round);    
@@ -1082,6 +1301,15 @@ SV * overload_true(mpc_t *a, SV *second, SV * third) {
      return newSVuv(1);
 }
 
+/********************************/
+/********************************/
+/********************************/
+/********************************/
+/********************************/
+/********************************/
+/********************************/
+/********************************/
+
 SV * overload_mul(mpc_t * a, SV * b, SV * third) {
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
@@ -1109,10 +1337,12 @@ SV * overload_mul(mpc_t * a, SV * b, SV * third) {
      if(SvIOK(b)) {
 #ifdef _MSC_VER
        mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
-#else
-       mpc_set_sj(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode);
-#endif
        mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+#else
+       /* mpc_set_sj(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode); */
+       _mpc_mul_sj(*mpc_t_obj, *a, SvIV(b), _perl_default_rounding_mode);
+#endif
+       /* mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode); */
        return obj_ref;
      }
 
@@ -1130,11 +1360,9 @@ SV * overload_mul(mpc_t * a, SV * b, SV * third) {
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
-       mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       _mpc_mul_ld(*mpc_t_obj, *a, (long double)SvNV(b), _perl_default_rounding_mode);
 #else
-       mpc_set_d(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
-       mpc_mul(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
+       _mpc_mul_d(*mpc_t_obj,*a, (double)SvNV(b), _perl_default_rounding_mode);
 #endif
 
       return obj_ref;
@@ -1318,7 +1546,6 @@ SV * overload_sub(mpc_t * a, SV * b, SV * third) {
        }
 
      croak("Invalid argument supplied to Math::MPC::overload_sub function");
-
 }
 
 SV * overload_div(mpc_t * a, SV * b, SV * third) {
@@ -1348,11 +1575,15 @@ SV * overload_div(mpc_t * a, SV * b, SV * third) {
      if(SvIOK(b)) {
 #ifdef _MSC_VER
        mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
-#else
-       mpc_set_sj(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode);
-#endif
        if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
        else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+#else
+       /* mpc_set_sj(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode); */
+       if(third == &PL_sv_yes) _mpc_sj_div(*mpc_t_obj, SvIV(b), *a, _perl_default_rounding_mode);
+       else _mpc_div_sj(*mpc_t_obj, *a, SvIV(b), _perl_default_rounding_mode);
+#endif
+       /* if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
+       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode); */
        return obj_ref;
        }
 #else
@@ -1377,12 +1608,16 @@ SV * overload_div(mpc_t * a, SV * b, SV * third) {
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
+       /* mpc_set_ld(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode); */
+       if(third == &PL_sv_yes) _mpc_ld_div(*mpc_t_obj, (long double)SvNV(b), *a, _perl_default_rounding_mode);
+       else _mpc_div_ld(*mpc_t_obj, *a, (long double)SvNV(b), _perl_default_rounding_mode);
 #else
-       mpc_set_d(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
+       /* mpc_set_d(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode); */
+       if(third == &PL_sv_yes) _mpc_d_div(*mpc_t_obj, (double)SvNV(b), *a, _perl_default_rounding_mode);
+       else _mpc_div_d(*mpc_t_obj, *a, (double)SvNV(b), _perl_default_rounding_mode);
 #endif
-       if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
-       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       /* if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode); */
+       /* else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode); */
        return obj_ref;
        }
 
@@ -1426,14 +1661,18 @@ SV * overload_div_eq(SV * a, SV * b, SV * third) {
        }
 
      if(SvIOK(b)) {
-       mpc_init3(temp, DEFAULT_PREC);
+       /* mpc_init3(temp, DEFAULT_PREC); */
 #ifdef _MSC_VER
+       mpc_init3(temp, DEFAULT_PREC);
        mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
-#else
-       mpc_set_sj(temp, SvIV(b), _perl_default_rounding_mode);
-#endif
        mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
        mpc_clear(temp);
+#else
+       /* mpc_set_sj(temp, SvIV(b), _perl_default_rounding_mode); */
+       _mpc_div_sj(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b), _perl_default_rounding_mode);
+#endif
+       /* mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_clear(temp); */
        return a;
        }
 #else
@@ -1454,14 +1693,16 @@ SV * overload_div_eq(SV * a, SV * b, SV * third) {
 #endif
 
      if(SvNOK(b)) {
-       mpc_init3(temp, DEFAULT_PREC);
+       /* mpc_init3(temp, DEFAULT_PREC); */
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld(temp, SvNV(b), _perl_default_rounding_mode);
+       _mpc_div_ld(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (long double)SvNV(b), _perl_default_rounding_mode);
+       /* mpc_set_ld(temp, SvNV(b), _perl_default_rounding_mode); */
 #else
-       mpc_set_d(temp, SvNV(b), _perl_default_rounding_mode);
+       _mpc_div_d(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (double)SvNV(b), _perl_default_rounding_mode);
+       /* mpc_set_d(temp, SvNV(b), _perl_default_rounding_mode); */
 #endif
-       mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
-       mpc_clear(temp);
+       /* mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode); */
+       /* mpc_clear(temp); */
        return a;
        }
 
@@ -1668,14 +1909,18 @@ SV * overload_mul_eq(SV * a, SV * b, SV * third) {
        }
 
      if(SvIOK(b)) {
-       mpc_init3(temp, DEFAULT_PREC);
+       /* mpc_init3(temp, DEFAULT_PREC); */
 #ifdef _MSC_VER
+       mpc_init3(temp, DEFAULT_PREC);
        mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
-#else
-       mpc_set_sj(temp, SvIV(b), _perl_default_rounding_mode);
-#endif
        mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
        mpc_clear(temp);
+#else
+       /* mpc_set_sj(temp, SvIV(b), _perl_default_rounding_mode); */
+       _mpc_mul_sj(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+#endif
+       /* mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_clear(temp); */
        return a;
        }
 #else
@@ -1692,14 +1937,16 @@ SV * overload_mul_eq(SV * a, SV * b, SV * third) {
 #endif
 
      if(SvNOK(b)) {
-       mpc_init3(temp, DEFAULT_PREC);
+       /* mpc_init3(temp, DEFAULT_PREC); */
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld(temp, SvNV(b), _perl_default_rounding_mode);
+       _mpc_mul_ld(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (long double)SvNV(b), _perl_default_rounding_mode);
+       /* mpc_set_ld(temp, SvNV(b), _perl_default_rounding_mode); */
 #else
-       mpc_set_d(temp, SvNV(b), _perl_default_rounding_mode);
+       _mpc_mul_d(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (double)SvNV(b), _perl_default_rounding_mode);
+       /* mpc_set_d(temp, SvNV(b), _perl_default_rounding_mode); */
 #endif
-       mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
-       mpc_clear(temp);
+       /* mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode); */
+       /* mpc_clear(temp); */
        return a;
        }
 
@@ -2596,6 +2843,69 @@ MODULE = Math::MPC	PACKAGE = Math::MPC
 
 PROTOTYPES: DISABLE
 
+
+int
+_mpc_mul_sj (rop, op, i, rnd)
+	mpc_ptr	rop
+	mpc_ptr	op
+	intmax_t	i
+	mpc_rnd_t	rnd
+
+int
+_mpc_mul_ld (rop, op, i, rnd)
+	mpc_ptr	rop
+	mpc_ptr	op
+	long double	i
+	mpc_rnd_t	rnd
+
+int
+_mpc_mul_d (rop, op, i, rnd)
+	mpc_ptr	rop
+	mpc_ptr	op
+	double	i
+	mpc_rnd_t	rnd
+
+int
+_mpc_div_sj (rop, op, i, rnd)
+	mpc_ptr	rop
+	mpc_ptr	op
+	intmax_t	i
+	mpc_rnd_t	rnd
+
+int
+_mpc_sj_div (rop, i, op, rnd)
+	mpc_ptr	rop
+	intmax_t	i
+	mpc_ptr	op
+	mpc_rnd_t	rnd
+
+int
+_mpc_div_ld (rop, op, i, rnd)
+	mpc_ptr	rop
+	mpc_ptr	op
+	long double	i
+	mpc_rnd_t	rnd
+
+int
+_mpc_ld_div (rop, i, op, rnd)
+	mpc_ptr	rop
+	long double	i
+	mpc_ptr	op
+	mpc_rnd_t	rnd
+
+int
+_mpc_div_d (rop, op, i, rnd)
+	mpc_ptr	rop
+	mpc_ptr	op
+	double	i
+	mpc_rnd_t	rnd
+
+int
+_mpc_d_div (rop, i, op, rnd)
+	mpc_ptr	rop
+	double	i
+	mpc_ptr	op
+	mpc_rnd_t	rnd
 
 void
 Rmpc_set_default_rounding_mode (round)

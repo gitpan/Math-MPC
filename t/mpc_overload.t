@@ -56,8 +56,11 @@ if($ok eq 'abcdefghijklmnopqr') {print "ok 1\n"}
 else {print "not ok 1 $ok\n"} 
 
 my $num = Math::MPC->new(200, 40);
-if(Math::MPC::overload_string($num) eq '2e2 +I*4e1') {print "ok 2\n"}
-else {print "not ok 2 ", Math::MPC::overload_string($num), "\n"}
+if(Math::MPC::overload_string($num) eq '(2e2 4e1)') {print "ok 2\n"}
+else {
+  warn "\nTest 2 got: ", Math::MPC::overload_string($num), "\n";
+  print "not ok 2\n";
+}
 
 # checking overload_copy subroutine
 $ok = '';

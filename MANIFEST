@@ -25,5 +25,6 @@ t/out_str1.t
 t/out_str2.t
 t/pod.t
 t/set_str.t
+t/signed_zero.t
 t/special.t
 typemap
