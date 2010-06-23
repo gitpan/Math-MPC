@@ -4,11 +4,9 @@
 
 #include <stdio.h>
 
-#if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
 #ifndef _MSC_VER
 #include <inttypes.h>
 #include <limits.h>
-#endif
 #endif
 
 #include <gmp.h>

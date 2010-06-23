@@ -119,7 +119,7 @@ Rmpc_set_nan Rmpc_swap
 Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_div Rmpc_div_d Rmpc_d_div
 );
 
-    $Math::MPC::VERSION = '0.81';
+    $Math::MPC::VERSION = '0.82';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 

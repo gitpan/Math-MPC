@@ -1,3 +1,6 @@
+0.82
+ - Implement '#include <inttypes.h>'. (Should have been done for 0.81.)
+   See https://rt.cpan.org/Ticket/Display.html?id=58564
 0.81
  - Change the overload_string() and _get_str() functions to match the
    formatting provided by mpc_out_str().
