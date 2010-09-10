@@ -119,7 +119,7 @@ Rmpc_set_nan Rmpc_swap
 Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_div Rmpc_div_d Rmpc_d_div
 );
 
-    $Math::MPC::VERSION = '0.82';
+    $Math::MPC::VERSION = '0.83';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
@@ -405,10 +405,6 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    provided by that library.
    Operator overloading is also available.
    The following documentation heavily plagiarises the mpc documentation.
-   (Believe the mpc docs in preference to these docs if/when there's a 
-   conflict.)
-   See also the Math::MPC test suite for some (simplistic) examples of
-   usage.
 
    use warnings;
    use Math::MPC qw(:mpc);
@@ -416,6 +412,9 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    my $mpc1 = Math::MPC->new(12.5, 1125); # 12.5 + 1125*i
    $mpc2 = sqrt($mpc1);
    print "Square root of $mpc1 is $mpc2\n";
+
+   See also the Math::MPC test suite for some (simplistic) examples of
+   usage.
 
 
 =head1 ROUNDING MODE

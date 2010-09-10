@@ -1,6 +1,17 @@
+0.83
+ - Add some warn() statements to t/bool.t, to try and see why test 2
+   fails - as reported by one of the cpan-testers. (That done, I
+   received an email from Jean-Louis Morel, with a patch that fixes
+   the issue ... I'll retain t/bool.t in its modified state.)
+ - Patch overload_not, overload_not_equiv and overload_equiv (in
+   MPC.xs) so that NaNs do not get passed on to the MPC comparison
+   functions (as this is something forbidden by the documentation).
+   Thanks to Jean-Louis Morel.
+
 0.82
  - Implement '#include <inttypes.h>'. (Should have been done for 0.81.)
    See https://rt.cpan.org/Ticket/Display.html?id=58564
+
 0.81
  - Change the overload_string() and _get_str() functions to match the
    formatting provided by mpc_out_str().

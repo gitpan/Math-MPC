@@ -4,7 +4,8 @@ MPC.pm
 MPC.xs
 README
 CHANGES
-t/aa_basic.t
+t/aaa_compat.t
+t/aab_basic.t
 t/bool.t
 t/get_str.t
 t/mpc_64.t

@@ -2121,6 +2121,8 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
      mpc_t t;
      int ret;
 
+     if(mpfr_nan_p(MPC_RE(*a)) || mpfr_nan_p(MPC_IM(*a))) return newSViv(0);
+
 #ifdef USE_64_BIT_INT
      if(SvUOK(b)) {
        mpfr_init2(temp, _perl_default_prec_re);
@@ -2208,6 +2210,8 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+         if(mpfr_nan_p(MPC_RE(*(INT2PTR(mpc_t *, SvIV(SvRV(b)))))) ||
+            mpfr_nan_p(MPC_IM(*(INT2PTR(mpc_t *, SvIV(SvRV(b))))))) return newSViv(0);
          ret = mpc_cmp(*a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))));
          if(ret == 0) return newSViv(1);
          return newSViv(0);
@@ -2222,6 +2226,8 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
      mpfr_t temp;
      mpc_t t;
      int ret;
+
+     if(mpfr_nan_p(MPC_RE(*a)) || mpfr_nan_p(MPC_IM(*a))) return newSViv(1);
 
 #ifdef USE_64_BIT_INT
      if(SvUOK(b)) {
@@ -2310,6 +2316,8 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+         if(mpfr_nan_p(MPC_RE(*(INT2PTR(mpc_t *, SvIV(SvRV(b)))))) ||
+            mpfr_nan_p(MPC_IM(*(INT2PTR(mpc_t *, SvIV(SvRV(b))))))) return newSViv(1);
          if(mpc_cmp(*a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))))) return newSViv(1);
          return newSViv(0);
          }
@@ -2319,6 +2327,7 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
 }
 
 SV * overload_not(mpc_t * a, SV * second, SV * third) {
+     if(mpfr_nan_p(MPC_RE(*a)) || mpfr_nan_p(MPC_IM(*a))) return newSViv(1); /* Thanks Jean-Louis Morel */
      if(mpc_cmp_si_si(*a, 0, 0)) return newSViv(0);
      return newSViv(1);
 }
