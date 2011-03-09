@@ -3,7 +3,7 @@ use strict;
 use Math::MPC qw(:mpc);
 use Math::MPFR qw(:mpfr);
 
-print "1..6\n";
+print "1..8\n";
 
 print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
 print "# Usinf mpc library version ", MPC_VERSION_STRING, "\n";
@@ -1180,4 +1180,60 @@ if($have_GMPf) {
 }
 else {
   print "ok 6 - skipped, no Math::GMPf\n";
+}
+
+$ok = '';
+
+unless(Math::MPC::_have_Complex_h()) {
+  eval{Rmpc_set_dc($mpc, $round, $round);};
+  if($@){
+    $ok .= 'a';
+    if($@ =~ /not implemented/){$ok .= 'b'}
+    else {warn "a: \$\@: $@\n"}
+  }
+
+  eval{Rmpc_set_ldc($mpc, $round, $round);};
+  if($@){
+    $ok .= 'c';
+    if($@ =~ /not implemented/){$ok .= 'd'}
+    else {warn "a: \$\@: $@\n"}
+  }
+}
+else {
+  warn "Skipping test 7 - Math::MPC_have_complex_h returns true\n";
+  $ok = 'abcd';
+}
+
+if($ok eq 'abcd') {print "ok 7\n"}
+else {
+  warn "7: \$ok: $ok\n";
+  print "not ok 7\n";
+}
+
+$ok = '';
+
+unless(Math::MPC::_have_Complex_h()) {
+  eval{Rmpc_get_dc($round, $mpc, $round);};
+  if($@){
+    $ok .= 'a';
+    if($@ =~ /not implemented/){$ok .= 'b'}
+    else {warn "a: \$\@: $@\n"}
+  }
+
+  eval{Rmpc_get_ldc($round, $mpc, $round);};
+  if($@){
+    $ok .= 'c';
+    if($@ =~ /not implemented/){$ok .= 'd'}
+    else {warn "a: \$\@: $@\n"}
+  }
+}
+else {
+  warn "Skipping test 8 - Math::MPC_have_complex_h returns true\n";
+  $ok = 'abcd';
+}
+
+if($ok eq 'abcd') {print "ok 8\n"}
+else {
+  warn "8: \$ok: $ok\n";
+  print "not ok 8\n";
 }

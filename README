@@ -10,8 +10,8 @@ MPC, like MPFR and GMP, is free. It is distributed under the
 GNU Lesser General Public License (GNU Lesser GPL).
 
 Because this module wraps the MPC functions, it requires that the
-MPC library (version 0.8.0 or later), the GMP library (version 4.2.0
-or later) and the MPFR library (version 2.3.0 or later) have been
+MPC library (version 0.8.0 or later), the GMP library (version 4.3.2
+or later) and the MPFR library (version 2.4.2 or later) have been
 installed. 
 
 For the GMP library see:
@@ -72,19 +72,28 @@ default - but if you do find that you need to override the default,
 please let me know. That you have found it necessary to override the
 default is something I probably ought to know about.
 
+=========================
+_Complex C types support
+=========================
+
+The mpc library (beginning with version 0.9) provides support for assigning
+and returning the 'double _Complex' and 'long double _Complex' C data types.
+Therefore Math::MPC (beginning with version 0.90) provides optional support for
+assigning/returning Math::Complex_C (double _Complex) objects and Math::Complex_C::Long
+(long double _Complex) objects, using the Rmpc_set_dc, Rmpc_set_ldc, Rmpc_get_dc and
+Rmpc_get_ldc functions.
+
+If Math::Complex_C can be loaded then complex.h will be included in the compilation
+and, iff _MPC_H_HAVE_COMPLEX is thereby defined (in mpc.h), then Math::MPC will be built
+with support for the above mentioned set/get functions.
+
+If there's a need to override this default behaviour, just open the Makefile.PL and
+comment in the line of code that forces '$do_complex_h' to be assigned the value you
+want ... either -1 (to force exclusion of support), or 1 (to force support). Then
+run 'make realclean' and start over again.
+
+Any problems, let me know.
+
 I am contactable by email at sisyphus at(@) cpan dot (.) org.
-
-==========
-MS WINDOWS
-==========
-If building with an MSVC++ compiler against MinGW-built mpc, gmp and mpfr
-libs, you'll need to additionally link to MinGW's libgcc.a and libcoldname.a.
-First, create copies of the 5 '.a' files (named libmpc.lib, libgmp.lib,
-libmpfr.lib, libgcc.lib, libcoldname.lib) and then run:
-
-perl Makefile.pl INC="-IC:/path/to/gmp_includes -I/path/to/mpfr_includes -IC:/path/to/mpc_include"
-    LIBS="-LC:/path/to/mpc_lib -lmpc -LC:/path/to/gcc_lib -lgcc -LC:/path/to/coldname_lib -lcoldname
-    -LC:/path/to/mpfr_lib -lmpfr -LC:/path/to/gmp_lib -lgmp"
-
 
 

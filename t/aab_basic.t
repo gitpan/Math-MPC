@@ -9,13 +9,18 @@ my $string = Rmpc_get_version();
 
 print STDERR "\n# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print STDERR "# Using Math::MPC version ", $Math::MPC::VERSION, "\n";
-print STDERR "# Math::MPC uses mpc library version ", MPC_VERSION_STRING, "\n";
-print STDERR "# Math::MPFR uses mpfr library version ", MPFR_VERSION_STRING, "\n";
+print STDERR "# Math::MPC uses mpc library version ", Rmpc_get_version(), "\n";
+print STDERR "# Math::MPFR uses mpfr library version ", Rmpfr_get_version(), "\n";
 print STDERR "# Math::MPC uses mpfr library version ", Math::MPC::mpfr_v(), "\n";
 print STDERR "# Math::MPFR uses gmp library version ", Math::MPFR::gmp_v(), "\n";
 print STDERR "# Math::MPC uses gmp library version ", Math::MPC::gmp_v(), "\n";
 
-if($Math::MPC::VERSION eq '0.83') {print "ok 1\n"}
+Math::MPC::_have_Complex_h() ?
+ warn "\n# Built with support for 'double _Complex' and 'long double _Complex' types\n"
+                             :
+ warn "\n# Built without support for 'double _Complex' and 'long double _Complex types'\n"; 
+
+if($Math::MPC::VERSION eq '0.90') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPC::VERSION\n"}
 
 if(MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 7) {print "ok 2\n"}

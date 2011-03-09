@@ -73,8 +73,24 @@ $ok .= 'e' if $mpc1 == 1;
 Rmpc_tanh($mpc1, $zero, MPC_RNDNN);
 $ok .= 'f' if $mpc1 == 0;
 
-if($ok eq 'abcdef') {print "ok 3\n"}
-else {print "not ok 3 $ok\n"}
+if(MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 8) {
+  Rmpc_sin_cos($mpc1, $mpc2, $zero, MPC_RNDNN, MPC_RNDNN);
+  $ok .= 'g' if $mpc1 == 0 && $mpc2 == 1;
+}
+else {
+  eval{Rmpc_sin_cos($mpc1, $mpc2, $zero, MPC_RNDNN, MPC_RNDNN);};
+  if($@) {
+    if($@ =~ /not supported by your version/){$ok .= 'g'}
+    else {warn "3g: \$\@: $@\n"}
+  }
+  else {warn "\$\@ not set\n"}
+}
+
+if($ok eq 'abcdefg') {print "ok 3\n"}
+else {
+  warn "3: $ok\n";
+  print "not ok 3 $ok\n";
+}
 
 $ok = '';
 

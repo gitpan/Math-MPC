@@ -1,3 +1,18 @@
+0.90
+ - Add Rmpc_sin_cos, Rmpc_set_dc, Rmpc_set_ldc, Rmpc_get_dc, Rmpc_get_ldc
+   (new in mpc-0.9).
+ - Add documentation of gmp_v and mpfr_v (previously missed).
+ - In the documentation, elaborate on the way that Rmpc_get-version() and 
+   MPC_VERSION & friends determine their values. (Thanks Vincent Lefevre.) 
+ - In MPC.xs change mpfr_v() to return mpfr_get_version() instead of
+   MPC_VERSION_STRING.
+ - In t/aab_basic.t print out the mpfr and mpc library versions from 
+   the libraries, instead of from the headers (as had been the case)
+ - Some of the croak() messages in MPC.xs finished with "\n" - which
+   has now been removed from those messages.
+ - Releases of the MPC library (after 0.8.2) will require gmp-4.3.2
+   and mpfr-2.4.2. README and Makefile.PL have now been changed.
+
 0.83
  - Add some warn() statements to t/bool.t, to try and see why test 2
    fails - as reported by one of the cpan-testers. (That done, I

@@ -7,11 +7,18 @@
 #ifndef _MSC_VER
 #include <inttypes.h>
 #include <limits.h>
+#ifdef _DO_COMPLEX_H
+#include <complex.h>
+#endif
 #endif
 
 #include <gmp.h>
 #include <mpfr.h>
 #include <mpc.h>
+
+#ifndef _MPC_H_HAVE_COMPLEX
+#undef _DO_COMPLEX_H
+#endif
 
 #ifdef _MSC_VER
 #pragma warning(disable:4700 4715 4716)
@@ -20,6 +27,10 @@
 
 #ifdef OLDPERL
 #define SvUOK SvIsUV
+#endif
+
+#if MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 8
+#define SIN_COS_AVAILABLE 1
 #endif
 
 #define MPC_RE(x) ((x)->re)
@@ -63,7 +74,7 @@ int _mpc_mul_sj (mpc_ptr rop, mpc_ptr op, intmax_t i, mpc_rnd_t rnd) {
 
 #else
 
-   croak("_mpc_mul_sj not implememnted on this build of perl\n");
+   croak("_mpc_mul_sj not implememnted on this build of perl");
 }
 
 #endif
@@ -91,7 +102,7 @@ int _mpc_mul_ld (mpc_ptr rop, mpc_ptr op, long double i, mpc_rnd_t rnd) {
 
 #else
 
-   croak("_mpc_mul_ld not implememnted on this build of perl\n");
+   croak("_mpc_mul_ld not implememnted on this build of perl");
 }
 
 #endif
@@ -136,7 +147,7 @@ int _mpc_div_sj (mpc_ptr rop, mpc_ptr op, intmax_t i, mpc_rnd_t rnd) {
 
 #else
 
-   croak("_mpc_div_sj not implememnted on this build of perl\n");
+   croak("_mpc_div_sj not implememnted on this build of perl");
 }
 
 #endif
@@ -164,7 +175,7 @@ int _mpc_sj_div (mpc_ptr rop, intmax_t i, mpc_ptr op, mpc_rnd_t rnd) {
 
 #else
 
-   croak("_mpc_sj_div not implememnted on this build of perl\n");
+   croak("_mpc_sj_div not implememnted on this build of perl");
 }
 
 #endif
@@ -192,7 +203,7 @@ int _mpc_div_ld (mpc_ptr rop, mpc_ptr op, long double i, mpc_rnd_t rnd) {
 
 #else
 
-   croak("_mpc_div_ld not implememnted on this build of perl\n");
+   croak("_mpc_div_ld not implememnted on this build of perl");
 }
 
 #endif
@@ -220,7 +231,7 @@ int _mpc_ld_div (mpc_ptr rop, long double i, mpc_ptr op, mpc_rnd_t rnd) {
 
 #else
 
-   croak("_mpc_ld_div not implememnted on this build of perl\n");
+   croak("_mpc_ld_div not implememnted on this build of perl");
 }
 
 #endif
@@ -2459,7 +2470,7 @@ void _get_r_string(mpc_t * p, SV * base, SV * n_digits, SV * round) {
 
      out = mpfr_get_str(0, &ptr, b, SvUV(n_digits), MPC_RE(*p), (mpc_rnd_t)SvUV(round) & 3);
 
-     if(out == NULL) croak("An error occurred in _get_r_string()\n");
+     if(out == NULL) croak("An error occurred in _get_r_string()");
 
      // sp = mark; // not needed;
      ST(0) = sv_2mortal(newSVpv(out, 0));
@@ -2479,7 +2490,7 @@ void _get_i_string(mpc_t * p, SV * base, SV * n_digits, SV * round) {
 
      out = mpfr_get_str(0, &ptr, b, SvUV(n_digits), MPC_IM(*p), (mpc_rnd_t)SvUV(round) & 3);
 
-     if(out == NULL) croak("An error occurred in _get_i_string()\n");
+     if(out == NULL) croak("An error occurred in _get_i_string()");
 
      // sp = mark; // not needed
      ST(0) = sv_2mortal(newSVpv(out, 0));
@@ -2747,7 +2758,7 @@ SV * gmp_v() {
 }
 
 SV * mpfr_v() {
-     return newSVpv(MPFR_VERSION_STRING, 0);
+     return newSVpv(mpfr_get_version(), 0);
 }
 
 /* Not yet available
@@ -2844,6 +2855,61 @@ SV * overload_atan2(mpc_t * p, mpc_t * q, SV * third) {
      return obj_ref;
 }
 
+SV * Rmpc_sin_cos(mpc_t * rop_sin, mpc_t * rop_cos, mpc_t * op, SV * rnd_sin, SV * rnd_cos) {
+#ifdef SIN_COS_AVAILABLE
+     return newSViv(mpc_sin_cos(*rop_sin, *rop_cos, *op, (mpc_rnd_t)SvUV(rnd_sin), (mpc_rnd_t)SvUV(rnd_cos)));
+#else
+     croak("Rmpc_­sin_cos() not supported by your version (%s) of the mpc library", MPC_VERSION_STRING);
+#endif
+}
+
+void Rmpc_get_dc(SV * crop, mpc_t * op, SV * round) {
+#ifdef _DO_COMPLEX_H
+     if(sv_isobject(crop) && strEQ(HvNAME(SvSTASH(SvRV(crop))), "Math::Complex_C::Long"))
+       croak("1st arg to Rmpc_get_dc is a Math::Complex_C::Long object - expects a Math::Complex_C object");
+     *(INT2PTR(double _Complex *, SvIV(SvRV(crop)))) = mpc_get_dc(*op, (mpc_rnd_t)SvUV(round)); 
+#else
+     croak("Rmpc_get_dc() not implemented");
+#endif
+}
+
+void Rmpc_get_ldc(SV * crop, mpc_t * op, SV * round) {
+#ifdef _DO_COMPLEX_H
+     if(sv_isobject(crop) && strEQ(HvNAME(SvSTASH(SvRV(crop))), "Math::Complex_C"))
+       croak("1st arg to Rmpc_get_ldc is a Math::Complex_C object - expects a Math::Complex_C::Long object");
+     *(INT2PTR(long double _Complex *, SvIV(SvRV(crop)))) = mpc_get_ldc(*op, (mpc_rnd_t)SvUV(round));
+#else
+     croak("Rmpc_get_ldc() not implemented");
+#endif
+}
+
+SV * Rmpc_set_dc(mpc_t * op, SV * crop, SV * round) {
+#ifdef _DO_COMPLEX_H
+     if(sv_isobject(crop) && strEQ(HvNAME(SvSTASH(SvRV(crop))), "Math::Complex_C::Long"))
+       croak("2nd arg to Rmpc_set_dc is a Math::Complex_C::Long object - expects a Math::Complex_C object");
+     return newSViv(mpc_set_dc(*op, *(INT2PTR(double _Complex *, SvIV(SvRV(crop)))), (mpc_rnd_t)SvUV(round)));
+#else
+     croak("Rmpc_set_dc() not implemented");
+#endif
+}
+
+SV * Rmpc_set_ldc(mpc_t * op, SV * crop, SV * round) {
+#ifdef _DO_COMPLEX_H
+     if(sv_isobject(crop) && strEQ(HvNAME(SvSTASH(SvRV(crop))), "Math::Complex_C"))
+       croak("2nd arg to Rmpc_set_ldc is a Math::Complex_C object - expects a Math::Complex_C::Long object");
+     return newSViv(mpc_set_ldc(*op, *(INT2PTR(long double _Complex *, SvIV(SvRV(crop)))), (mpc_rnd_t)SvUV(round)));
+#else
+     croak("Rmpc_set_ldc() not implemented");
+#endif
+}
+
+SV * _have_Complex_h() {
+#ifdef _DO_COMPLEX_H
+     return newSVuv(1);
+#else
+     return newSVuv(0);
+#endif
+}
 
 
 MODULE = Math::MPC	PACKAGE = Math::MPC	
@@ -4548,4 +4614,63 @@ overload_atan2 (p, q, third)
 	mpc_t *	p
 	mpc_t *	q
 	SV *	third
+
+SV *
+Rmpc_sin_cos (rop_sin, rop_cos, op, rnd_sin, rnd_cos)
+	mpc_t *	rop_sin
+	mpc_t *	rop_cos
+	mpc_t *	op
+	SV *	rnd_sin
+	SV *	rnd_cos
+
+void
+Rmpc_get_dc (crop, op, round)
+	SV *	crop
+	mpc_t *	op
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpc_get_dc(crop, op, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+void
+Rmpc_get_ldc (crop, op, round)
+	SV *	crop
+	mpc_t *	op
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpc_get_ldc(crop, op, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+Rmpc_set_dc (op, crop, round)
+	mpc_t *	op
+	SV *	crop
+	SV *	round
+
+SV *
+Rmpc_set_ldc (op, crop, round)
+	mpc_t *	op
+	SV *	crop
+	SV *	round
+
+SV *
+_have_Complex_h ()
 

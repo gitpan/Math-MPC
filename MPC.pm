@@ -77,6 +77,7 @@ Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
 Rmpc_set_default_prec2 Rmpc_get_default_prec2
 Rmpc_set_re_prec Rmpc_set_im_prec
 Rmpc_get_prec Rmpc_get_prec2 Rmpc_get_re_prec Rmpc_get_im_prec
+Rmpc_get_dc Rmpc_get_ldc
 RMPC_RE RMPC_IM RMPC_INEX_RE RMPC_INEX_IM
 Rmpc_clear Rmpc_clear_ptr Rmpc_clear_mpc
 Rmpc_deref4 Rmpc_get_str
@@ -103,6 +104,8 @@ Rmpc_set_f_ld Rmpc_set_q_ld Rmpc_set_z_ld Rmpc_set_ld_f Rmpc_set_ld_q Rmpc_set_l
 Rmpc_set_f_q Rmpc_set_q_f Rmpc_set_f_z Rmpc_set_z_f Rmpc_set_z_q Rmpc_set_q_z
 Rmpc_set_f_fr Rmpc_set_q_fr Rmpc_set_z_fr Rmpc_set_fr_f Rmpc_set_fr_q Rmpc_set_fr_z
 
+Rmpc_set_dc Rmpc_set_ldc
+
 Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
@@ -111,7 +114,7 @@ Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string 
 TRmpc_out_str TRmpc_inp_str
-Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
+Rmpc_sin Rmpc_cos Rmpc_sin_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
 Rmpc_asin Rmpc_acos Rmpc_atan Rmpc_asinh Rmpc_acosh Rmpc_atanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
 Rmpc_pow Rmpc_pow_d Rmpc_pow_ld Rmpc_pow_si Rmpc_pow_ui Rmpc_pow_z Rmpc_pow_fr
@@ -119,7 +122,7 @@ Rmpc_set_nan Rmpc_swap
 Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_div Rmpc_div_d Rmpc_d_div
 );
 
-    $Math::MPC::VERSION = '0.83';
+    $Math::MPC::VERSION = '0.90';
 
     DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
 
@@ -133,6 +136,7 @@ Rmpc_set_prec Rmpc_set_default_prec Rmpc_get_default_prec
 Rmpc_set_default_prec2 Rmpc_get_default_prec2
 Rmpc_set_re_prec Rmpc_set_im_prec
 Rmpc_get_prec Rmpc_get_prec2 Rmpc_get_re_prec Rmpc_get_im_prec
+Rmpc_get_dc Rmpc_get_ldc
 RMPC_RE RMPC_IM RMPC_INEX_RE RMPC_INEX_IM
 Rmpc_clear Rmpc_clear_ptr Rmpc_clear_mpc
 Rmpc_deref4 Rmpc_get_str
@@ -159,6 +163,8 @@ Rmpc_set_f_ld Rmpc_set_q_ld Rmpc_set_z_ld Rmpc_set_ld_f Rmpc_set_ld_q Rmpc_set_l
 Rmpc_set_f_q Rmpc_set_q_f Rmpc_set_f_z Rmpc_set_z_f Rmpc_set_z_q Rmpc_set_q_z
 Rmpc_set_f_fr Rmpc_set_q_fr Rmpc_set_z_fr Rmpc_set_fr_f Rmpc_set_fr_q Rmpc_set_fr_z
 
+Rmpc_set_dc Rmpc_set_ldc
+
 Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
@@ -167,7 +173,7 @@ Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string
 TRmpc_out_str TRmpc_inp_str
-Rmpc_sin Rmpc_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
+Rmpc_sin Rmpc_cos Rmpc_sin_cos Rmpc_tan Rmpc_sinh Rmpc_cosh Rmpc_tanh
 Rmpc_asin Rmpc_acos Rmpc_atan Rmpc_asinh Rmpc_acosh Rmpc_atanh
 Rmpc_real Rmpc_imag Rmpc_arg Rmpc_proj
 Rmpc_pow Rmpc_pow_d Rmpc_pow_ld Rmpc_pow_si Rmpc_pow_ui Rmpc_pow_z Rmpc_pow_fr
@@ -500,9 +506,9 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    "$str" simply means a string of symbols that represent a number,
    eg '1234567890987654321234567@7' which might be a base 10 number,
-   or 'zsa34760sdfgq123r5@11' which would have to represent a base 36
-   number (because "z" is a valid digit only in base 36). Valid
-   bases for MPC numbers are 2 to 36 (inclusive).
+   or 'zsa34760sdfgq123r5@11' which would have to represent at least
+   a base 36 number (because "z" is a valid digit only in bases 36
+   and above). Valid bases for MPC numbers are 2 to 36 (inclusive).
 
    "$rnd" is simply one of the 16 rounding mode values (discussed above).
 
@@ -519,7 +525,18 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    "$mpfr" is a Math::MPFR object (floating point). You'll need to 
            'use Math::MPFR;' in order to create $mpfr. (Math::MPFR
-           a pre-requisite module for Math::MPC.) 
+           a pre-requisite module for Math::MPC.)
+
+   "$cc" is a Math::Complex_C (double _Complex) object. You'll need to
+         'use Math::Complex_C' (or create your own double _Complex
+         object) in order to create $cc, and to use the functions that
+         take such an argument. (Math::Complex_C is *not* a
+         pre-requisite module for Math::MPC.) 
+
+   "$lcc" is a Math::Complex_C::Long (long double _Complex) object.
+         You'll need to 'use Math::Complex_C' (or create your own
+         long double _Complex object in order to create $lcc, and
+         to use the functions that take such an argument.
 
    ######################
 
@@ -644,11 +661,16 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_set_q($rop, $mpq, $rnd);
    $si = Rmpc_set_z($rop, $mpz, $rnd);
    $si = Rmpc_set_fr($rop, $mpfr, $rnd);
+   $si = Rmpc_set_dc($rop, $cc, $rnd);
+   $si = Rmpc_set_ldc($rop, $lcc, $rnd);
     Set the value of $rop from 2nd arg, rounded to the precision of
     $rop towards the given direction $rnd.
     Don't use Rmpc_set_ld unless perl has been built with long 
     double support. Don't use Rmpc_set_uj or Rmpc_set_sj unless
     perl has been built with long long int support.
+    For Rmpc_set_dc and Rmpc_set_ldc, an mpc library (version 0.9
+    or later) that has been built with support for these data types
+    is needed.
 
    $si = Rmpc_set_str($rop, $string, $base, $rnd);
    $si = Rmpc_strtoc($rop, $string, $base, $rnd);
@@ -875,6 +897,14 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     Set $rop to the cosine of $op, rounded according to $rnd with
     the precision of $rop.
 
+   $si = Rmpc_sin_cos($r_sin, $r_cos, $op, $rnd_sin, $rnd_cos);
+    Needs version 0.9 or later of the mpc C library.
+    Set $r_sin/$r_cos to the sin/cos of $op, rounded according to
+    $rnd_sin/$rnd_cos.
+    (If the mpc C library is pre version 0.9, calling this
+    function will cause the program to die with an appropriate
+    error message.)
+
    $si = Rmpc_tan($rop, $op, $rnd);
     Set $rop to the tangent of $op, rounded according to $rnd with
     the precision of $rop.
@@ -967,7 +997,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     alternatively XeY or XEY. (X is the mantissa, Y is the exponent.
     The mantissa is always in the specified base. The exponent is always
     read in decimal. This function first reads the real part, followed by
-    the imaginary part. The argument $base may be in the range 2 to 36.
+    the imaginary part. The argument $base may be in the range 0,2..36.
     Return the number of bytes read, or if an error occurred, return 0.
 
    $ul = 
@@ -975,7 +1005,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     This function changed from 1st release (version 0.45) of Math::MPC. 
     Output $op to $stream, in base $base, rounded according to $rnd. First
     the real part is printed, followed by the imaginary part. The base may
-    vary from 2 to 36.  Print at most $digits significant digits for each
+    be 0,2..36.  Print at most $digits significant digits for each
     part, or if $digits is 0, the maximum number of digits accurately 
     representable by $op. In addition to the significant digits, a decimal
     point at the right of the first digit and a trailing exponent, in the
@@ -994,6 +1024,11 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     assuming both output and input use rounding to nearest, will recover
     the original value of $op. See the mpc documentation for details.
 
+   Rmpc_get_dc($cc, $op, $rnd);
+   Rmpc_get_ldc($lcc, $op, $rnd);
+    Set the 'double _Complex'/'long double _Complex' object to the value
+    of $op, rounded according to $rnd. Needs an mpc library (version 0.9
+    or later) that has been built with support for these data types.
 
    ####################
 
@@ -1018,11 +1053,18 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     and subtraction the sign of zero will be handled correctly by the
     overloaded operators if both operands are Math::MPC objects.)
 
+    For the purposes of the overloaded 'not', '!' and 'bool'
+    operators, a "false" Math::MPC object is one with real and
+    imaginary parts that are both "false" - where "false" currently
+    means either 0 or NaN.
+    (A "true" Math::MPC object is, of course, simply one that is not
+    "false".)
+
     The following operators are overloaded:
      + - * / ** sqrt (Return object has default precision)
      += -= *= /= **= (Precision remains unchanged)
      == != 
-     ! not
+     ! not bool
      abs (Returns an MPFR object, blessed into package Math::MPFR)
      exp log (Return object has default precision)
      sin cos (Return object has default precision)
@@ -1081,28 +1123,47 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    $ui = MPC_VERSION_MAJOR;
     Returns the 'x' in the 'x.y.z' of the MPC library version.
+    Value is as specified by the header file (mpc.h) that was
+    used to build Math::MPC.
 
    $ui =MPC_VERSION_MINOR;
     Returns the 'y' in the 'x.y.z' of the MPC library version.
+    Value is as specified by the header file (mpc.h) that was
+    used to build Math::MPC.
 
    $ui = MPC_VERSION_PATCHLEVEL;
     Returns the 'z' in the 'x.y.z' of the MPC library version.
+    Value is as specified by the header file (mpc.h) that was
+    used to build Math::MPC.
 
    $ui = MPC_VERSION();
     An integer value derived from the library's major, minor and
-    patchlevel values.
+    patchlevel values. Value is as specified by the header file
+    (mpc.h) that was used to build Math::MPC.
 
    $ui = MPC_VERSION_NUM($major, $minor, $patchlevel);
     Returns an integer in the same format as used by MPC_VERSION,
-    using the given $major, $minor and $patchlevel.
+    using the given $major, $minor and $patchlevel. Value is as
+    specified by the header file (mpc.h) that was used to build
+    Math::MPC.
 
    $string = MPC_VERSION_STRING;
     $string contains the MPC library version ('x.y.z'), as defined
-    by the header file (mpc.h)
+    by the header file (mpc.h) that was used to build Math::MPC
 
    $string = Rmpc_get_version();
     $string contains the MPC library version ('x.y.z'), as defined
-    by the library.
+    by the mpc library being used by Math::MPC.
+
+   $MPFR_version = Math::MPC::mpfr_v();
+    $MPFR_version is set to the version of the mpfr library
+    being used by the mpc library that Math::MPC uses.
+    (The function is not exportable.)
+
+   $GMP_version = Math::MPC::gmp_v();
+    $GMP_version is set to the version of the gmp library being
+    used by the mpc library that Math::MPC uses.
+    (The function is not exportable.)
 
    ####################
 
@@ -1126,7 +1187,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
     This program is free software; you may redistribute it and/or 
     modify it under the same terms as Perl itself.
-    Copyright 2006-2009, 2010, Sisyphus
+    Copyright 2006-2009, 2010, 2011 Sisyphus
 
 =head1 AUTHOR
 
