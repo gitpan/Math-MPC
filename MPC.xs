@@ -2189,6 +2189,10 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
 #ifdef USE_LONG_DOUBLE
        mpfr_init2(temp, _perl_default_prec_re);
        mpfr_set_ld(temp, SvNV(b), _perl_default_rounding_mode & 3);
+       if(mpfr_nan_p(temp)) {
+         mpfr_clear(temp);
+         return newSViv(0);
+       }
        mpc_init3(t, DEFAULT_PREC);
        mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
        mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
@@ -2198,7 +2202,8 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
 #else
        mpc_init3(t, DEFAULT_PREC);
        mpc_set_d(t, SvNV(b), _perl_default_rounding_mode);
-       ret = mpc_cmp(*a, t);
+       if(mpfr_nan_p(MPC_RE(t))) ret = 1;
+       else ret = mpc_cmp(*a, t);
        mpc_clear(t);
 #endif
        if(ret == 0) return newSViv(1);
@@ -2220,6 +2225,9 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
        }
 
      if(sv_isobject(b)) {
+       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::Complex_C")) {
+
+       }
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
          if(mpfr_nan_p(MPC_RE(*(INT2PTR(mpc_t *, SvIV(SvRV(b)))))) ||
             mpfr_nan_p(MPC_IM(*(INT2PTR(mpc_t *, SvIV(SvRV(b))))))) return newSViv(0);
@@ -2295,6 +2303,10 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
 #ifdef USE_LONG_DOUBLE
        mpfr_init2(temp, _perl_default_prec_re);
        mpfr_set_ld(temp, SvNV(b), _perl_default_rounding_mode & 3);
+       if(mpfr_nan_p(temp)) {
+         mpfr_clear(temp);
+         return newSViv(1);
+       }
        mpc_init3(t, DEFAULT_PREC);
        mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
        mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
@@ -2304,7 +2316,8 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
 #else
        mpc_init3(t, DEFAULT_PREC);
        mpc_set_d(t, SvNV(b), _perl_default_rounding_mode);
-       ret = mpc_cmp(*a, t);
+       if(mpfr_nan_p(MPC_RE(t))) ret = 1;
+       else ret = mpc_cmp(*a, t);
        mpc_clear(t);
 #endif
        if(ret == 0) return newSViv(0);

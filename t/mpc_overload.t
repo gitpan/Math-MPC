@@ -4,7 +4,7 @@ use Math::MPC qw(:mpc);
 use Math::MPFR qw(:mpfr);
 use Math::BigInt;
 
-print "1..5\n";
+print "1..7\n";
 
 my $mbi2;
 my $ok = '';
@@ -288,6 +288,20 @@ else {
   print "not ok 5\n";
 }
 
+my $nan;
+
+if(Math::MPC::_has_longdouble()) {
+ $nan = Rmpfr_get_ld(Math::MPFR->new(), GMP_RNDN);
+}
+else {
+ $nan = Rmpfr_get_d(Math::MPFR->new(), GMP_RNDN);
+}
+
+if($nan == $nan) {print "not ok 6\n"}
+else {print "ok 6\n"}
+
+if($mpc6 == $nan) {print "not ok 7\n"}
+else {print "ok 7\n"}
 
 
 

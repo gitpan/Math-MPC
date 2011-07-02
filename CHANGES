@@ -1,3 +1,7 @@
+0.91
+ - overload_equiv and overload_not_equiv weren't correctly handling the
+   case where the NV is a NaN. (Add tests in mpc_overload.t.)
+
 0.90
  - Add Rmpc_sin_cos, Rmpc_set_dc, Rmpc_set_ldc, Rmpc_get_dc, Rmpc_get_ldc
    (new in mpc-0.9).

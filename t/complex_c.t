@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPC qw(:mpc);
 
-my $count = 11;
+my $count = 16;
 
 print "1..$count\n";
 
@@ -143,4 +143,81 @@ if($@) {
   }
 }
 else {print "not ok 11\n"}
+
+unless(Math::Complex_C::_double_Complexsize() == Math::Complex_C::_longdouble_Complexsize()) {
+
+  eval {require ActivePerl::DocTools;};
+  unless($@) {
+    warn "\nExpect tests 12-14, 16 to fail on ActivePerl for Windows.\n";
+    warn "Can someone explain ? ... and why test 15 does not also fail ?\n";
+  }
+
+  my $cc_rop = sqrt($cc);
+  my $ccl_rop = sqrt($ccl);
+
+  Rmpc_set_dc($mpcc, $cc_rop, MPC_RNDNN);
+  Rmpc_set_ldc($mpccl, $ccl_rop, MPC_RNDNN);
+
+  if($mpcc != $mpccl) {print "ok 12\n"}
+  else {
+    warn "\$mpccl: $mpccl\n";
+    print "not ok 12\n";
+  }
+
+  Math::Complex_C::pow_c($cc_rop, $cc, Math::Complex_C->new(1.1, 1.1));
+  Math::Complex_C::pow_cl($ccl_rop, $ccl, Math::Complex_C::Long->new(1.1, 1.1));
+
+  Rmpc_set_dc($mpcc, $cc_rop, MPC_RNDNN);
+  Rmpc_set_ldc($mpccl, $ccl_rop, MPC_RNDNN);
+
+  if($mpcc != $mpccl) {print "ok 13\n"}
+  else {
+    warn "\$mpccl: $mpccl\n";
+    print "not ok 13\n";
+  }
+
+  Math::Complex_C::exp_c($cc_rop, $cc);
+  Math::Complex_C::exp_cl($ccl_rop, $ccl);
+
+  Rmpc_set_dc($mpcc, $cc_rop, MPC_RNDNN);
+  Rmpc_set_ldc($mpccl, $ccl_rop, MPC_RNDNN);
+
+  if($mpcc != $mpccl) {print "ok 14\n"}
+  else {
+    warn "\$mpccl: $mpccl\n";
+    print "not ok 14\n";
+  }
+
+  Math::Complex_C::log_c($cc_rop, $cc);
+  Math::Complex_C::log_cl($ccl_rop, $ccl);
+
+  Rmpc_set_dc($mpcc, $cc_rop, MPC_RNDNN);
+  Rmpc_set_ldc($mpccl, $ccl_rop, MPC_RNDNN);
+
+  if($mpcc != $mpccl) {print "ok 15\n"}
+  else {
+    warn "\$mpccl: $mpccl\n";
+    print "not ok 15\n";
+  }
+
+  #print "\n\n$mpcc\n$mpccl\n\n";
+
+  Math::Complex_C::cos_c($cc_rop, $cc);
+  Math::Complex_C::cos_cl($ccl_rop, $ccl);
+
+  Rmpc_set_dc($mpcc, $cc_rop, MPC_RNDNN);
+  Rmpc_set_ldc($mpccl, $ccl_rop, MPC_RNDNN);
+
+  if($mpcc != $mpccl) {print "ok 16\n"}
+  else {
+    warn "\$mpccl: $mpccl\n";
+    print "not ok 16\n";
+  }
+}
+else {
+  warn "Skipping tests 12 to 16 - tests are inapplicable\n";
+  print "ok $_\n" for 12 .. 16;
+}
+
+
 
