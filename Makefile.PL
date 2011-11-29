@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 use Config;
-require 5.006;
+require 5.008008;
 
 $do_complex_h = 0; # Let the Makefile.PL decide whether to support the double _Complex and
                    # long double _Complex data types.
@@ -69,7 +69,7 @@ my %options = (
     '-lmpc -lmpfr -lgmp'
   ],
   VERSION_FROM => 'MPC.pm',
-  clean   => { FILES => 'out1.txt out2.txt out3.txt out4.txt out5.txt out6.txt out7.txt' },
+  clean   => { FILES => 'out1.txt out2.txt out3.txt out4.txt out5.txt out6.txt out7.txt save_child_setting.txt' },
 );
 
 WriteMakefile(%options);

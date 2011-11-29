@@ -297,7 +297,10 @@ else {
  $nan = Rmpfr_get_d(Math::MPFR->new(), GMP_RNDN);
 }
 
-if($nan == $nan) {print "not ok 6\n"}
+if($nan == $nan) {
+  warn "If test 6 fails, it is probably due to a bug in perl itself\n";
+  print "not ok 6\n";
+}
 else {print "ok 6\n"}
 
 if($mpc6 == $nan) {print "not ok 7\n"}

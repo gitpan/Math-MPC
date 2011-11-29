@@ -29,4 +29,5 @@ t/pod.t
 t/set_str.t
 t/signed_zero.t
 t/special.t
+t/tls.t
 typemap

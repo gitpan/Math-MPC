@@ -29,6 +29,14 @@
 #define SvUOK SvIsUV
 #endif
 
+#ifndef Newx
+#  define Newx(v,n,t) New(0,v,n,t)
+#endif
+
+#ifndef Newxz
+#  define Newxz(v,n,t) Newz(0,v,n,t)
+#endif
+
 #if MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 8
 #define SIN_COS_AVAILABLE 1
 #endif
@@ -43,12 +51,27 @@
      _inex_im = (mpfr_set_ ## imag_t) (MPC_IM (z), (imag_value), MPC_RND_IM (rnd)); \
    }
 
-#define DEFAULT_PREC _perl_default_prec_re,_perl_default_prec_im
+#define MY_CXT_KEY "Math::MPC::_guts" XS_VERSION
 
+typedef struct {
+  mp_prec_t _perl_default_prec_re;
+  mp_prec_t _perl_default_prec_im;
+  mpc_rnd_t _perl_default_rounding_mode;
+} my_cxt_t;
+
+START_MY_CXT
+
+#define DEFAULT_PREC MY_CXT._perl_default_prec_re,MY_CXT._perl_default_prec_im
+#define DEFAULT_PREC_RE MY_CXT._perl_default_prec_re
+#define DEFAULT_PREC_IM MY_CXT._perl_default_prec_im
+#define DEFAULT_ROUNDING_MODE MY_CXT._perl_default_rounding_mode
+
+/* These (CXT) values set at boot ... MPC_RNDNN == 0 */
+/*
 mpc_rnd_t _perl_default_rounding_mode = MPC_RNDNN;
-
 mp_prec_t _perl_default_prec_re = 53;
 mp_prec_t _perl_default_prec_im = 53;
+*/
 
 
 
@@ -268,34 +291,40 @@ int _mpc_d_div (mpc_ptr rop, double i, mpc_ptr op, mpc_rnd_t rnd) {
 }
 
 void Rmpc_set_default_rounding_mode(SV * round) {
-     _perl_default_rounding_mode = (mpc_rnd_t)SvUV(round);    
+     dMY_CXT;
+     DEFAULT_ROUNDING_MODE = (mpc_rnd_t)SvUV(round);    
 }
 
 SV * Rmpc_get_default_rounding_mode() {
-     return newSVuv(_perl_default_rounding_mode);
+     dMY_CXT;
+     return newSVuv(DEFAULT_ROUNDING_MODE);
 }
 
 void Rmpc_set_default_prec(SV * prec) {
-     _perl_default_prec_re = (mp_prec_t)SvUV(prec);
-     _perl_default_prec_im = (mp_prec_t)SvUV(prec);
+     dMY_CXT;
+     DEFAULT_PREC_RE = (mp_prec_t)SvUV(prec);
+     DEFAULT_PREC_IM = (mp_prec_t)SvUV(prec);
 } 
 
 void Rmpc_set_default_prec2(SV * prec_re, SV * prec_im) {
-     _perl_default_prec_re = (mp_prec_t)SvUV(prec_re);
-     _perl_default_prec_im = (mp_prec_t)SvUV(prec_im);
+     dMY_CXT;
+     DEFAULT_PREC_RE = (mp_prec_t)SvUV(prec_re);
+     DEFAULT_PREC_IM = (mp_prec_t)SvUV(prec_im);
 } 
 
 SV * Rmpc_get_default_prec() {
-     if(_perl_default_prec_re == _perl_default_prec_im)
-       return newSVuv(_perl_default_prec_re);
+     dMY_CXT;
+     if(DEFAULT_PREC_RE == DEFAULT_PREC_IM)
+       return newSVuv(DEFAULT_PREC_RE);
      return newSVuv(0);
 }
 
 void Rmpc_get_default_prec2() {
      dXSARGS;
+     dMY_CXT;
      EXTEND(SP, 2);
-     ST(0) = sv_2mortal(newSVuv(_perl_default_prec_re));
-     ST(1) = sv_2mortal(newSVuv(_perl_default_prec_im));
+     ST(0) = sv_2mortal(newSVuv(DEFAULT_PREC_RE));
+     ST(1) = sv_2mortal(newSVuv(DEFAULT_PREC_IM));
      XSRETURN(2);
 }
 
@@ -319,11 +348,11 @@ void Rmpc_get_prec2(mpc_t * x) {
      dXSARGS;
      mp_prec_t re, im;
      mpc_get_prec2(&re, &im, *x);
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
      EXTEND(SP, 2);
      ST(0) = sv_2mortal(newSVuv(re));
      ST(1) = sv_2mortal(newSVuv(im));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -1320,6 +1349,7 @@ SV * overload_true(mpc_t *a, SV *second, SV * third) {
 /********************************/
 
 SV * overload_mul(mpc_t * a, SV * b, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -1335,58 +1365,58 @@ SV * overload_mul(mpc_t * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(*mpc_t_obj, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(*mpc_t_obj, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 
      if(SvIOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
-       mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
+       mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
 #else
-       /* mpc_set_sj(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode); */
-       _mpc_mul_sj(*mpc_t_obj, *a, SvIV(b), _perl_default_rounding_mode);
+       /* mpc_set_sj(*mpc_t_obj, SvIV(b), DEFAULT_ROUNDING_MODE); */
+       _mpc_mul_sj(*mpc_t_obj, *a, SvIV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       /* mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode); */
+       /* mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE); */
        return obj_ref;
      }
 
 #else
      if(SvUOK(b)) {
-       mpc_mul_ui(*mpc_t_obj, *a, SvUV(b), _perl_default_rounding_mode);
+       mpc_mul_ui(*mpc_t_obj, *a, SvUV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
-       mpc_mul_si(*mpc_t_obj, *a, SvIV(b), _perl_default_rounding_mode);
+       mpc_mul_si(*mpc_t_obj, *a, SvIV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 #endif
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       _mpc_mul_ld(*mpc_t_obj, *a, (long double)SvNV(b), _perl_default_rounding_mode);
+       _mpc_mul_ld(*mpc_t_obj, *a, (long double)SvNV(b), DEFAULT_ROUNDING_MODE);
 #else
-       _mpc_mul_d(*mpc_t_obj,*a, (double)SvNV(b), _perl_default_rounding_mode);
+       _mpc_mul_d(*mpc_t_obj,*a, (double)SvNV(b), DEFAULT_ROUNDING_MODE);
 #endif
 
       return obj_ref;
      }
 
      if(SvPOK(b)) {
-       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1)
+       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1)
          croak("Invalid string supplied to Math::MPC::overload_mul");
-       mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_mul(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_mul(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_mul(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
        }
@@ -1395,6 +1425,7 @@ SV * overload_mul(mpc_t * a, SV * b, SV * third) {
 }
 
 SV * overload_add(mpc_t* a, SV * b, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -1410,37 +1441,37 @@ SV * overload_add(mpc_t* a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(*mpc_t_obj, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(*mpc_t_obj, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_add(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_add(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 
      if(SvIOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_sj(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode);
+       mpc_set_sj(*mpc_t_obj, SvIV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_add(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_add(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 
 #else
 
      if(SvUOK(b)) {
-       mpc_add_ui(*mpc_t_obj, *a, SvUV(b), _perl_default_rounding_mode);
+       mpc_add_ui(*mpc_t_obj, *a, SvUV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
-         mpc_add_ui(*mpc_t_obj, *a, SvUV(b), _perl_default_rounding_mode);
+         mpc_add_ui(*mpc_t_obj, *a, SvUV(b), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
-       mpc_sub_ui(*mpc_t_obj, *a, SvIV(b) * -1, _perl_default_rounding_mode);
+       mpc_sub_ui(*mpc_t_obj, *a, SvIV(b) * -1, DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
@@ -1448,26 +1479,26 @@ SV * overload_add(mpc_t* a, SV * b, SV * third) {
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
-       mpc_add(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_set_ld(*mpc_t_obj, SvNV(b), DEFAULT_ROUNDING_MODE);
+       mpc_add(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_d(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
-       mpc_add(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
+       mpc_set_d(*mpc_t_obj, SvNV(b), DEFAULT_ROUNDING_MODE);
+       mpc_add(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
 #endif
 
        return obj_ref;
      }
 
      if(SvPOK(b)) {
-       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1)
+       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1)
          croak("Invalid string supplied to Math::MPC::overload_add");
-       mpc_add(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_add(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_add(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_add(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
        }
@@ -1476,6 +1507,7 @@ SV * overload_add(mpc_t* a, SV * b, SV * third) {
 }
 
 SV * overload_sub(mpc_t * a, SV * b, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -1490,66 +1522,66 @@ SV * overload_sub(mpc_t * a, SV * b, SV * third) {
 #ifdef USE_64_BIT_INT
      if(SvUOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(*mpc_t_obj, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(*mpc_t_obj, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       if(third == &PL_sv_yes) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
-       else mpc_sub(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       if(third == &PL_sv_yes) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       else mpc_sub(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_sj(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode);
+       mpc_set_sj(*mpc_t_obj, SvIV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       if(third == &PL_sv_yes) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
-       else mpc_sub(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       if(third == &PL_sv_yes) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       else mpc_sub(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 #else
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes) mpc_ui_sub(*mpc_t_obj, SvUV(b), *a, _perl_default_rounding_mode);
-       else mpc_sub_ui(*mpc_t_obj, *a, SvUV(b), _perl_default_rounding_mode);
+       if(third == &PL_sv_yes) mpc_ui_sub(*mpc_t_obj, SvUV(b), *a, DEFAULT_ROUNDING_MODE);
+       else mpc_sub_ui(*mpc_t_obj, *a, SvUV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
-         if(third == &PL_sv_yes) mpc_ui_sub(*mpc_t_obj, SvUV(b), *a, _perl_default_rounding_mode);
-         else mpc_sub_ui(*mpc_t_obj, *a, SvUV(b), _perl_default_rounding_mode);
+         if(third == &PL_sv_yes) mpc_ui_sub(*mpc_t_obj, SvUV(b), *a, DEFAULT_ROUNDING_MODE);
+         else mpc_sub_ui(*mpc_t_obj, *a, SvUV(b), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
-       mpc_add_ui(*mpc_t_obj, *a, SvIV(b) * -1, _perl_default_rounding_mode);
-       if(third == &PL_sv_yes) mpc_neg(*mpc_t_obj, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_add_ui(*mpc_t_obj, *a, SvIV(b) * -1, DEFAULT_ROUNDING_MODE);
+       if(third == &PL_sv_yes) mpc_neg(*mpc_t_obj, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 #endif
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_ld(*mpc_t_obj, SvNV(b), DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_d(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_d(*mpc_t_obj, SvNV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       if(third == &PL_sv_yes) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
-       else mpc_sub(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       if(third == &PL_sv_yes) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       else mpc_sub(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvPOK(b)) {
-       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1)
+       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1)
          croak("Invalid string supplied to Math::MPC::overload_sub");
-       if(third == &PL_sv_yes) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
-       else mpc_sub(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       if(third == &PL_sv_yes) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       else mpc_sub(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_sub(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_sub(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
        }
@@ -1558,6 +1590,7 @@ SV * overload_sub(mpc_t * a, SV * b, SV * third) {
 }
 
 SV * overload_div(mpc_t * a, SV * b, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -1572,75 +1605,75 @@ SV * overload_div(mpc_t * a, SV * b, SV * third) {
 #ifdef USE_64_BIT_INT
      if(SvUOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(*mpc_t_obj, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(*mpc_t_obj, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
-       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
-       if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
-       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
+       if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
 #else
-       /* mpc_set_sj(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode); */
-       if(third == &PL_sv_yes) _mpc_sj_div(*mpc_t_obj, SvIV(b), *a, _perl_default_rounding_mode);
-       else _mpc_div_sj(*mpc_t_obj, *a, SvIV(b), _perl_default_rounding_mode);
+       /* mpc_set_sj(*mpc_t_obj, SvIV(b), DEFAULT_ROUNDING_MODE); */
+       if(third == &PL_sv_yes) _mpc_sj_div(*mpc_t_obj, SvIV(b), *a, DEFAULT_ROUNDING_MODE);
+       else _mpc_div_sj(*mpc_t_obj, *a, SvIV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       /* if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
-       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode); */
+       /* if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE); */
        return obj_ref;
        }
 #else
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes) mpc_ui_div(*mpc_t_obj, SvUV(b), *a, _perl_default_rounding_mode);
-       else mpc_div_ui(*mpc_t_obj, *a, SvUV(b), _perl_default_rounding_mode);
+       if(third == &PL_sv_yes) mpc_ui_div(*mpc_t_obj, SvUV(b), *a, DEFAULT_ROUNDING_MODE);
+       else mpc_div_ui(*mpc_t_obj, *a, SvUV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
-         if(third == &PL_sv_yes) mpc_ui_div(*mpc_t_obj, SvUV(b), *a, _perl_default_rounding_mode);
-         else mpc_div_ui(*mpc_t_obj, *a, SvUV(b), _perl_default_rounding_mode);
+         if(third == &PL_sv_yes) mpc_ui_div(*mpc_t_obj, SvUV(b), *a, DEFAULT_ROUNDING_MODE);
+         else mpc_div_ui(*mpc_t_obj, *a, SvUV(b), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
-       if(third == &PL_sv_yes) mpc_ui_div(*mpc_t_obj, SvIV(b) * -1, *a, _perl_default_rounding_mode);
-       else mpc_div_ui(*mpc_t_obj, *a, SvIV(b) * -1, _perl_default_rounding_mode);
-       mpc_neg(*mpc_t_obj, *mpc_t_obj, _perl_default_rounding_mode);
+       if(third == &PL_sv_yes) mpc_ui_div(*mpc_t_obj, SvIV(b) * -1, *a, DEFAULT_ROUNDING_MODE);
+       else mpc_div_ui(*mpc_t_obj, *a, SvIV(b) * -1, DEFAULT_ROUNDING_MODE);
+       mpc_neg(*mpc_t_obj, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 #endif
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       /* mpc_set_ld(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode); */
-       if(third == &PL_sv_yes) _mpc_ld_div(*mpc_t_obj, (long double)SvNV(b), *a, _perl_default_rounding_mode);
-       else _mpc_div_ld(*mpc_t_obj, *a, (long double)SvNV(b), _perl_default_rounding_mode);
+       /* mpc_set_ld(*mpc_t_obj, SvNV(b), DEFAULT_ROUNDING_MODE); */
+       if(third == &PL_sv_yes) _mpc_ld_div(*mpc_t_obj, (long double)SvNV(b), *a, DEFAULT_ROUNDING_MODE);
+       else _mpc_div_ld(*mpc_t_obj, *a, (long double)SvNV(b), DEFAULT_ROUNDING_MODE);
 #else
-       /* mpc_set_d(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode); */
-       if(third == &PL_sv_yes) _mpc_d_div(*mpc_t_obj, (double)SvNV(b), *a, _perl_default_rounding_mode);
-       else _mpc_div_d(*mpc_t_obj, *a, (double)SvNV(b), _perl_default_rounding_mode);
+       /* mpc_set_d(*mpc_t_obj, SvNV(b), DEFAULT_ROUNDING_MODE); */
+       if(third == &PL_sv_yes) _mpc_d_div(*mpc_t_obj, (double)SvNV(b), *a, DEFAULT_ROUNDING_MODE);
+       else _mpc_div_d(*mpc_t_obj, *a, (double)SvNV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       /* if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode); */
-       /* else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode); */
+       /* if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE); */
+       /* else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE); */
        return obj_ref;
        }
 
      if(SvPOK(b)) {
-       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1)
+       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1)
          croak("Invalid string supplied to Math::MPC::overload_div");
-       if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, _perl_default_rounding_mode);
-       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_div(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_div(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
        }
@@ -1651,7 +1684,7 @@ SV * overload_div(mpc_t * a, SV * b, SV * third) {
 
 
 SV * overload_div_eq(SV * a, SV * b, SV * third) {
-
+     dMY_CXT;
      mpc_t temp;
 
      SvREFCNT_inc(a);
@@ -1660,11 +1693,11 @@ SV * overload_div_eq(SV * a, SV * b, SV * third) {
      if(SvUOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
 #ifdef _MSC_VER
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(temp, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(temp, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
@@ -1673,30 +1706,30 @@ SV * overload_div_eq(SV * a, SV * b, SV * third) {
        /* mpc_init3(temp, DEFAULT_PREC); */
 #ifdef _MSC_VER
        mpc_init3(temp, DEFAULT_PREC);
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
-       mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
+       mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
 #else
-       /* mpc_set_sj(temp, SvIV(b), _perl_default_rounding_mode); */
-       _mpc_div_sj(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b), _perl_default_rounding_mode);
+       /* mpc_set_sj(temp, SvIV(b), DEFAULT_ROUNDING_MODE); */
+       _mpc_div_sj(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       /* mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       /* mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp); */
        return a;
        }
 #else
      if(SvUOK(b)) {
-       mpc_div_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+       mpc_div_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
        return a;
        }
 
      if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
-         mpc_div_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+         mpc_div_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
          return a;
          }
-       mpc_div_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b) * -1, _perl_default_rounding_mode);
-       mpc_neg(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), _perl_default_rounding_mode);
+       mpc_div_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b) * -1, DEFAULT_ROUNDING_MODE);
+       mpc_neg(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), DEFAULT_ROUNDING_MODE);
        return a;
        }
 #endif
@@ -1704,31 +1737,31 @@ SV * overload_div_eq(SV * a, SV * b, SV * third) {
      if(SvNOK(b)) {
        /* mpc_init3(temp, DEFAULT_PREC); */
 #ifdef USE_LONG_DOUBLE
-       _mpc_div_ld(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (long double)SvNV(b), _perl_default_rounding_mode);
-       /* mpc_set_ld(temp, SvNV(b), _perl_default_rounding_mode); */
+       _mpc_div_ld(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (long double)SvNV(b), DEFAULT_ROUNDING_MODE);
+       /* mpc_set_ld(temp, SvNV(b), DEFAULT_ROUNDING_MODE); */
 #else
-       _mpc_div_d(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (double)SvNV(b), _perl_default_rounding_mode);
-       /* mpc_set_d(temp, SvNV(b), _perl_default_rounding_mode); */
+       _mpc_div_d(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (double)SvNV(b), DEFAULT_ROUNDING_MODE);
+       /* mpc_set_d(temp, SvNV(b), DEFAULT_ROUNDING_MODE); */
 #endif
-       /* mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode); */
+       /* mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE); */
        /* mpc_clear(temp); */
        return a;
        }
 
      if(SvPOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
-       if(mpc_set_str(temp, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1) {
+       if(mpc_set_str(temp, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1) {
          SvREFCNT_dec(a);
          croak("Invalid string supplied to Math::MPC::overload_div_eq");
          } 
-       mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
          }
        }
@@ -1739,7 +1772,7 @@ SV * overload_div_eq(SV * a, SV * b, SV * third) {
 }
 
 SV * overload_sub_eq(SV * a, SV * b, SV * third) {
-
+     dMY_CXT;
      mpc_t temp;
 
      SvREFCNT_inc(a);
@@ -1748,11 +1781,11 @@ SV * overload_sub_eq(SV * a, SV * b, SV * third) {
      if(SvUOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
 #ifdef _MSC_VER
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(temp, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(temp, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
@@ -1760,26 +1793,26 @@ SV * overload_sub_eq(SV * a, SV * b, SV * third) {
      if(SvIOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
 #ifdef _MSC_VER
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_sj(temp, SvIV(b), _perl_default_rounding_mode);
+       mpc_set_sj(temp, SvIV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
 #else
      if(SvUOK(b)) {
-       mpc_sub_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+       mpc_sub_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
        return a;
        }
 
      if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
-         mpc_sub_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+         mpc_sub_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
          return a;
          }
-       mpc_add_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b) * -1, _perl_default_rounding_mode);
+       mpc_add_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b) * -1, DEFAULT_ROUNDING_MODE);
        return a;
        }
 #endif
@@ -1788,29 +1821,29 @@ SV * overload_sub_eq(SV * a, SV * b, SV * third) {
        mpc_init3(temp, DEFAULT_PREC);
 
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld(temp, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_ld(temp, SvNV(b), DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_d(temp, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_d(temp, SvNV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
 
      if(SvPOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
-       if(mpc_set_str(temp, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1) {
+       if(mpc_set_str(temp, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1) {
          SvREFCNT_dec(a);
          croak("Invalid string supplied to Math::MPC::overload_sub_eq");
          }
-       mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
          }
        }
@@ -1821,6 +1854,7 @@ SV * overload_sub_eq(SV * a, SV * b, SV * third) {
 }
 
 SV * overload_add_eq(SV * a, SV * b, SV * third) {
+     dMY_CXT;
      mpc_t temp;
      SvREFCNT_inc(a);
 
@@ -1828,11 +1862,11 @@ SV * overload_add_eq(SV * a, SV * b, SV * third) {
      if(SvUOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
 #ifdef _MSC_VER
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(temp, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(temp, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
@@ -1840,26 +1874,26 @@ SV * overload_add_eq(SV * a, SV * b, SV * third) {
      if(SvIOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
  #ifdef _MSC_VER
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_sj(temp, SvIV(b), _perl_default_rounding_mode);
+       mpc_set_sj(temp, SvIV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
 #else
      if(SvUOK(b)) {
-       mpc_add_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+       mpc_add_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
        return a;
        }
 
      if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
-         mpc_add_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+         mpc_add_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
          return a;
          }
-       mpc_sub_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b) * -1, _perl_default_rounding_mode);
+       mpc_sub_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b) * -1, DEFAULT_ROUNDING_MODE);
        return a;
        }
 #endif
@@ -1867,29 +1901,29 @@ SV * overload_add_eq(SV * a, SV * b, SV * third) {
      if(SvNOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld(temp, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_ld(temp, SvNV(b), DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_d(temp, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_d(temp, SvNV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
 
      if(SvPOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
-       if(mpc_set_str(temp, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1) {
+       if(mpc_set_str(temp, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1) {
          SvREFCNT_dec(a);
          croak("Invalid string supplied to Math::MPC::overload_add_eq");
          }
-       mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
          }
        }
@@ -1899,7 +1933,7 @@ SV * overload_add_eq(SV * a, SV * b, SV * third) {
 }
 
 SV * overload_mul_eq(SV * a, SV * b, SV * third) {
-
+     dMY_CXT;
      mpc_t temp;
 
      SvREFCNT_inc(a);
@@ -1908,11 +1942,11 @@ SV * overload_mul_eq(SV * a, SV * b, SV * third) {
      if(SvUOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
 #ifdef _MSC_VER
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(temp, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(temp, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
@@ -1921,25 +1955,25 @@ SV * overload_mul_eq(SV * a, SV * b, SV * third) {
        /* mpc_init3(temp, DEFAULT_PREC); */
 #ifdef _MSC_VER
        mpc_init3(temp, DEFAULT_PREC);
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
-       mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
+       mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
 #else
-       /* mpc_set_sj(temp, SvIV(b), _perl_default_rounding_mode); */
-       _mpc_mul_sj(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+       /* mpc_set_sj(temp, SvIV(b), DEFAULT_ROUNDING_MODE); */
+       _mpc_mul_sj(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       /* mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       /* mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp); */
        return a;
        }
 #else
      if(SvUOK(b)) {
-       mpc_mul_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+       mpc_mul_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
        return a;
        }
 
      if(SvIOK(b)) {
-       mpc_mul_si(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+       mpc_mul_si(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
        return a;
        }
 
@@ -1948,31 +1982,31 @@ SV * overload_mul_eq(SV * a, SV * b, SV * third) {
      if(SvNOK(b)) {
        /* mpc_init3(temp, DEFAULT_PREC); */
 #ifdef USE_LONG_DOUBLE
-       _mpc_mul_ld(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (long double)SvNV(b), _perl_default_rounding_mode);
-       /* mpc_set_ld(temp, SvNV(b), _perl_default_rounding_mode); */
+       _mpc_mul_ld(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (long double)SvNV(b), DEFAULT_ROUNDING_MODE);
+       /* mpc_set_ld(temp, SvNV(b), DEFAULT_ROUNDING_MODE); */
 #else
-       _mpc_mul_d(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (double)SvNV(b), _perl_default_rounding_mode);
-       /* mpc_set_d(temp, SvNV(b), _perl_default_rounding_mode); */
+       _mpc_mul_d(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), (double)SvNV(b), DEFAULT_ROUNDING_MODE);
+       /* mpc_set_d(temp, SvNV(b), DEFAULT_ROUNDING_MODE); */
 #endif
-       /* mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode); */
+       /* mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE); */
        /* mpc_clear(temp); */
        return a;
        }
 
      if(SvPOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
-       if(mpc_set_str(temp, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1) {
+       if(mpc_set_str(temp, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1) {
          SvREFCNT_dec(a);
          croak("Invalid string supplied to Math::MPC::overload_mul_eq");
          }
-       mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
        }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
          }
        }
@@ -1982,6 +2016,7 @@ SV * overload_mul_eq(SV * a, SV * b, SV * third) {
 }
 
 SV * overload_pow(mpc_t * a, SV * b, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -1997,56 +2032,56 @@ SV * overload_pow(mpc_t * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(*mpc_t_obj, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(*mpc_t_obj, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_pow(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_pow(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 
      if(SvIOK(b)) {
 #ifdef _MSC_VER
-       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_sj(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode);
+       mpc_set_sj(*mpc_t_obj, SvIV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_pow(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_pow(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 
 #else
      if(SvUOK(b)) {
-       mpc_pow_ui(*mpc_t_obj, *a, SvUV(b), _perl_default_rounding_mode);
+       mpc_pow_ui(*mpc_t_obj, *a, SvUV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
-       mpc_pow_si(*mpc_t_obj, *a, SvIV(b), _perl_default_rounding_mode);
+       mpc_pow_si(*mpc_t_obj, *a, SvIV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 #endif
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpc_pow_ld(*mpc_t_obj, *a, SvNV(b), _perl_default_rounding_mode);
+       mpc_pow_ld(*mpc_t_obj, *a, SvNV(b), DEFAULT_ROUNDING_MODE);
 #else
-       mpc_pow_d(*mpc_t_obj, *a, SvNV(b), _perl_default_rounding_mode);
+       mpc_pow_d(*mpc_t_obj, *a, SvNV(b), DEFAULT_ROUNDING_MODE);
 #endif
 
      return obj_ref;
      }
 
      if(SvPOK(b)) {
-       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1)
+       if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1)
          croak("Invalid string supplied to Math::MPC::overload_pow");
-       mpc_pow(*mpc_t_obj, *a, *mpc_t_obj, _perl_default_rounding_mode);
+       mpc_pow(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_pow(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_pow(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
      }
@@ -2055,6 +2090,7 @@ SV * overload_pow(mpc_t * a, SV * b, SV * third) {
 }
 
 SV * overload_pow_eq(SV * a, SV * b, SV * third) {
+     dMY_CXT;
      mpc_t temp;
 
      SvREFCNT_inc(a);
@@ -2063,11 +2099,11 @@ SV * overload_pow_eq(SV * a, SV * b, SV * third) {
      if(SvUOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
 #ifdef _MSC_VER
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_uj(temp, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_uj(temp, SvUV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_pow(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_pow(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
      }
@@ -2075,22 +2111,22 @@ SV * overload_pow_eq(SV * a, SV * b, SV * third) {
      if(SvIOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
 #ifdef _MSC_VER
-       mpc_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode);
+       mpc_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_sj(temp, SvIV(b), _perl_default_rounding_mode);
+       mpc_set_sj(temp, SvIV(b), DEFAULT_ROUNDING_MODE);
 #endif
-       mpc_pow(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_pow(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
      }
 #else
      if(SvUOK(b)) {
-       mpc_pow_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), _perl_default_rounding_mode);
+       mpc_pow_ui(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvUV(b), DEFAULT_ROUNDING_MODE);
        return a;
      }
 
      if(SvIOK(b)) {
-       mpc_pow_si(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b), _perl_default_rounding_mode);
+       mpc_pow_si(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvIV(b), DEFAULT_ROUNDING_MODE);
        return a;
      }
 
@@ -2098,27 +2134,27 @@ SV * overload_pow_eq(SV * a, SV * b, SV * third) {
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpc_pow_ld(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvNV(b), _perl_default_rounding_mode);
+       mpc_pow_ld(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvNV(b), DEFAULT_ROUNDING_MODE);
 #else
-       mpc_pow_d(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvNV(b), _perl_default_rounding_mode);
+       mpc_pow_d(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), SvNV(b), DEFAULT_ROUNDING_MODE);
 #endif
        return a;
      }
 
      if(SvPOK(b)) {
        mpc_init3(temp, DEFAULT_PREC);
-       if(mpc_set_str(temp, SvPV_nolen(b), 0, _perl_default_rounding_mode) == -1) {
+       if(mpc_set_str(temp, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1) {
          SvREFCNT_dec(a);
          croak("Invalid string supplied to Math::MPC::overload_pow_eq");
        }
-       mpc_pow(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, _perl_default_rounding_mode);
+       mpc_pow(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), temp, DEFAULT_ROUNDING_MODE);
        mpc_clear(temp);
        return a;
      }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
-         mpc_pow(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_pow(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
        }
      }
@@ -2128,6 +2164,7 @@ SV * overload_pow_eq(SV * a, SV * b, SV * third) {
 }
 
 SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
+     dMY_CXT;
      mpfr_t temp;
      mpc_t t;
      int ret;
@@ -2136,15 +2173,15 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
 
 #ifdef USE_64_BIT_INT
      if(SvUOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_re);
+       mpfr_init2(temp, DEFAULT_PREC_RE);
 #ifdef _MSC_VER
-       mpfr_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode & 3);
+       mpfr_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE & 3);
 #else
-       mpfr_set_uj(temp, SvUV(b), _perl_default_rounding_mode & 3);
+       mpfr_set_uj(temp, SvUV(b), DEFAULT_ROUNDING_MODE & 3);
 #endif
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
-       mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
+       mpc_set_ui_ui(t, 0, 0, DEFAULT_ROUNDING_MODE);
+       mpc_add_fr(t, t, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
@@ -2153,15 +2190,15 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
        }
 
      if(SvIOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_re);
+       mpfr_init2(temp, DEFAULT_PREC_RE);
 #ifdef _MSC_VER
-       mpfr_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode & 3);
+       mpfr_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE & 3);
 #else
-       mpfr_set_sj(temp, SvIV(b), _perl_default_rounding_mode & 3);
+       mpfr_set_sj(temp, SvIV(b), DEFAULT_ROUNDING_MODE & 3);
 #endif
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
-       mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
+       mpc_set_ui_ui(t, 0, 0, DEFAULT_ROUNDING_MODE);
+       mpc_add_fr(t, t, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
@@ -2171,7 +2208,7 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
 #else
      if(SvUOK(b)) {
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui(t, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_ui(t, SvUV(b), DEFAULT_ROUNDING_MODE);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
        if(ret == 0) return newSViv(1);
@@ -2187,21 +2224,21 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpfr_init2(temp, _perl_default_prec_re);
-       mpfr_set_ld(temp, SvNV(b), _perl_default_rounding_mode & 3);
+       mpfr_init2(temp, DEFAULT_PREC_RE);
+       mpfr_set_ld(temp, SvNV(b), DEFAULT_ROUNDING_MODE & 3);
        if(mpfr_nan_p(temp)) {
          mpfr_clear(temp);
          return newSViv(0);
        }
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
-       mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
+       mpc_set_ui_ui(t, 0, 0, DEFAULT_ROUNDING_MODE);
+       mpc_add_fr(t, t, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
 #else
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_d(t, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_d(t, SvNV(b), DEFAULT_ROUNDING_MODE);
        if(mpfr_nan_p(MPC_RE(t))) ret = 1;
        else ret = mpc_cmp(*a, t);
        mpc_clear(t);
@@ -2211,12 +2248,12 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
        }
 
      if(SvPOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_re);
-       if(mpfr_set_str(temp, (char *)SvPV_nolen(b), 0, _perl_default_rounding_mode & 3))
+       mpfr_init2(temp, DEFAULT_PREC_RE);
+       if(mpfr_set_str(temp, (char *)SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE & 3))
          croak("Invalid string supplied to Math::MPC::overload_equiv");
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
-       mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
+       mpc_set_ui_ui(t, 0, 0, DEFAULT_ROUNDING_MODE);
+       mpc_add_fr(t, t, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
@@ -2241,7 +2278,7 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
 }
 
 SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
-
+     dMY_CXT;
      mpfr_t temp;
      mpc_t t;
      int ret;
@@ -2250,15 +2287,15 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
 
 #ifdef USE_64_BIT_INT
      if(SvUOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_re);
+       mpfr_init2(temp, DEFAULT_PREC_RE);
 #ifdef _MSC_VER
-       mpfr_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode & 3);
+       mpfr_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE & 3);
 #else
-       mpfr_set_uj(temp, SvUV(b), _perl_default_rounding_mode & 3);
+       mpfr_set_uj(temp, SvUV(b), DEFAULT_ROUNDING_MODE & 3);
 #endif
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
-       mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
+       mpc_set_ui_ui(t, 0, 0, DEFAULT_ROUNDING_MODE);
+       mpc_add_fr(t, t, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
@@ -2267,15 +2304,15 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
        }
 
      if(SvIOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_re);
+       mpfr_init2(temp, DEFAULT_PREC_RE);
 #ifdef _MSC_VER
-       mpfr_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode & 3);
+       mpfr_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE & 3);
 #else
-       mpfr_set_sj(temp, SvIV(b), _perl_default_rounding_mode & 3);
+       mpfr_set_sj(temp, SvIV(b), DEFAULT_ROUNDING_MODE & 3);
 #endif
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
-       mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
+       mpc_set_ui_ui(t, 0, 0, DEFAULT_ROUNDING_MODE);
+       mpc_add_fr(t, t, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
@@ -2285,7 +2322,7 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
 #else
      if(SvUOK(b)) {
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui(t, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_ui(t, SvUV(b), DEFAULT_ROUNDING_MODE);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
        if(ret == 0) return newSViv(0);
@@ -2301,21 +2338,21 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpfr_init2(temp, _perl_default_prec_re);
-       mpfr_set_ld(temp, SvNV(b), _perl_default_rounding_mode & 3);
+       mpfr_init2(temp, DEFAULT_PREC_RE);
+       mpfr_set_ld(temp, SvNV(b), DEFAULT_ROUNDING_MODE & 3);
        if(mpfr_nan_p(temp)) {
          mpfr_clear(temp);
          return newSViv(1);
        }
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
-       mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
+       mpc_set_ui_ui(t, 0, 0, DEFAULT_ROUNDING_MODE);
+       mpc_add_fr(t, t, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
 #else
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_d(t, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_d(t, SvNV(b), DEFAULT_ROUNDING_MODE);
        if(mpfr_nan_p(MPC_RE(t))) ret = 1;
        else ret = mpc_cmp(*a, t);
        mpc_clear(t);
@@ -2325,12 +2362,12 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
        }
 
      if(SvPOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_re);
-       if(mpfr_set_str(temp, (char *)SvPV_nolen(b), 0, _perl_default_rounding_mode & 3))
+       mpfr_init2(temp, DEFAULT_PREC_RE);
+       if(mpfr_set_str(temp, (char *)SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE & 3))
          croak("Invalid string supplied to Math::MPC::overload_not_equiv");
        mpc_init3(t, DEFAULT_PREC);
-       mpc_set_ui_ui(t, 0, 0, _perl_default_rounding_mode);
-       mpc_add_fr(t, t, temp, _perl_default_rounding_mode);
+       mpc_set_ui_ui(t, 0, 0, DEFAULT_ROUNDING_MODE);
+       mpc_add_fr(t, t, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        ret = mpc_cmp(*a, t);
        mpc_clear(t);
@@ -2357,6 +2394,7 @@ SV * overload_not(mpc_t * a, SV * second, SV * third) {
 }
 
 SV * overload_sqrt(mpc_t * p, SV * second, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -2366,7 +2404,7 @@ SV * overload_sqrt(mpc_t * p, SV * second, SV * third) {
      obj = newSVrv(obj_ref, "Math::MPC");
      mpc_init3(*mpc_t_obj, DEFAULT_PREC);
 
-     mpc_sqrt(*mpc_t_obj, *p, _perl_default_rounding_mode);
+     mpc_sqrt(*mpc_t_obj, *p, DEFAULT_ROUNDING_MODE);
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
      return obj_ref;
@@ -2374,6 +2412,7 @@ SV * overload_sqrt(mpc_t * p, SV * second, SV * third) {
 
 void overload_copy(mpc_t * p, SV * second, SV * third) {
      dXSARGS;
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      mp_prec_t re, im;
@@ -2385,15 +2424,16 @@ void overload_copy(mpc_t * p, SV * second, SV * third) {
 
      mpc_get_prec2(&re, &im, *p);
      mpc_init3(*mpc_t_obj, re, im);
-     mpc_set(*mpc_t_obj, *p, _perl_default_rounding_mode);
+     mpc_set(*mpc_t_obj, *p, DEFAULT_ROUNDING_MODE);
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(1);
 }
 
 SV * overload_abs(mpc_t * p, SV * second, SV * third) {
+     dMY_CXT;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
@@ -2403,13 +2443,14 @@ SV * overload_abs(mpc_t * p, SV * second, SV * third) {
      obj = newSVrv(obj_ref, "Math::MPFR");
      mpfr_init(*mpfr_t_obj);
 
-     mpc_abs(*mpfr_t_obj, *p, _perl_default_rounding_mode);
+     mpc_abs(*mpfr_t_obj, *p, DEFAULT_ROUNDING_MODE);
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
      return obj_ref;
 }
 
 SV * overload_exp(mpc_t * p, SV * second, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -2419,13 +2460,14 @@ SV * overload_exp(mpc_t * p, SV * second, SV * third) {
      obj = newSVrv(obj_ref, "Math::MPC");
      mpc_init3(*mpc_t_obj, DEFAULT_PREC);
 
-     mpc_exp(*mpc_t_obj, *p, _perl_default_rounding_mode);
+     mpc_exp(*mpc_t_obj, *p, DEFAULT_ROUNDING_MODE);
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
      return obj_ref;
 }
 
 SV * overload_log(mpc_t * p, SV * second, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -2435,13 +2477,14 @@ SV * overload_log(mpc_t * p, SV * second, SV * third) {
      obj = newSVrv(obj_ref, "Math::MPC");
      mpc_init3(*mpc_t_obj, DEFAULT_PREC);
 
-     mpc_log(*mpc_t_obj, *p, _perl_default_rounding_mode);
+     mpc_log(*mpc_t_obj, *p, DEFAULT_ROUNDING_MODE);
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
      return obj_ref;
 }
 
 SV * overload_sin(mpc_t * p, SV * second, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -2451,13 +2494,14 @@ SV * overload_sin(mpc_t * p, SV * second, SV * third) {
      obj = newSVrv(obj_ref, "Math::MPC");
      mpc_init3(*mpc_t_obj, DEFAULT_PREC);
 
-     mpc_sin(*mpc_t_obj, *p, _perl_default_rounding_mode);
+     mpc_sin(*mpc_t_obj, *p, DEFAULT_ROUNDING_MODE);
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
      return obj_ref;
 }
 
 SV * overload_cos(mpc_t * p, SV * second, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -2467,7 +2511,7 @@ SV * overload_cos(mpc_t * p, SV * second, SV * third) {
      obj = newSVrv(obj_ref, "Math::MPC");
      mpc_init3(*mpc_t_obj, DEFAULT_PREC);
 
-     mpc_cos(*mpc_t_obj, *p, _perl_default_rounding_mode);
+     mpc_cos(*mpc_t_obj, *p, DEFAULT_ROUNDING_MODE);
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
      return obj_ref;
@@ -2485,11 +2529,11 @@ void _get_r_string(mpc_t * p, SV * base, SV * n_digits, SV * round) {
 
      if(out == NULL) croak("An error occurred in _get_r_string()");
 
-     // sp = mark; // not needed;
+     /* sp = mark; *//* not needed */
      ST(0) = sv_2mortal(newSVpv(out, 0));
      mpfr_free_str(out);
      ST(1) = sv_2mortal(newSViv(ptr));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -2505,11 +2549,11 @@ void _get_i_string(mpc_t * p, SV * base, SV * n_digits, SV * round) {
 
      if(out == NULL) croak("An error occurred in _get_i_string()");
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
      ST(0) = sv_2mortal(newSVpv(out, 0));
      mpfr_free_str(out);
      ST(1) = sv_2mortal(newSViv(ptr));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -2540,6 +2584,7 @@ SV * _itsa(SV * a) {
 }
 
 SV * _new_real(SV * b) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      mpfr_t temp;
      SV * obj_ref, * obj;
@@ -2556,76 +2601,76 @@ SV * _new_real(SV * b) {
 #ifdef USE_64_BIT_INT
 
      if(SvUOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_re);
+       mpfr_init2(temp, DEFAULT_PREC_RE);
 #ifdef _MSC_VER
-       mpfr_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode & 3);
+       mpfr_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE & 3);
 #else
-       mpfr_set_uj(temp, SvUV(b), _perl_default_rounding_mode & 3);
+       mpfr_set_uj(temp, SvUV(b), DEFAULT_ROUNDING_MODE & 3);
 #endif
-       mpc_set_fr(*mpc_t_obj, temp, _perl_default_rounding_mode);
+       mpc_set_fr(*mpc_t_obj, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        return obj_ref;
      }
 
      if(SvIOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_re);
+       mpfr_init2(temp, DEFAULT_PREC_RE);
 #ifdef _MSC_VER
-       mpfr_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode & 3);
+       mpfr_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE & 3);
 #else
-       mpfr_set_sj(temp, SvIV(b), _perl_default_rounding_mode & 3);
+       mpfr_set_sj(temp, SvIV(b), DEFAULT_ROUNDING_MODE & 3);
 #endif
-       mpc_set_fr(*mpc_t_obj, temp, _perl_default_rounding_mode);
+       mpc_set_fr(*mpc_t_obj, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        return obj_ref;
      }
 
 #else
      if(SvUOK(b)) {
-       mpc_set_ui(*mpc_t_obj, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_ui(*mpc_t_obj, SvUV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
-       mpc_set_si(*mpc_t_obj, SvIV(b), _perl_default_rounding_mode);
+       mpc_set_si(*mpc_t_obj, SvIV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 #endif
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_ld(*mpc_t_obj, SvNV(b), DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_d(*mpc_t_obj, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_d(*mpc_t_obj, SvNV(b), DEFAULT_ROUNDING_MODE);
 #endif
 
      return obj_ref;
      }
 
      if(SvPOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_re);
-       if(mpfr_set_str(temp, SvPV_nolen(b), 0, _perl_default_rounding_mode & 3))
+       mpfr_init2(temp, DEFAULT_PREC_RE);
+       if(mpfr_set_str(temp, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE & 3))
          croak("Invalid string supplied to Math::MPC::new");
-       mpc_set_fr(*mpc_t_obj, temp, _perl_default_rounding_mode);
+       mpc_set_fr(*mpc_t_obj, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        return obj_ref;
      }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
-         mpc_set_fr(*mpc_t_obj, *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_set_fr(*mpc_t_obj, *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPf")) {
-         mpc_set_f(*mpc_t_obj, *(INT2PTR(mpf_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_set_f(*mpc_t_obj, *(INT2PTR(mpf_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPq")) {
-         mpc_set_q(*mpc_t_obj, *(INT2PTR(mpq_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_set_q(*mpc_t_obj, *(INT2PTR(mpq_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMP") ||
           strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPz"))  {
-         mpc_set_z(*mpc_t_obj, *(INT2PTR(mpz_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         mpc_set_z(*mpc_t_obj, *(INT2PTR(mpz_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
      }
@@ -2634,6 +2679,7 @@ SV * _new_real(SV * b) {
 }
 
 SV * _new_im(SV * b) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      mpfr_t temp;
      SV * obj_ref, * obj;
@@ -2651,84 +2697,84 @@ SV * _new_im(SV * b) {
 #ifdef USE_64_BIT_INT
 
      if(SvUOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_im);
+       mpfr_init2(temp, DEFAULT_PREC_IM);
 #ifdef _MSC_VER
-       mpfr_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode / 16);
+       mpfr_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE / 16);
 #else
-       mpfr_set_uj(temp, SvUV(b), _perl_default_rounding_mode / 16);
+       mpfr_set_uj(temp, SvUV(b), DEFAULT_ROUNDING_MODE / 16);
 #endif
-       VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, _perl_default_rounding_mode);
+       VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        return obj_ref;
      }
 
      if(SvIOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_im);
+       mpfr_init2(temp, DEFAULT_PREC_IM);
 #ifdef _MSC_VER
-       mpfr_set_str(temp, SvPV_nolen(b), 10, _perl_default_rounding_mode / 16);
+       mpfr_set_str(temp, SvPV_nolen(b), 10, DEFAULT_ROUNDING_MODE / 16);
 #else
-       mpfr_set_sj(temp, SvIV(b), _perl_default_rounding_mode / 16);
+       mpfr_set_sj(temp, SvIV(b), DEFAULT_ROUNDING_MODE / 16);
 #endif
-       VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, _perl_default_rounding_mode);
+       VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        return obj_ref;
      }
 
 #else
      if(SvUOK(b)) {
-       mpc_set_ui_ui(*mpc_t_obj, 0, SvUV(b), _perl_default_rounding_mode);
+       mpc_set_ui_ui(*mpc_t_obj, 0, SvUV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
-       mpc_set_si_si(*mpc_t_obj, 0, SvIV(b), _perl_default_rounding_mode);
+       mpc_set_si_si(*mpc_t_obj, 0, SvIV(b), DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
 #endif
 
      if(SvNOK(b)) {
 #ifdef USE_LONG_DOUBLE
-       mpc_set_ld_ld(*mpc_t_obj, 0, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_ld_ld(*mpc_t_obj, 0, SvNV(b), DEFAULT_ROUNDING_MODE);
 #else
-       mpc_set_d_d(*mpc_t_obj, 0, SvNV(b), _perl_default_rounding_mode);
+       mpc_set_d_d(*mpc_t_obj, 0, SvNV(b), DEFAULT_ROUNDING_MODE);
 #endif
 
      return obj_ref;
      }
 
      if(SvPOK(b)) {
-       mpfr_init2(temp, _perl_default_prec_im);
-       if(mpfr_set_str(temp, SvPV_nolen(b), 0, _perl_default_rounding_mode / 16))
+       mpfr_init2(temp, DEFAULT_PREC_IM);
+       if(mpfr_set_str(temp, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE / 16))
          croak("Invalid string supplied to Math::MPC::new");
-       VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, _perl_default_rounding_mode);
+       VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, DEFAULT_ROUNDING_MODE);
        mpfr_clear(temp);
        return obj_ref;
      }
 
      if(sv_isobject(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
-         VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode);
+         VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPf")) {
-         mpfr_init2(temp, _perl_default_prec_im);
-         mpfr_set_f(temp, *(INT2PTR(mpf_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode / 16);
-         VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, _perl_default_rounding_mode);
+         mpfr_init2(temp, DEFAULT_PREC_IM);
+         mpfr_set_f(temp, *(INT2PTR(mpf_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE / 16);
+         VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, DEFAULT_ROUNDING_MODE);
          mpfr_clear(temp);
          return obj_ref;
        }
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPq")) {
-         mpfr_init2(temp, _perl_default_prec_im);
-         mpfr_set_q(temp, *(INT2PTR(mpq_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode / 16);
-         VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, _perl_default_rounding_mode);
+         mpfr_init2(temp, DEFAULT_PREC_IM);
+         mpfr_set_q(temp, *(INT2PTR(mpq_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE / 16);
+         VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, DEFAULT_ROUNDING_MODE);
          mpfr_clear(temp);
          return obj_ref;
        }
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMP") ||
           strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPz"))  {
-         mpfr_init2(temp, _perl_default_prec_im);
-         mpfr_set_z(temp, *(INT2PTR(mpz_t *, SvIV(SvRV(b)))), _perl_default_rounding_mode / 16);
-         VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, _perl_default_rounding_mode);
+         mpfr_init2(temp, DEFAULT_PREC_IM);
+         mpfr_set_z(temp, *(INT2PTR(mpz_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE / 16);
+         VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, DEFAULT_ROUNDING_MODE);
          mpfr_clear(temp);
          return obj_ref;
        }
@@ -2851,6 +2897,7 @@ void Rmpc_swap(mpc_t * a, mpc_t * b) {
 
 /* atan2(x, y) = atan(x / y) */
 SV * overload_atan2(mpc_t * p, mpc_t * q, SV * third) {
+     dMY_CXT;
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
 
@@ -2860,9 +2907,9 @@ SV * overload_atan2(mpc_t * p, mpc_t * q, SV * third) {
      obj = newSVrv(obj_ref, "Math::MPC");
      mpc_init3(*mpc_t_obj, DEFAULT_PREC);
 
-     mpc_div(*mpc_t_obj, *p, *q, _perl_default_rounding_mode);
+     mpc_div(*mpc_t_obj, *p, *q, DEFAULT_ROUNDING_MODE);
 
-     mpc_atan(*mpc_t_obj, *mpc_t_obj, _perl_default_rounding_mode);
+     mpc_atan(*mpc_t_obj, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
      sv_setiv(obj, INT2PTR(IV,mpc_t_obj));
      SvREADONLY_on(obj);
      return obj_ref;
@@ -2924,6 +2971,21 @@ SV * _have_Complex_h() {
 #endif
 }
 
+SV * _mpfr_buildopt_tls_p() {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSViv(mpfr_buildopt_tls_p());
+#else
+     croak("Math::MPC::_mpfr_buildopt_tls_p not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * get_xs_version() {
+     return newSVpv(XS_VERSION, 0);
+}
+
+void CLONE(SV * x, ...) {
+   MY_CXT_CLONE;
+}
 
 MODULE = Math::MPC	PACKAGE = Math::MPC	
 
@@ -4686,4 +4748,35 @@ Rmpc_set_ldc (op, crop, round)
 
 SV *
 _have_Complex_h ()
+
+SV *
+_mpfr_buildopt_tls_p ()
+
+SV *
+get_xs_version ()
+
+void
+CLONE (x, ...)
+	SV *	x
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	CLONE(x);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+BOOT:
+
+  {
+  MY_CXT_INIT;
+  MY_CXT._perl_default_prec_re = 53;
+  MY_CXT._perl_default_prec_im = 53;
+  MY_CXT._perl_default_rounding_mode = 0;
+  }
 
