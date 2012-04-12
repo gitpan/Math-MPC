@@ -1,3 +1,7 @@
+0.93
+ - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
+   warns that it's invalid.
+
 0.92
  - The default rounding mode and default precision globals are now thread-safe.
    Consequently at least 5.008008 is required.

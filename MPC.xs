@@ -295,7 +295,7 @@ void Rmpc_set_default_rounding_mode(SV * round) {
      DEFAULT_ROUNDING_MODE = (mpc_rnd_t)SvUV(round);    
 }
 
-SV * Rmpc_get_default_rounding_mode() {
+SV * Rmpc_get_default_rounding_mode(void) {
      dMY_CXT;
      return newSVuv(DEFAULT_ROUNDING_MODE);
 }
@@ -312,14 +312,14 @@ void Rmpc_set_default_prec2(SV * prec_re, SV * prec_im) {
      DEFAULT_PREC_IM = (mp_prec_t)SvUV(prec_im);
 } 
 
-SV * Rmpc_get_default_prec() {
+SV * Rmpc_get_default_prec(void) {
      dMY_CXT;
      if(DEFAULT_PREC_RE == DEFAULT_PREC_IM)
        return newSVuv(DEFAULT_PREC_RE);
      return newSVuv(0);
 }
 
-void Rmpc_get_default_prec2() {
+void Rmpc_get_default_prec2(void) {
      dXSARGS;
      dMY_CXT;
      EXTEND(SP, 2);
@@ -2783,7 +2783,7 @@ SV * _new_im(SV * b) {
      croak("Invalid argument supplied to Math::MPC::_new_im");
 }
 
-int _has_longlong() {
+int _has_longlong(void) {
 #ifdef USE_64_BIT_INT
     return 1;
 #else
@@ -2791,7 +2791,7 @@ int _has_longlong() {
 #endif
 }
 
-int _has_longdouble() {
+int _has_longdouble(void) {
 #ifdef USE_LONG_DOUBLE
     return 1;
 #else
@@ -2800,7 +2800,7 @@ int _has_longdouble() {
 }
 
 /* Has inttypes.h been included ? */
-int _has_inttypes() {
+int _has_inttypes(void) {
 #ifdef _MSC_VER
 return 0;
 #else
@@ -2812,11 +2812,11 @@ return 0;
 #endif
 }
 
-SV * gmp_v() {
+SV * gmp_v(void) {
      return newSVpv(gmp_version, 0);
 }
 
-SV * mpfr_v() {
+SV * mpfr_v(void) {
      return newSVpv(mpfr_get_version(), 0);
 }
 
@@ -2826,19 +2826,19 @@ SV * RMPC_MAX_PREC(mpc_t * a) {
 }
 */
 
-SV * _MPC_VERSION_MAJOR() {
+SV * _MPC_VERSION_MAJOR(void) {
      return newSVuv(MPC_VERSION_MAJOR);
 }
 
-SV * _MPC_VERSION_MINOR() {
+SV * _MPC_VERSION_MINOR(void) {
      return newSVuv(MPC_VERSION_MINOR);
 }
   
-SV * _MPC_VERSION_PATCHLEVEL() {
+SV * _MPC_VERSION_PATCHLEVEL(void) {
      return newSVuv(MPC_VERSION_PATCHLEVEL);
 }
 
-SV * _MPC_VERSION() {
+SV * _MPC_VERSION(void) {
      return newSVuv(MPC_VERSION);
 }
 
@@ -2846,11 +2846,11 @@ SV * _MPC_VERSION_NUM(SV * x, SV * y, SV * z) {
      return newSVuv(MPC_VERSION_NUM((unsigned long)SvUV(x), (unsigned long)SvUV(y), (unsigned long)SvUV(z)));
 }
 
-SV * _MPC_VERSION_STRING() {
+SV * _MPC_VERSION_STRING(void) {
      return newSVpv(MPC_VERSION_STRING, 0);
 }
 
-SV * Rmpc_get_version() {
+SV * Rmpc_get_version(void) {
      return newSVpv(mpc_get_version(), 0);
 }
 
@@ -2963,7 +2963,7 @@ SV * Rmpc_set_ldc(mpc_t * op, SV * crop, SV * round) {
 #endif
 }
 
-SV * _have_Complex_h() {
+SV * _have_Complex_h(void) {
 #ifdef _DO_COMPLEX_H
      return newSVuv(1);
 #else
@@ -2971,7 +2971,7 @@ SV * _have_Complex_h() {
 #endif
 }
 
-SV * _mpfr_buildopt_tls_p() {
+SV * _mpfr_buildopt_tls_p(void) {
 #if MPFR_VERSION_MAJOR >= 3
      return newSViv(mpfr_buildopt_tls_p());
 #else
@@ -2979,7 +2979,7 @@ SV * _mpfr_buildopt_tls_p() {
 #endif
 }
 
-SV * get_xs_version() {
+SV * get_xs_version(void) {
      return newSVpv(XS_VERSION, 0);
 }
 
@@ -3073,6 +3073,7 @@ Rmpc_set_default_rounding_mode (round)
 
 SV *
 Rmpc_get_default_rounding_mode ()
+		
 
 void
 Rmpc_set_default_prec (prec)
@@ -3109,9 +3110,11 @@ Rmpc_set_default_prec2 (prec_re, prec_im)
 
 SV *
 Rmpc_get_default_prec ()
+		
 
 void
 Rmpc_get_default_prec2 ()
+		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -4569,30 +4572,39 @@ _new_im (b)
 
 int
 _has_longlong ()
+		
 
 int
 _has_longdouble ()
+		
 
 int
 _has_inttypes ()
+		
 
 SV *
 gmp_v ()
+		
 
 SV *
 mpfr_v ()
+		
 
 SV *
 _MPC_VERSION_MAJOR ()
+		
 
 SV *
 _MPC_VERSION_MINOR ()
+		
 
 SV *
 _MPC_VERSION_PATCHLEVEL ()
+		
 
 SV *
 _MPC_VERSION ()
+		
 
 SV *
 _MPC_VERSION_NUM (x, y, z)
@@ -4602,9 +4614,11 @@ _MPC_VERSION_NUM (x, y, z)
 
 SV *
 _MPC_VERSION_STRING ()
+		
 
 SV *
 Rmpc_get_version ()
+		
 
 SV *
 Rmpc_real (rop, op, round)
@@ -4748,12 +4762,15 @@ Rmpc_set_ldc (op, crop, round)
 
 SV *
 _have_Complex_h ()
+		
 
 SV *
 _mpfr_buildopt_tls_p ()
+		
 
 SV *
 get_xs_version ()
+		
 
 void
 CLONE (x, ...)
