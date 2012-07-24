@@ -17,7 +17,9 @@
 #include <mpc.h>
 
 #ifndef _MPC_H_HAVE_COMPLEX
+#ifndef _Complex_I
 #undef _DO_COMPLEX_H
+#endif
 #endif
 
 #ifdef _MSC_VER
@@ -1197,12 +1199,24 @@ SV * Rmpc_norm(mpfr_t * a, mpc_t * b, SV * round) {
      return newSViv(mpc_norm(*a, *b, (mpc_rnd_t)SvUV(round)));
 }
 
-SV * Rmpc_mul_2exp(mpc_t * a, mpc_t * b, SV * c, SV * round) {
+/* Beginning mpc-1.0, mpc_mul_2exp and mpc_div_2exp were
+*  renamed mpc_mul_2ui and mpc_div_2ui
+*/
+
+SV * Rmpc_mul_2ui(mpc_t * a, mpc_t * b, SV * c, SV * round) {
+#if MPC_VERSION < 65536
      return newSViv(mpc_mul_2exp(*a, *b, SvUV(c), (mpc_rnd_t)SvUV(round)));
+#else
+     return newSViv(mpc_mul_2ui(*a, *b, SvUV(c), (mpc_rnd_t)SvUV(round)));
+#endif
 }
 
-SV * Rmpc_div_2exp(mpc_t * a, mpc_t * b, SV * c, SV * round) {
+SV * Rmpc_div_2ui(mpc_t * a, mpc_t * b, SV * c, SV * round) {
+#if MPC_VERSION < 65536
      return newSViv(mpc_div_2exp(*a, *b, SvUV(c), (mpc_rnd_t)SvUV(round)));
+#else
+     return newSViv(mpc_div_2ui(*a, *b, SvUV(c), (mpc_rnd_t)SvUV(round)));
+#endif
 }
 
 SV * Rmpc_cmp(mpc_t * a, mpc_t * b) {
@@ -2983,9 +2997,43 @@ SV * get_xs_version(void) {
      return newSVpv(XS_VERSION, 0);
 }
 
+SV * _wrap_count(void) {
+     return newSVuv(PL_sv_count);
+}
+
+/* Beginning mpc-1.0, mpc_mul_2si and mpc_div_2si were added */
+
+SV * Rmpc_mul_2si(mpc_t * a, mpc_t * b, SV * c, SV * round) {
+#if MPC_VERSION >= 65536
+     return newSViv(mpc_mul_2si(*a, *b, SvUV(c), (mpc_rnd_t)SvUV(round)));
+# else
+     croak("mpc_mul_2si not implemented until mpc-1.0. We have version %d", MPC_VERSION);
+#endif
+}
+
+SV * Rmpc_div_2si(mpc_t * a, mpc_t * b, SV * c, SV * round) {
+#if MPC_VERSION >= 65536
+     return newSViv(mpc_div_2si(*a, *b, SvUV(c), (mpc_rnd_t)SvUV(round)));
+# else
+     croak("mpc_div_2si not implemented until mpc-1.0. We have version %d", MPC_VERSION);
+#endif
+}
+
+SV * Rmpc_log10(mpc_t * rop, mpc_t *op, SV * round) {
+#if MPC_VERSION >= 65536
+     return newSViv(mpc_log10(*rop, *op, (mpc_rnd_t)SvUV(round)));
+# else
+     croak("mpc_log10 not implemented until mpc-1.0. We have version %d", MPC_VERSION);
+#endif
+}
+
+/* I think the CLONE() function needs to come at the very end ... not sure */
+
 void CLONE(SV * x, ...) {
    MY_CXT_CLONE;
 }
+
+
 
 MODULE = Math::MPC	PACKAGE = Math::MPC	
 
@@ -4226,14 +4274,14 @@ Rmpc_norm (a, b, round)
 	SV *	round
 
 SV *
-Rmpc_mul_2exp (a, b, c, round)
+Rmpc_mul_2ui (a, b, c, round)
 	mpc_t *	a
 	mpc_t *	b
 	SV *	c
 	SV *	round
 
 SV *
-Rmpc_div_2exp (a, b, c, round)
+Rmpc_div_2ui (a, b, c, round)
 	mpc_t *	a
 	mpc_t *	b
 	SV *	c
@@ -4771,6 +4819,30 @@ _mpfr_buildopt_tls_p ()
 SV *
 get_xs_version ()
 		
+
+SV *
+_wrap_count ()
+		
+
+SV *
+Rmpc_mul_2si (a, b, c, round)
+	mpc_t *	a
+	mpc_t *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpc_div_2si (a, b, c, round)
+	mpc_t *	a
+	mpc_t *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpc_log10 (rop, op, round)
+	mpc_t *	rop
+	mpc_t *	op
+	SV *	round
 
 void
 CLONE (x, ...)

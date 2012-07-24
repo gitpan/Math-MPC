@@ -1200,7 +1200,7 @@ unless(Math::MPC::_have_Complex_h()) {
   }
 }
 else {
-  warn "Skipping test 7 - Math::MPC_have_complex_h returns true\n";
+  warn "Skipping test 7 - Math::MPC::_have_complex_h returns true\n";
   $ok = 'abcd';
 }
 
@@ -1228,7 +1228,7 @@ unless(Math::MPC::_have_Complex_h()) {
   }
 }
 else {
-  warn "Skipping test 8 - Math::MPC_have_complex_h returns true\n";
+  warn "Skipping test 8 - Math::MPC::_have_complex_h returns true\n";
   $ok = 'abcd';
 }
 

@@ -1,3 +1,11 @@
+1.00
+ - Add Rmpc_log10, Rmpc_mul2si and Rmpc-div_2si (new in 1.0.0)
+ - Accommodate namechange of mpc_mul_2exp and mpc_div_2exp to mpc_mul_2ui
+   and mpc_div_2ui (respectively) in mpc-1.0.0.
+ - Rewrite the detecting of availability of double _Complex and long double _Complex
+   types by looking for _Complex_I instead of _MPC_H_HAVE_COMPLEX (in line with
+   the way mpc.h currently does it).
+
 0.93
  - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
    warns that it's invalid.

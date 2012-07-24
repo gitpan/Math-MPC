@@ -108,8 +108,10 @@ Rmpc_set_dc Rmpc_set_ldc
 Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
+Rmpc_mul_2si Rmpc_mul_2ui
 Rmpc_div Rmpc_div_ui Rmpc_ui_div Rmpc_div_fr Rmpc_sqrt Rmpc_div_2exp
-Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log
+Rmpc_div_2si Rmpc_div_2ui
+Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log Rmpc_log10
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string 
 TRmpc_out_str TRmpc_inp_str
@@ -121,9 +123,10 @@ Rmpc_set_nan Rmpc_swap
 Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_div Rmpc_div_d Rmpc_d_div
 );
 
-    $Math::MPC::VERSION = '0.93';
+    our $VERSION = '1';
+    $VERSION = eval $VERSION;
 
-    DynaLoader::bootstrap Math::MPC $Math::MPC::VERSION;
+    DynaLoader::bootstrap Math::MPC $VERSION;
 
     %Math::MPC::EXPORT_TAGS =(mpc => [qw(
 MPC_RNDNN MPC_RNDND MPC_RNDNU MPC_RNDNZ MPC_RNDDN MPC_RNDUN MPC_RNDZN MPC_RNDDD 
@@ -167,8 +170,10 @@ Rmpc_set_dc Rmpc_set_ldc
 Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
+Rmpc_mul_2si Rmpc_mul_2ui
 Rmpc_div Rmpc_div_ui Rmpc_ui_div Rmpc_div_fr Rmpc_sqrt Rmpc_div_2exp
-Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log
+Rmpc_div_2si Rmpc_div_2ui
+Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log Rmpc_log10
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string
 TRmpc_out_str TRmpc_inp_str
@@ -207,6 +212,11 @@ Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_d
 *Rmpc_ld_div  = \&Math::MPC::_mpc_ld_div;
 *Rmpc_div_d   = \&Math::MPC::_mpc_div_d;
 *Rmpc_d_div   = \&Math::MPC::_mpc_d_div;
+
+# Beginning with mpc-1.0, mpc_mul_2exp and mpc_div_2exp
+# were renamed to mpc_mul_2ui and mpc_div_2ui.
+*Rmpc_mul_2exp = \&Rmpc_mul_2ui;
+*Rmpc_div_2exp = \&Rmpc_div_2ui;
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
@@ -822,14 +832,18 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     Return 0 iff the result is exact.
 
    $si = Rmpc_mul_2exp($rop, $op, $ui, $rnd);
-    Set $rop to $op times 2 raised to $ui rounded according to $rnd.
-    Just increases the exponents of the real and imaginary parts by
-    $ui when $rop and $op are identical.
+   $si = Rmpc_mul_2ui ($rop, $op, $ui, $rnd);#same as Rmpc_mul_2exp
+   $si1 = Rmpc_mul_2si ($rop, $op, $si2, $rnd);
+    Set $rop to $op times 2 raised to 3rd arg rounded according to
+    $rnd. Just increases the exponents of the real and imaginary
+    parts by value of 3rd arg when $rop and $op are identical.
 
    $si = Rmpc_div_2exp($rop, $op, $ui, $rnd);
-    Set $rop to $op divided by 2 raised to $ui rounded according to
-    $rnd. Just decreases the exponents of the real and imaginary 
-    parts by $ui when $rop and $op are identical.
+   $si = Rmpc_div_2ui ($rop, $op, $ui, $rnd);#same as Rmpc_div_2exp
+   $si1 = Rmpc_div_2si ($rop, $op, $si2, $rnd);
+    Set $rop to $op divided by 2 raised to 3rd arg rounded according
+    to $rnd. Just decreases the exponents of the real and imaginary 
+    parts by value of 3rd arg when $rop and $op are identical.
 
   Rmpc_swap($op1, $op2);
     Swap the values (and precisions) of op1 and op2 efficiently.
@@ -868,6 +882,10 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_log($rop, $op, $rnd);
     Set $rop to the log of $op, rounded according to $rnd with the
     precision of $rop.
+
+   $si = Rmpc_log10($rop, $op, $rnd);
+    Set $rop to the base 10 log of $op, rounded according to $rnd with
+    the precision of $rop.
 
    $si = Rmpc_arg ($mpfr, $op, $rnd);
      Set $mpfr to the argument of $op, with a branch cut along the

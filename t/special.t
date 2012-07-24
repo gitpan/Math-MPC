@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPC qw(:mpc);
 
-print "1..2\n";
+print "1..3\n";
 
 my $ok = '';
 
@@ -48,3 +48,21 @@ if(Rmpfr_get_prec($mpfr1) == 81) {$ok .= 'g'}
 
 if($ok eq 'abcdefg') {print "ok 2\n"}
 else {print "not ok 2 $ok \n"}
+
+Rmpc_set_ui($mpc1, 10, MPC_RNDNN);
+eval {Rmpc_log10($mpc1, $mpc1, MPC_RNDNN);};
+
+if(65536 > MPC_VERSION) {
+  if($@ =~ /mpc_log10 not implemented until mpc\-1\.0/) {print "ok 3\n"}
+  else {
+    warn "\$\@: $@\n";
+    print "not ok 3\n";
+  }
+}
+else {
+  if($mpc1 == 1) {print "ok 3\n"}
+  else {
+    warn "\$mpc1: $mpc1\n";
+    print "not ok 3\n";
+  }
+}

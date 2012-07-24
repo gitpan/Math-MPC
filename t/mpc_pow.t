@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPC qw(:mpc);
 
-print "1..2\n";
+print "1..8\n";
 
 my($have_gmpz, $have_gmp) = (0, 0);
 my $ok = '';
@@ -117,3 +117,82 @@ if($mpfr > 0.6237845862 && $mpfr < 0.62378458628) {$ok .= 'f'}
 
 if($ok eq 'abcdef') {print "ok 2\n"}
 else {print "not ok 2 $ok\n"}
+
+Rmpc_set_ui($mpc, 5, MPC_RNDNN);
+
+Rmpc_mul_2exp($mpc, $mpc, 4, MPC_RNDNN);
+
+if($mpc == 80) {print "ok 3\n"}
+else {
+  warn "\$mpc: $mpc\n";
+  print "not ok 3\n";
+}
+
+eval{Rmpc_mul_2si($mpc, $mpc, -4, MPC_RNDNN);};
+
+if(MPC_VERSION >= 65536) {
+  if($mpc == 5) {print "ok 4\n"}
+  else {
+    warn "\$mpc: $mpc\n";
+    print "not ok 4\n";
+  }
+}
+else {
+  if($@ =~ /mpc_mul_2si not implemented until mpc\-1\.0/) {print "ok 4\n"}
+  else {
+    warn "\$\@: $@\n";
+    print "not ok 4\n";
+  }
+}
+
+#####################################
+Rmpc_set_ui($mpc, 5, MPC_RNDNN);
+
+Rmpc_mul_2ui($mpc, $mpc, 4, MPC_RNDNN);
+
+if($mpc == 80) {print "ok 5\n"}
+else {
+  warn "\$mpc: $mpc\n";
+  print "not ok 5\n";
+}
+
+Rmpc_div_2ui($mpc, $mpc, 4, MPC_RNDNN);
+
+if($mpc == 5) {print "ok 6\n"}
+else {
+  warn "\$mpc: $mpc\n";
+  print "not ok 6\n";
+}
+#####################################
+
+Rmpc_set_ui($mpc, 5, MPC_RNDNN);
+
+eval {Rmpc_div_2si($mpc, $mpc, -4, MPC_RNDNN);};
+
+if(MPC_VERSION >= 65536) {
+  if($mpc == 80) {print "ok 7\n"}
+  else {
+    warn "\$mpc: $mpc\n";
+    print "not ok 7\n";
+  }
+}
+else {
+  if($@ =~ /mpc_div_2si not implemented until mpc\-1\.0/) {print "ok 7\n"}
+  else {
+    warn "\$\@: $@\n";
+    print "not ok 7\n";
+  }
+}
+
+Rmpc_set_ui($mpc, 80, MPC_RNDNN);
+Rmpc_div_2exp($mpc, $mpc, 4, MPC_RNDNN);
+
+if($mpc == 5) {print "ok 8\n"}
+else {
+  warn "\$mpc: $mpc\n";
+  print "not ok 8\n";
+}
+
+print "$mpc\n";
+
+
