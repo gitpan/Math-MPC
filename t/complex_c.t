@@ -68,9 +68,18 @@ my $mpccl = Math::MPC->new();
 Rmpc_set_dc($mpcc, $cc, MPC_RNDNN);
 Rmpc_set_ldc($mpccl, $ccl, MPC_RNDNN);
 
+# Math::Complex_C::assign_cl changed with the release of version 0.07
+
 if(Math::Complex_C::_nvsize() == Math::Complex_C::_doublesize()) {
-  if($mpcc == $mpccl) {print "ok 5\n"}
-  else {print "not ok 5\n"}
+  if($Math::Complex_C::VERSION < 0.065) {
+    warn "\nBetter to upgrade to the latest version of Math::Complex_C\n";
+    if($mpcc == $mpccl) {print "ok 5\n"}
+    else {print "not ok 5\n"}
+  }
+  else {
+    if($mpcc == $mpccl) {print "not ok 5\n"}
+    else {print "ok 5\n"}
+  }
 }
 elsif((Math::Complex_C::_nvsize() == Math::Complex_C::_longdoublesize()) &&
       (Math::Complex_C::_longdoublesize() > Math::Complex_C::_doublesize())) {

@@ -20,7 +20,7 @@ Math::MPC::_have_Complex_h() ?
                              :
  warn "\n# Built without support for 'double _Complex' and 'long double _Complex types'\n"; 
 
-if($Math::MPC::VERSION eq '1') {print "ok 1\n"}
+if($Math::MPC::VERSION eq '1.01') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPC::VERSION\n"}
 
 if(MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 7) {print "ok 2\n"}
@@ -33,9 +33,9 @@ if(MPC_VERSION == MPC_VERSION_NUM(MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERS
 else {print "not ok 4 ", MPC_VERSION, " does not match ",
                          MPC_VERSION_NUM(MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCHLEVEL), "\n"}
 
-if($Math::MPC::VERSION eq Math::MPC::get_xs_version()) {print "ok 5\n"}
+if($Math::MPC::VERSION eq Math::MPC::_get_xs_version()) {print "ok 5\n"}
 else {
-  warn "\$Math::MPC::VERSION: $Math::MPC::VERSION\nXS_VERSION: ", Math::MPC::get_xs_version(), "\n";
+  warn "\$Math::MPC::VERSION: $Math::MPC::VERSION\nXS_VERSION: ", Math::MPC::_get_xs_version(), "\n";
   print "not ok 5\n";
 } 
 

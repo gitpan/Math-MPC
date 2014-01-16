@@ -1429,7 +1429,8 @@ SV * overload_mul(mpc_t * a, SV * b, SV * third) {
      }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_mul(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
@@ -1511,7 +1512,8 @@ SV * overload_add(mpc_t* a, SV * b, SV * third) {
      }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_add(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
@@ -1594,7 +1596,8 @@ SV * overload_sub(mpc_t * a, SV * b, SV * third) {
        }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_sub(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
@@ -1686,7 +1689,8 @@ SV * overload_div(mpc_t * a, SV * b, SV * third) {
        }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_div(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
          }
@@ -1774,7 +1778,8 @@ SV * overload_div_eq(SV * a, SV * b, SV * third) {
        }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_div(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
          }
@@ -1856,7 +1861,8 @@ SV * overload_sub_eq(SV * a, SV * b, SV * third) {
        }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_sub(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
          }
@@ -1936,7 +1942,8 @@ SV * overload_add_eq(SV * a, SV * b, SV * third) {
        }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_add(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
          }
@@ -2019,7 +2026,8 @@ SV * overload_mul_eq(SV * a, SV * b, SV * third) {
        }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_mul(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
          }
@@ -2094,7 +2102,8 @@ SV * overload_pow(mpc_t * a, SV * b, SV * third) {
      }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_pow(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
@@ -2167,7 +2176,8 @@ SV * overload_pow_eq(SV * a, SV * b, SV * third) {
      }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          mpc_pow(*(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(a)))), *(INT2PTR(mpc_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
        }
@@ -2276,10 +2286,8 @@ SV * overload_equiv(mpc_t * a, SV * b, SV * third) {
        }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::Complex_C")) {
-
-       }
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          if(mpfr_nan_p(MPC_RE(*(INT2PTR(mpc_t *, SvIV(SvRV(b)))))) ||
             mpfr_nan_p(MPC_IM(*(INT2PTR(mpc_t *, SvIV(SvRV(b))))))) return newSViv(0);
          ret = mpc_cmp(*a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))));
@@ -2390,7 +2398,8 @@ SV * overload_not_equiv(mpc_t * a, SV * b, SV * third) {
        }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPC")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPC")) {
          if(mpfr_nan_p(MPC_RE(*(INT2PTR(mpc_t *, SvIV(SvRV(b)))))) ||
             mpfr_nan_p(MPC_IM(*(INT2PTR(mpc_t *, SvIV(SvRV(b))))))) return newSViv(1);
          if(mpc_cmp(*a, *(INT2PTR(mpc_t *, SvIV(SvRV(b)))))) return newSViv(1);
@@ -2587,12 +2596,13 @@ SV * _itsa(SV * a) {
      if(SvNOK(a)) return newSVuv(3);
      if(SvPOK(a)) return newSVuv(4);
      if(sv_isobject(a)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(a))), "Math::MPFR")) return newSVuv(5);
-       if(strEQ(HvNAME(SvSTASH(SvRV(a))), "Math::GMPf")) return newSVuv(6);
-       if(strEQ(HvNAME(SvSTASH(SvRV(a))), "Math::GMPq")) return newSVuv(7);
-       if(strEQ(HvNAME(SvSTASH(SvRV(a))), "Math::GMPz")) return newSVuv(8);
-       if(strEQ(HvNAME(SvSTASH(SvRV(a))), "Math::GMP")) return newSVuv(9);
-       if(strEQ(HvNAME(SvSTASH(SvRV(a))), "Math::MPC")) return newSVuv(10);
+       const char *h = HvNAME(SvSTASH(SvRV(a)));
+       if(strEQ(h, "Math::MPFR")) return newSVuv(5);
+       if(strEQ(h, "Math::GMPf")) return newSVuv(6);
+       if(strEQ(h, "Math::GMPq")) return newSVuv(7);
+       if(strEQ(h, "Math::GMPz")) return newSVuv(8);
+       if(strEQ(h, "Math::GMP")) return newSVuv(9);
+       if(strEQ(h, "Math::MPC")) return newSVuv(10);
        }
      return newSVuv(0);
 }
@@ -2670,20 +2680,21 @@ SV * _new_real(SV * b) {
      }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPFR")) {
          mpc_set_fr(*mpc_t_obj, *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPf")) {
+       if(strEQ(h, "Math::GMPf")) {
          mpc_set_f(*mpc_t_obj, *(INT2PTR(mpf_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPq")) {
+       if(strEQ(h, "Math::GMPq")) {
          mpc_set_q(*mpc_t_obj, *(INT2PTR(mpq_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMP") ||
-          strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPz"))  {
+       if(strEQ(h, "Math::GMP") ||
+          strEQ(h, "Math::GMPz"))  {
          mpc_set_z(*mpc_t_obj, *(INT2PTR(mpz_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
@@ -2766,26 +2777,27 @@ SV * _new_im(SV * b) {
      }
 
      if(sv_isobject(b)) {
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPFR")) {
          VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPf")) {
+       if(strEQ(h, "Math::GMPf")) {
          mpfr_init2(temp, DEFAULT_PREC_IM);
          mpfr_set_f(temp, *(INT2PTR(mpf_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE / 16);
          VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, DEFAULT_ROUNDING_MODE);
          mpfr_clear(temp);
          return obj_ref;
        }
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPq")) {
+       if(strEQ(h, "Math::GMPq")) {
          mpfr_init2(temp, DEFAULT_PREC_IM);
          mpfr_set_q(temp, *(INT2PTR(mpq_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE / 16);
          VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, DEFAULT_ROUNDING_MODE);
          mpfr_clear(temp);
          return obj_ref;
        }
-       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMP") ||
-          strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::GMPz"))  {
+       if(strEQ(h, "Math::GMP") ||
+          strEQ(h, "Math::GMPz"))  {
          mpfr_init2(temp, DEFAULT_PREC_IM);
          mpfr_set_z(temp, *(INT2PTR(mpz_t *, SvIV(SvRV(b)))), DEFAULT_ROUNDING_MODE / 16);
          VOID_MPC_SET_X_Y(ui, fr, *mpc_t_obj, 0, temp, DEFAULT_ROUNDING_MODE);
@@ -2939,8 +2951,12 @@ SV * Rmpc_sin_cos(mpc_t * rop_sin, mpc_t * rop_cos, mpc_t * op, SV * rnd_sin, SV
 
 void Rmpc_get_dc(SV * crop, mpc_t * op, SV * round) {
 #ifdef _DO_COMPLEX_H
-     if(sv_isobject(crop) && strEQ(HvNAME(SvSTASH(SvRV(crop))), "Math::Complex_C::Long"))
-       croak("1st arg to Rmpc_get_dc is a Math::Complex_C::Long object - expects a Math::Complex_C object");
+     if(sv_isobject(crop)) {
+       const char *h = HvNAME(SvSTASH(SvRV(crop)));
+       if(strNE(h, "Math::Complex_C"))
+         croak("1st arg to Rmpc_get_dc is a %s object - needs to be a Math::Complex_C object", h);
+     }
+     else croak("1st arg to Rmpc_get_dc needs to be a Math::Complex_C object");
      *(INT2PTR(double _Complex *, SvIV(SvRV(crop)))) = mpc_get_dc(*op, (mpc_rnd_t)SvUV(round)); 
 #else
      croak("Rmpc_get_dc() not implemented");
@@ -2949,8 +2965,12 @@ void Rmpc_get_dc(SV * crop, mpc_t * op, SV * round) {
 
 void Rmpc_get_ldc(SV * crop, mpc_t * op, SV * round) {
 #ifdef _DO_COMPLEX_H
-     if(sv_isobject(crop) && strEQ(HvNAME(SvSTASH(SvRV(crop))), "Math::Complex_C"))
-       croak("1st arg to Rmpc_get_ldc is a Math::Complex_C object - expects a Math::Complex_C::Long object");
+     if(sv_isobject(crop)) {
+       const char *h = HvNAME(SvSTASH(SvRV(crop)));
+       if(strNE(h, "Math::Complex_C::Long"))
+         croak("1st arg to Rmpc_get_ldc is a %s object - needs to be a Math::Complex_C::Long object", h);
+     }
+     else croak("1st arg to Rmpc_get_ldc needs to be a Math::Complex_C::Long object");
      *(INT2PTR(long double _Complex *, SvIV(SvRV(crop)))) = mpc_get_ldc(*op, (mpc_rnd_t)SvUV(round));
 #else
      croak("Rmpc_get_ldc() not implemented");
@@ -2959,8 +2979,12 @@ void Rmpc_get_ldc(SV * crop, mpc_t * op, SV * round) {
 
 SV * Rmpc_set_dc(mpc_t * op, SV * crop, SV * round) {
 #ifdef _DO_COMPLEX_H
-     if(sv_isobject(crop) && strEQ(HvNAME(SvSTASH(SvRV(crop))), "Math::Complex_C::Long"))
-       croak("2nd arg to Rmpc_set_dc is a Math::Complex_C::Long object - expects a Math::Complex_C object");
+     if(sv_isobject(crop)) {
+       const char *h = HvNAME(SvSTASH(SvRV(crop)));
+       if(strNE(h, "Math::Complex_C"))
+         croak("2nd arg to Rmpc_set_dc is a %s object - needs to be a Math::Complex_C object", h);
+     }
+     else croak("2nd arg to Rmpc_set_dc needs to be a Math::Complex_C object");
      return newSViv(mpc_set_dc(*op, *(INT2PTR(double _Complex *, SvIV(SvRV(crop)))), (mpc_rnd_t)SvUV(round)));
 #else
      croak("Rmpc_set_dc() not implemented");
@@ -2969,8 +2993,12 @@ SV * Rmpc_set_dc(mpc_t * op, SV * crop, SV * round) {
 
 SV * Rmpc_set_ldc(mpc_t * op, SV * crop, SV * round) {
 #ifdef _DO_COMPLEX_H
-     if(sv_isobject(crop) && strEQ(HvNAME(SvSTASH(SvRV(crop))), "Math::Complex_C"))
-       croak("2nd arg to Rmpc_set_ldc is a Math::Complex_C object - expects a Math::Complex_C::Long object");
+     if(sv_isobject(crop)) {
+       const char *h = HvNAME(SvSTASH(SvRV(crop)));
+       if(strNE(h, "Math::Complex_C::Long"))
+       croak("2nd arg to Rmpc_set_ldc is a %s object - needs ti be a Math::Complex_C::Long object", h);
+     }
+     else croak("2nd arg to Rmpc_set_ldc needs to be a Math::Complex_C::Long object");
      return newSViv(mpc_set_ldc(*op, *(INT2PTR(long double _Complex *, SvIV(SvRV(crop)))), (mpc_rnd_t)SvUV(round)));
 #else
      croak("Rmpc_set_ldc() not implemented");
@@ -2993,7 +3021,7 @@ SV * _mpfr_buildopt_tls_p(void) {
 #endif
 }
 
-SV * get_xs_version(void) {
+SV * _get_xs_version(void) {
      return newSVpv(XS_VERSION, 0);
 }
 
@@ -4817,7 +4845,7 @@ _mpfr_buildopt_tls_p ()
 		
 
 SV *
-get_xs_version ()
+_get_xs_version ()
 		
 
 SV *

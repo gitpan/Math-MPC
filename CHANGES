@@ -1,3 +1,9 @@
+1.01
+ - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
+   doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
+ - Alter test 5 of t/complex_c.t to accommodate version 0.07 (and later) of
+   Math::Complex_C.
+
 1.00
  - Add Rmpc_log10, Rmpc_mul2si and Rmpc-div_2si (new in 1.0.0)
  - Accommodate namechange of mpc_mul_2exp and mpc_div_2exp to mpc_mul_2ui
