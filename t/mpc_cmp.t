@@ -20,7 +20,7 @@ $ok .= 'e' if Rmpc_cmp($m3, $m4);
 $ok .= 'f' if $m3 != $m4;
 
 if($ok eq 'abcdef') {print "ok 1\n"}
-else {print "not ok 1 $ok \n"} 
+else {print "not ok 1 $ok \n"}
 
 $ok = '';
 
@@ -31,4 +31,4 @@ $ok .= 'd' unless Rmpc_cmp_si($m4, -230);
 $ok .= 'e' unless Rmpc_cmp_si_si($m5, -3, -7);
 
 if($ok eq 'abcde') {print "ok 2\n"}
-else {print "not ok 2 $ok \n"} 
+else {print "not ok 2 $ok \n"}

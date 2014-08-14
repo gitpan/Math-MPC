@@ -447,7 +447,7 @@ $ok .= 'l' if $mpfr1 > 0 && $mpfr1 < 0.0000001;
 if($ok eq 'abcdefghijkl') {print "ok 6\n"}
 else {print "not ok 6\n"}
 
-$ok = ''; 
+$ok = '';
 
 my $log = log(exp(Math::MPC->new(8.5, 0)));
 

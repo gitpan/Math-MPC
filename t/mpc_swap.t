@@ -21,10 +21,10 @@ if($mpc1 == $mpc2_copy) {print "ok 1\n"}
 else {
   warn "\nmpc1: $mpc1\nmpc2_copy: $mpc2_copy\n";
   print "not ok 1\n";
-} 
+}
 
 if($mpc2 == $mpc1_copy) {print "ok 2\n"}
 else {
   warn "\nmpc2: $mpc2\nmpc1_copy: $mpc1_copy\n";
   print "not ok 2\n";
-} 
+}

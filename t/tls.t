@@ -199,7 +199,7 @@ if($cut) { # perform tests
   } else {
     sleep 1;
     Rmpc_set_default_prec2(330, 340);
-    my @args = Rmpc_get_default_prec2(); 
+    my @args = Rmpc_get_default_prec2();
     _save("$args[0] $args[1]");
     exit(0);
   }
@@ -258,7 +258,7 @@ if($cut) { # perform tests
     sleep 1;
     Rmpc_set_default_prec2(330, 340);
     my @args = Rmpc_get_default_prec2();
-    push @args, Rmpc_get_default_prec(); 
+    push @args, Rmpc_get_default_prec();
     _save("$args[0] $args[1] $args[2]");
     exit(0);
   }
@@ -300,7 +300,7 @@ else {
   print "ok 3\n";
   print "ok 4\n";
   print "ok 5\n";
-} 
+}
 
 
 sub _save {
@@ -323,7 +323,7 @@ sub _retrieve {
     if($ret =~ / /) {
       @ret = split / /, $ret;
       return @ret;
-    } 
+    }
     return $ret;
 }
 

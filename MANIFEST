@@ -31,3 +31,5 @@ t/signed_zero.t
 t/special.t
 t/tls.t
 typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

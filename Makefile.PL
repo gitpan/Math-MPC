@@ -26,7 +26,7 @@ print " gmp-4.3.2 (or later)\n mpfr-2.4.2 (or later)\n mpc-0.8 (or later)\n\n";
 
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
-if($use_64_bit_int == -1) {}                                
+if($use_64_bit_int == -1) {}
 elsif($use_64_bit_int == 1) {$defines .= " -DUSE_64_BIT_INT"}
 else {
   unless($Config::Config{ivsize} < 8) {
@@ -59,7 +59,7 @@ $defines =~ /-D_DO_COMPLEX_H/ ? print "Trying to build with 'double _Complex' & 
 
 print "If this is wrong, see the \"_Complex C types support\" section in the README\n\n";
 
-my %options = (       
+my %options = (
   NAME => 'Math::MPC',
   AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
   ABSTRACT => 'Perl interface to the MPC (multi precision complex) library',
@@ -68,8 +68,19 @@ my %options = (
   LIBS => [
     '-lmpc -lmpfr -lgmp'
   ],
+  LICENSE  => 'perl',
   VERSION_FROM => 'MPC.pm',
   clean   => { FILES => 'out1.txt out2.txt out3.txt out4.txt out5.txt out6.txt out7.txt save_child_setting.txt' },
+  META_MERGE => {
+   'meta-spec' => { version => 2 },
+    resources => {
+      repository => {
+        type => 'git',
+        url => 'https://github.com/sisyphus/math-mpc.git',
+        web => 'https://github.com/sisyphus/math-mpc',
+      },
+    },
+  },
 );
 
 WriteMakefile(%options);

@@ -21,7 +21,7 @@ if($@ =~ /Math::MPC::overload_sub/) {$ok .= 'b'}
 eval {$mbi2 = $mpc / $string;};
 if($@ =~ /Math::MPC::overload_div/) {$ok .= 'c'}
 eval {$mbi2 = $mpc * $string;};
-if($@ =~ /Math::MPC::overload_mul/) {$ok .= 'd'} 
+if($@ =~ /Math::MPC::overload_mul/) {$ok .= 'd'}
 eval {$mbi2 = $mpc + $mbi;};
 if($@ =~ /Math::MPC::overload_add/) {$ok .= 'e'}
 eval {$mbi2 = $mpc - $mbi;};
@@ -29,9 +29,9 @@ if($@ =~ /Math::MPC::overload_sub/) {$ok .= 'f'}
 eval {$mbi2 = $mpc / $mbi;};
 if($@ =~ /Math::MPC::overload_div/) {$ok .= 'g'}
 eval {$mbi2 = $mpc * $mbi;};
-if($@ =~ /Math::MPC::overload_mul/) {$ok .= 'h'} 
+if($@ =~ /Math::MPC::overload_mul/) {$ok .= 'h'}
 eval {$mbi2 = $mpc ** $mbi;};
-if($@ =~ /Math::MPC::overload_pow/) {$ok .= 'i'} 
+if($@ =~ /Math::MPC::overload_pow/) {$ok .= 'i'}
 
 eval {$mpc += $string;};
 if($@ =~ /Math::MPC::overload_add_eq/) {$ok .= 'j'}
@@ -40,7 +40,7 @@ if($@ =~ /Math::MPC::overload_sub_eq/) {$ok .= 'k'}
 eval {$mpc /= $string;};
 if($@ =~ /Math::MPC::overload_div_eq/) {$ok .= 'l'}
 eval {$mpc *= $string;};
-if($@ =~ /Math::MPC::overload_mul_eq/) {$ok .= 'm'} 
+if($@ =~ /Math::MPC::overload_mul_eq/) {$ok .= 'm'}
 eval {$mpc += $mbi;};
 if($@ =~ /Math::MPC::overload_add_eq/) {$ok .= 'n'}
 eval {$mpc -= $mbi;};
@@ -53,7 +53,7 @@ eval {$mpc **= $mbi;};
 if($@ =~ /Math::MPC::overload_pow_eq/) {$ok .= 'r'}
 
 if($ok eq 'abcdefghijklmnopqr') {print "ok 1\n"}
-else {print "not ok 1 $ok\n"} 
+else {print "not ok 1 $ok\n"}
 
 my $num = Math::MPC->new(200, 40);
 if(Math::MPC::overload_string($num) eq '(2e2 4e1)') {print "ok 2\n"}
@@ -102,7 +102,7 @@ $ok .= 'h' if $p[0] == 70 && $p[1] == 80 && $mpc5 == $mpc3 - 1;
 $mpc5 -= -1;
 
 if($mpc3 == $mpc5) {$ok .= 'i'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'j'}
 
 if($ok eq 'abcdefghij') {print "ok 3\n"}
@@ -117,28 +117,28 @@ $mpc5 += 2;
 $mpc3 = $mpc3 + 2;
 
 if($mpc3 == $mpc5) {$ok .= 'a'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'b'}
 
 $mpc5 += 2.5;
 $mpc3 = $mpc3 + 2.5;
 
 if($mpc3 == $mpc5) {$ok .= 'c'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'd'}
 
-$mpc5 += $string; 
+$mpc5 += $string;
 $mpc3 = $mpc3 + $string;
 
 if($mpc3 == $mpc5) {$ok .= 'e'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'f'}
 
 $mpc5 += $mpc4;
 $mpc3 = $mpc3 + $mpc4;
 
 if($mpc3 == $mpc5) {$ok .= 'g'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'h'}
 
 ## minus ##
@@ -147,28 +147,28 @@ $mpc5 -= 2;
 $mpc3 = $mpc3 - 2;
 
 if($mpc3 == $mpc5) {$ok .= 'i'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'j'}
 
 $mpc5 -= 2.5;
 $mpc3 = $mpc3 - 2.5;
 
 if($mpc3 == $mpc5) {$ok .= 'k'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'l'}
 
-$mpc5 -= $string; 
+$mpc5 -= $string;
 $mpc3 = $mpc3 - $string;
 
 if($mpc3 == $mpc5) {$ok .= 'm'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'n'}
 
 $mpc5 -= $mpc4;
 $mpc3 = $mpc3 - $mpc4;
 
 if($mpc3 == $mpc5) {$ok .= 'o'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'p'}
 
 ## mul ##
@@ -177,28 +177,28 @@ $mpc5 *= 2;
 $mpc3 = $mpc3 * 2;
 
 if($mpc3 == $mpc5) {$ok .= 'q'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'r'}
 
 $mpc5 *= 2.5;
 $mpc3 = $mpc3 * 2.5;
 
 if($mpc3 == $mpc5) {$ok .= 's'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 't'}
 
 $mpc5 *= $string;
 $mpc3 = $mpc3 * $string;
 
 if($mpc3 == $mpc5) {$ok .= 'u'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'v'}
 
 $mpc5 *= $mpc4;
 $mpc3 = $mpc3 * $mpc4;
 
 if($mpc3 == $mpc5) {$ok .= 'w'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'x'}
 
 ## div ##
@@ -207,28 +207,28 @@ $mpc5 /= 2;
 $mpc3 = $mpc3 / 2;
 
 if($mpc3 == $mpc5) {$ok .= 'y'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'z'}
 
 $mpc5 /= 2.5;
 $mpc3 = $mpc3 / 2.5;
 
 if($mpc3 == $mpc5) {$ok .= 'A'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'B'}
 
-$mpc5 /= $string; 
+$mpc5 /= $string;
 $mpc3 = $mpc3 / $string;
 
 if($mpc3 == $mpc5) {$ok .= 'C'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'D'}
 
 $mpc5 /= $mpc4;
 $mpc3 = $mpc3 / $mpc4;
 
 if($mpc3 == $mpc5) {$ok .= 'E'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'F'}
 
 ## pow ##
@@ -237,21 +237,21 @@ $mpc5 **= 2;
 $mpc3 = $mpc3 ** 2;
 
 if($mpc3 == $mpc5) {$ok .= 'G'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'H'}
 
 $mpc5 **= 2.5;
 $mpc3 = $mpc3 ** 2.5;
 
 if($mpc3 == $mpc5) {$ok .= 'I'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'J'}
 
-$mpc5 **= '(1.5 +1.5)'; 
+$mpc5 **= '(1.5 +1.5)';
 $mpc3 = $mpc3 ** '(1.5 +1.5)';
 
 if($mpc3 == $mpc5) {$ok .= 'K'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'L'}
 
 my $power = Math::MPC->new(1.5, 1.5);
@@ -260,7 +260,7 @@ $mpc5 **= $power;
 $mpc3 = $mpc3 ** $power;
 
 if($mpc3 == $mpc5) {$ok .= 'M'}
-if(Math::MPC::overload_string($mpc5) eq 
+if(Math::MPC::overload_string($mpc5) eq
    Math::MPC::overload_string($mpc3)) {$ok .= 'N'}
 
 if($ok eq 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN') {print "ok 4\n"}

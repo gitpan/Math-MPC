@@ -18,9 +18,9 @@ print STDERR "# Math::MPC uses gmp library version ", Math::MPC::gmp_v(), "\n";
 Math::MPC::_have_Complex_h() ?
  warn "\n# Built with support for 'double _Complex' and 'long double _Complex' types\n"
                              :
- warn "\n# Built without support for 'double _Complex' and 'long double _Complex types'\n"; 
+ warn "\n# Built without support for 'double _Complex' and 'long double _Complex types'\n";
 
-if($Math::MPC::VERSION eq '1.01') {print "ok 1\n"}
+if($Math::MPC::VERSION eq '1.02') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPC::VERSION\n"}
 
 if(MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 7) {print "ok 2\n"}
@@ -37,5 +37,5 @@ if($Math::MPC::VERSION eq Math::MPC::_get_xs_version()) {print "ok 5\n"}
 else {
   warn "\$Math::MPC::VERSION: $Math::MPC::VERSION\nXS_VERSION: ", Math::MPC::_get_xs_version(), "\n";
   print "not ok 5\n";
-} 
+}
 

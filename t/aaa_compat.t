@@ -11,7 +11,7 @@ else {
        "  This breaks assumptions that have been made - and could result\n",
        "  in failing tests and/or strange behaviour. It is recommended that\n",
        "  both modules be built in the same way as regards support of long\n",
-       "  doubles - see the Makefile.PL for information on how to control this\n"; 
+       "  doubles - see the Makefile.PL for information on how to control this\n";
   print "not ok 1\n";
 }
 
@@ -21,7 +21,7 @@ else {
        "  This breaks assumptions that have been made - and could result\n",
        "  in failing tests and/or strange behaviour. It is recommended that\n",
        "  both modules be built in the same way as regards support of long\n",
-       "  longs - see the Makefile.PL for information on how to control this\n"; 
+       "  longs - see the Makefile.PL for information on how to control this\n";
   print "not ok 2\n";
 }
 

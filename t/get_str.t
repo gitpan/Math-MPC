@@ -62,7 +62,7 @@ my $mpc3 = Math::MPC->new($nan, $inf);
 
 if(lc(Math::MPC::overload_string($mpc3)) eq '(@nan@ -@inf@)') {$ok .= 'b'}
 else {warn "\n2b: got '", lc(Math::MPC::overload_string($mpc3)), "'\n" }
- 
+
 if($ok eq 'ab') {print "ok 2\n"}
 else {print "not ok 2 $ok\n"}
 

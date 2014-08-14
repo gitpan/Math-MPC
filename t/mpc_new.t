@@ -77,9 +77,9 @@ if($@ =~ /Invalid string/) {$ok .= 'z'}
 if($ok eq 'abcdefghijklmnopqrstuvwxyz') {print "ok 1\n"}
 else {print "not ok 1 $ok\n"}
 
-$ok = ''; 
+$ok = '';
 
-($mpfr1, $mpfr2, $mpfr3, $mpfr4, $mpfr5) = (Rmpfr_init(), Rmpfr_init(), Rmpfr_init(), Rmpfr_init(), Rmpfr_init()); 
+($mpfr1, $mpfr2, $mpfr3, $mpfr4, $mpfr5) = (Rmpfr_init(), Rmpfr_init(), Rmpfr_init(), Rmpfr_init(), Rmpfr_init());
 
 {
 my $mpc1 = Math::MPC->new();
@@ -224,7 +224,7 @@ my $mpc1 = Math::MPC->new($mpc3);
 my $mpc2 = Math::MPC::new($mpc4);
 if($mpc3 == $mpc1) {$ok .= 'a'}
 if($mpc4 == $mpc2) {$ok .= 'b'}
-if($mpc1 == $mpc2) {$ok .= 'c'} 
+if($mpc1 == $mpc2) {$ok .= 'c'}
 }
 
 if($ok eq 'abc'){print "ok 9\n"}

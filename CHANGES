@@ -1,3 +1,10 @@
+1.02
+ - _has_inttypes() no longer checks for whether USE_LONG_DOUBLE is defined.
+   (Was harmless ... but didn't make much sense.)
+ - Define PERL_NO_GET_CONTEXT.
+ - Tweak to Math::MPC::gmp_v().
+ - Add metadata to Makefile.PL.
+
 1.01
  - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
    doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
@@ -28,11 +35,11 @@
  - Add Rmpc_sin_cos, Rmpc_set_dc, Rmpc_set_ldc, Rmpc_get_dc, Rmpc_get_ldc
    (new in mpc-0.9).
  - Add documentation of gmp_v and mpfr_v (previously missed).
- - In the documentation, elaborate on the way that Rmpc_get-version() and 
-   MPC_VERSION & friends determine their values. (Thanks Vincent Lefevre.) 
+ - In the documentation, elaborate on the way that Rmpc_get-version() and
+   MPC_VERSION & friends determine their values. (Thanks Vincent Lefevre.)
  - In MPC.xs change mpfr_v() to return mpfr_get_version() instead of
    MPC_VERSION_STRING.
- - In t/aab_basic.t print out the mpfr and mpc library versions from 
+ - In t/aab_basic.t print out the mpfr and mpc library versions from
    the libraries, instead of from the headers (as had been the case)
  - Some of the croak() messages in MPC.xs finished with "\n" - which
    has now been removed from those messages.
@@ -57,11 +64,11 @@
  - Change the overload_string() and _get_str() functions to match the
    formatting provided by mpc_out_str().
  - Fix the signed zero problem with overloaded mul and div operations,
-   and add t/signed_zero.t as a check. Thanks Paul Zimmerman and 
+   and add t/signed_zero.t as a check. Thanks Paul Zimmerman and
    Philippe Theveny.
  - Add Rmpc_mul_sj, Rmpc_mul_ld, Rmpc_mul_d, Rmpc_div_sj, Rmpc_sj_div,
    Rmpc_div_ld, Rmpc_ld_div, Rmpc_div_d and Rmpc_d_div. These simply
-   wrap the the XSubs created to fix the signed zero anomaly (above). 
+   wrap the the XSubs created to fix the signed zero anomaly (above).
 
 0.80
  - Requires version 0.8 of the mpc library.
@@ -130,15 +137,15 @@
  - Add mpfr_v and gmp_v functions (not exported).
  - mpc_out_str changed with mpc-0.5. The tests in out_str1.t and
    out_str2.t were changed accordingly.
- - Bring Rmpc_get_str in line with the changed formatting of 
+ - Bring Rmpc_get_str in line with the changed formatting of
    mpc_out_str that occurred with mpc-0.5.
 
 0.46
  - Add overloading of 'bool'.
- - Change Rmpc_out_str and Rmpc_inp_str to allow use of streams other 
+ - Change Rmpc_out_str and Rmpc_inp_str to allow use of streams other
    than STDOUT and STDIN.
  - For compatibility with my other MPFR/GMP based perl modules, add
-   TRmpc_out_str and TRmpc_inp_str (which, for Math::MPC only, are 
+   TRmpc_out_str and TRmpc_inp_str (which, for Math::MPC only, are
    aliased to Rmpc_out_str and Rmpc_inp_str respectively).
  - Change 'Rmpc_get_prec' return to match 'mpc_get_prec' (which is a new
    inclusion in mpc-0.4.6).

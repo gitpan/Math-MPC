@@ -186,7 +186,7 @@ else {
   eval {Rmpc_set_fr_uj($mpc, $mpfr, $uj, $round);};
   if($@ =~ /Rmpc_set_fr_uj not implemented/) {$ok .= 's'}
   else {warn "s: \$\@: $@\n"}
-  eval {Rmpc_set_fr_sj($mpc, $mpfr, $sj, $round);}; 
+  eval {Rmpc_set_fr_sj($mpc, $mpfr, $sj, $round);};
   if($@ =~ /Rmpc_set_fr_sj not implemented/) {$ok .= 't'}
   else {warn "t: \$\@: $@\n"}
   eval {Rmpc_set_uj_sj($mpc, $uj, $sj, $round);};
