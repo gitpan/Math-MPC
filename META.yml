@@ -16,4 +16,4 @@ no_index:
     - inc
 resources:
   repository: https://github.com/sisyphus/math-mpc.git
-version: 1.02
+version: 1.03
