@@ -3,11 +3,11 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPC qw(:mpc);
 
-eval {require Math::Complex_C;};
+eval {require Math::Complex_C::L;};
 
 if($@) {
   print "1..1\n";
-  warn "Skipping all tests - couldn't load Math::Complex_C\n\$\@: $@\n";
+  warn "Skipping all tests - couldn't load Math::Complex_C::L\n\$\@: $@\n";
   print "ok 1\n";
   exit 0;
 }
@@ -25,11 +25,11 @@ unless(Math::MPC::_have_Complex_h()) {
   exit 0;
 }
 
-my $cc = Math::Complex_C->new(4.5, -231.125);
+my $ccl = Math::Complex_C::L->new(4.5, -231.125);
 my $mpcc = Math::MPC->new();
 my $mpfr = Math::MPFR->new();
 
-Rmpc_set_dc($mpcc, $cc, MPC_RNDNN);
+Rmpc_set_ldc($mpcc, $ccl, MPC_RNDNN);
 
 RMPC_RE($mpfr, $mpcc);
 if($mpfr == 4.5) {print "ok 1\n"}
@@ -45,19 +45,19 @@ else {
   print "not ok 2\n";
 }
 
-Math::Complex_C::assign_c($cc, 3.19, -12.621);
+Math::Complex_C::L::assign_cl($ccl, 3.19, -12.621);
 
-Rmpc_set_dc($mpcc, $cc, MPC_RNDNN);
+my $mpccl = Math::MPC->new();
 
-my $cc_check = Math::Complex_C->new();
+Rmpc_set_ldc($mpccl, $ccl, MPC_RNDNN);
 
-Rmpc_get_dc($cc_check, $mpcc, MPC_RNDNN);
+my $ccl_check = Math::Complex_C::L->new();
 
-if($cc_check == $cc) {print "ok 3\n"}
+Rmpc_get_ldc($ccl_check, $mpccl, MPC_RNDNN);
+
+if($ccl_check == $ccl) {print "ok 3\n"}
 else {
-  warn "\$cc_check: $cc_check\n\$cc: $cc\n";
+  warn "\$ccl_check: $ccl_check\n\$ccl: $ccl\n";
   print "not ok 3\n";
 }
-
-
 

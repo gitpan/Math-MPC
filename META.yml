@@ -2,9 +2,12 @@
 abstract: 'Perl interface to the MPC (multi precision complex) library'
 author:
   - 'Sisyphus (sisyphus at (@) cpan dot (.) org)'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.120630'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,6 +17,8 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  Math::MPFR: 3.23
 resources:
   repository: https://github.com/sisyphus/math-mpc.git
-version: 1.03
+version: 1.04
